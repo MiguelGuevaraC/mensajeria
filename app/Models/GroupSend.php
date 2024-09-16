@@ -2,21 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MessageWhasapp extends Model
+class GroupSend extends Model
 {
     use SoftDeletes;
     protected $fillable = [
         'id',
-        'title',
-        'block1',
-        'block2',
-        'block3',
+        'name',
+        'comment',
         'company_id',
 
         'state',
+        'status',
         'created_at',
 
     ];
@@ -30,4 +30,5 @@ class MessageWhasapp extends Model
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+
 }

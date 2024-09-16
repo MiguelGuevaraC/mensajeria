@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Faker\Provider\ar_EG\Person;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,26 +14,26 @@ class WhatsappSend extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'number',
+        'sequentialNumber',
+        'messageSend',
         'userResponsability',
-        'namesStudent',
-        'dniStudent',
-        'namesParent',
-        'infoStudent',
+        'namesPerson',
+        'bussinesName',
+        'trade_name',
+        'documentNumber',
         'telephone',
-        'description',
-        'conceptSend',
-        'paymentAmount',
-        'expirationDate',
+        'amount',
         'costSend',
-
-        'cuota',
+        'concept',
+        'routeFile',
         'status',
         'created_at',
-        'student_id',
-        'user_id',
-        'comminment_id',
+        'updated_at',
+        'contact_id', 
+        'user_id', 
+        'messageWhasapp_id', 
     ];
+    
     
 
     protected $hidden = [
@@ -44,13 +45,12 @@ class WhatsappSend extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function student()
+    public function contact()
     {
-        return $this->belongsTo(Person::class, 'student_id');
+        return $this->belongsTo(Person::class, 'contact_id');
     }
-    public function conminmnet()
+    public function messageWhasapp()
     {
-        return $this->belongsTo(Compromiso::class, 'comminment_id');
+        return $this->belongsTo(MessageWhasapp::class, 'messageWhasapp_id');
     }
-
 }

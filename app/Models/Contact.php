@@ -2,21 +2,29 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MessageWhasapp extends Model
+class Contact extends Model
 {
     use SoftDeletes;
     protected $fillable = [
         'id',
-        'title',
-        'block1',
-        'block2',
-        'block3',
-        'company_id',
+        'documentNumber',
+        'names',
+        'telephone',
+        'address',
+        'concept',
+        'amount',
+        'dateReference',
+        'routeFile',
 
+
+        'migration_id',
+        'groupSend_id',
         'state',
+        'status',
         'created_at',
 
     ];

@@ -254,17 +254,17 @@ class UserController extends Controller
         $validatedData = $request->validated();
 
         // Verificar si ya existe un usuario de tipo 2 para la empresa especificada
-        if ($validatedData['typeofUser_id'] == 2) {
-            $existingUser = User::where('company_id', $validatedData['company_id'])
-                ->where('typeofUser_id', 2)
-                ->first();
+        // if ($validatedData['typeofUser_id'] == 2) {
+        //     $existingUser = User::where('company_id', $validatedData['company_id'])
+        //         ->where('typeofUser_id', 2)
+        //         ->first();
 
-            if ($existingUser) {
-                return response()->json([
-                    'error' => 'Ya existe un usuario de tipo Administrador para esta empresa.',
-                ], 422); // Código de estado 422 para errores de validación
-            }
-        }
+        //     if ($existingUser) {
+        //         return response()->json([
+        //             'error' => 'Ya existe un usuario de tipo Administrador para esta empresa.',
+        //         ], 422); // Código de estado 422 para errores de validación
+        //     }
+        // }
         // Cifrar la contraseña
         $hashedPassword = Hash::make($validatedData['password']);
 

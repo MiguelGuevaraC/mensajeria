@@ -26,46 +26,47 @@ $("#registroUsuarioE").submit(function (event) {
         success: function (response) {
             // Cerrar el modal de edición
             $("#modalNuevoUsuarioE").modal("hide");
-            
+
             // Recargar la tabla de usuarios
             $("#tbUsuarios").DataTable().ajax.reload();
 
             // Mostrar mensaje de éxito
             Swal.fire({
-                icon: 'success',
-                title: 'Actualización exitosa',
-                text: 'El usuario ha sido actualizado correctamente.',
+                icon: "success",
+                title: "Actualización exitosa",
+                text: "El usuario ha sido actualizado correctamente.",
             });
-            $("#modalNuevoUsuario").modal("hide");
+            $("#passE").val("");
+            $("#modalEditarUsuario").modal("hide");
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.error("Error al actualizar tipo de usuario:", errorThrown);
 
             // Extraer errores del servidor
             var errors = jqXHR.responseJSON;
-            var errorMessage = '<ul>';
+            var errorMessage = "<ul>";
 
             // Si el error es un mensaje de texto simple
             if (errors.error) {
-                errorMessage += '<li>' + errors.error + '</li>';
+                errorMessage += "<li>" + errors.error + "</li>";
             } else if (errors.errors) {
                 // Si el error es un array de mensajes
                 $.each(errors.errors, function (key, value) {
-                    errorMessage += '<li>' + value[0] + '</li>'; // Asume que los errores son arrays
+                    errorMessage += "<li>" + value[0] + "</li>"; // Asume que los errores son arrays
                 });
             }
 
-            errorMessage += '</ul>';
+            errorMessage += "</ul>";
 
             // Mostrar mensaje de error
             Swal.fire({
-                icon: 'error',
-                title: 'Error al actualizar',
+                icon: "error",
+                title: "Error al actualizar",
                 html: errorMessage,
             });
         },
     });
 });
 $(document).on("click", "#cerrarModalEditar", function () {
-    $("#modalNuevoUsuario").modal("hide");
+    $("#modalEditarUsuario").modal("hide");
 });

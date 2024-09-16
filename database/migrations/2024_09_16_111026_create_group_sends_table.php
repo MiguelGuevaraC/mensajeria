@@ -13,20 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('message_whasapps', function (Blueprint $table) {
+        Schema::create('group_sends', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable();
 
-            $table->text('block1')->nullable();
-            $table->text('block2')->nullable();
-            $table->text('block3')->nullable();
-            $table->text('block4')->nullable();
-            $table->text('routeFile')->nullable();
-
+            $table->string('name', 255);
+            $table->string('comment', 255);
             $table->boolean('state')->default(true);
             $table->text('status')->default('Normal')->nullable();
-            $table->timestamps();
+
             $table->foreignId('company_id')->nullable()->unsigned()->constrained('companies');
+
+            $table->timestamps();
             $table->softDeletes();
         });
     }
@@ -38,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('message_whasapps');
+        Schema::dropIfExists('group_sends');
     }
 };

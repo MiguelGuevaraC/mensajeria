@@ -61,7 +61,7 @@ class TypeUserController extends Controller
     {
 
         $typeUsers = TypeUser::where('state', 1)
-            ->whereNotIn('id', [1])
+            ->whereNotIn('id', [1,2])
             ->get();
 
         $typeUsers->transform(function ($typeUser) {
