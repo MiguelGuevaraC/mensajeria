@@ -15,8 +15,8 @@ class OptionMenuSeeder extends Seeder
     public function run()
     {
         $array = [
-            ['id' => '1', 'name' => 'Mensajes', 'route' => 'messages', 'groupmenu_id' => 1, 'icon' => 'fa fa-comments'],
-            ['id' => '2', 'name' => 'Grupos', 'route' => 'groups', 'groupmenu_id' => 1, 'icon' => 'fa fa-layer-group'],
+            ['id' => '1', 'name' => 'Mensajes', 'route' => 'message', 'groupmenu_id' => 1, 'icon' => 'fa fa-comments'],
+            ['id' => '2', 'name' => 'Grupos', 'route' => 'groupSend', 'groupmenu_id' => 1, 'icon' => 'fa fa-layer-group'],
             ['id' => '3', 'name' => 'Contactos', 'route' => 'contacts', 'groupmenu_id' => 1, 'icon' => 'fa-solid fa-people-group'],
             ['id' => '4', 'name' => 'Empresas', 'route' => 'company', 'groupmenu_id' => 1, 'icon' => 'fa-solid fa-building'],
 

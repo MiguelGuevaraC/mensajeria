@@ -19,6 +19,15 @@
 }
 .modal-content {
     border-radius: 20px;
+    margin-top:45px;
+}
+.modal-content {
+    padding: 20px;
+    border-radius: 28px;
+    background: #000d3de6;
+    color: white;
+    font-size: 12px;
+    margin-top:45px;
 }
 
 .selectActivos {

@@ -5,12 +5,14 @@ use App\Http\Controllers\InicioController;
 use App\Http\Controllers\web\CompanyController;
 use App\Http\Controllers\web\DashboardController;
 use App\Http\Controllers\web\GroupMenuController;
+use App\Http\Controllers\web\GroupSendController;
 use App\Http\Controllers\web\MessageController;
 use App\Http\Controllers\web\MigrationController;
 use App\Http\Controllers\web\OptionMenuController;
 use App\Http\Controllers\web\TypeUserController;
 use App\Http\Controllers\web\UserController;
 use App\Http\Controllers\web\WhatsappSendController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -98,10 +100,13 @@ Route::group(['middleware' => ['auth']], function () {
 
     //MESSAGE
     Route::get('message', [MessageController::class, 'index']);
-    Route::get('message/showExample', [MessageController::class, 'showExample']);
+    Route::get('messageAll', [MessageController::class, 'all']);
+
+
+    Route::get('message/showExample/{id}', [MessageController::class, 'showExample']);
     Route::get('message/{id}', [MessageController::class, 'show']);
     Route::post('message', [MessageController::class, 'store']);
-    Route::put('message/{id}', [MessageController::class, 'update']);
+    Route::post('message/{id}', [MessageController::class, 'update']);
     Route::delete('message/{id}', [MessageController::class, 'destroy']);
 
     Route::get('pdfExport', [WhatsappSendController::class, 'pdfExport'])->name('pdf.export');
@@ -110,4 +115,16 @@ Route::group(['middleware' => ['auth']], function () {
     //DASHBOARD
     Route::get('dashboard', [DashboardController::class, 'index']);
     Route::get('dataDashboard', [DashboardController::class, 'dataDashboard']);
+
+    Route::get('groupSend', [GroupSendController::class, 'index']);
+    Route::get('groupSendAll', [GroupSendController::class, 'all']);
+    Route::get('groupSend/{id}', [GroupSendController::class, 'show']);
+    Route::post('groupSend', [GroupSendController::class, 'store']);
+    Route::put('groupSend/{id}', [GroupSendController::class, 'update']);
+    Route::delete('groupSend/{id}', [GroupSendController::class, 'destroy']);
+
+
+    Route::get('searchByDni/{dni}', [UserController::class, 'searchByDni']);
+    Route::get('searchByRuc/{ruc}', [UserController::class, 'searchByRuc']);
+
 });

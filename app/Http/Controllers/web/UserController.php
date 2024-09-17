@@ -7,10 +7,12 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\GroupMenu;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -415,4 +417,71 @@ class UserController extends Controller
 
     }
 
+
+
+    public function searchByDni($dni)
+    {
+
+        $validator = Validator::make(['dni' => $dni], [
+            'dni' => 'required|numeric|digits:8',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->first()], 422);
+        }
+
+        $respuesta = array();
+        $client = new Client();
+        try {
+            $res = $client->get('http://facturae-garzasoft.com/facturacion/buscaCliente/BuscaCliente2.php?' . 'dni=' . $dni . '&fe=N&token=qusEj_w7aHEpX');
+
+            if ($res->getStatusCode() == 200) { // 200 OK
+                $response_data = $res->getBody()->getContents();
+                $respuesta = json_decode($response_data);
+                return response()->json([
+                    $respuesta,
+                ]);
+            } else {
+                return response()->json([
+                    "status" => 0,
+                    "msg" => "Server Error",
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => 0,
+                "msg" => "Server Error: " . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function searchByRuc($ruc)
+    {
+
+        $validator = Validator::make(['ruc' => $ruc], [
+            'ruc' => 'required|numeric|digits:11',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->first()], 422);
+        }
+
+        $respuesta = array();
+
+        $client = new Client([
+            'verify' => false,
+        ]);
+        $res = $client->get('https://comprobante-e.com/facturacion/buscaCliente/BuscaClienteRuc.php?fe=N&token=qusEj_w7aHEpX&' . 'ruc=' . $ruc);
+        if ($res->getStatusCode() == 200) { // 200 OK
+            $response_data = $res->getBody()->getContents();
+            $respuesta = json_decode($response_data);
+        } else {
+            return response()->json([
+                "status" => 0,
+                "msg" => "Server error",
+            ], 500);
+        }
+        return response()->json([
+            $respuesta,
+        ]);
+    }
 }

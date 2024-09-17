@@ -299,39 +299,16 @@
 
                 <!--Page content-->
                 <!--===================================================-->
-                <div class="panel">
-                    <div id="demo-custom-toolbar2" class="" style="text-align: right">
-                        <button id="btonShowEtiquetas" style="margin: 12px" class="btn btn-danger"><i class="demo-pli-plus"></i> Ver Etiquetas </button>
-                        <button id="btonShowView" style="margin: 12px" class="btn btn-warning"><i class="demo-pli-plus"></i> Vista Mensaje </button>
-                    </div>
-                    <div id="messageForm">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <div class="textarea-container">
-                            <label for="title">TÍTULO</label>
-                            <textarea id="title" class="largTitle">{{$message->title ?? ''}}</textarea>
-                        </div>
-                        <div class="textarea-container">
-                            <label for="block1">PARRAFO 1</label>
-                            <textarea id="block1" class="large">{{$message->block1 ?? ''}}</textarea>
-                        </div>
-                        <div class="textarea-container">
-                            <label for="block2">PARRAFO 2</label>
-                            <textarea id="block2" class="large">{{$message->block2 ?? ''}}</textarea>
-                        </div>
-                        <div class="textarea-container">
-                            <label for="block3">PARRAFO 3</label>
-                            <textarea id="block3" class="large">{{$message->block3 ?? ''}}</textarea>
-                        </div>
-                        <div class="textarea-container">
-                            <label for="block4">PARRAFO 4</label>
-                            <textarea id="block4" class="large">{{$message->block4 ?? ''}}</textarea>
-                        </div>
-                    </div>
-                    <div id="demo-custom-toolbar2" class="" style="text-align: center">
-                        <button id="btonSaveMessage" style="margin: 12px" class="btn btn-success"><i class="demo-pli-plus"></i> Guardar </button>
-                    </div>
+                <div id="demo-custom-toolbar2" class="" style="text-align: left">
+                    <button id="btonShowEtiquetas" style="margin: 12px" class="btn btn-success"><i class="demo-pli-plus"></i> Ver Etiquetas </button>
+                    <button id="btonStoreMensaje" style="margin: 12px" class="btn btn-danger"><i class="demo-pli-plus"></i> Añadir </button>
+                    {{-- <button id="btonShowView" style="margin: 12px" class="btn btn-warning"><i class="demo-pli-plus"></i> Vista Mensaje </button> --}}
                 </div>
-                
+                <div class="container mt-2">
+                <div class="">
+                    @include('Modulos.Message.Tables.tablaMensaje')
+                </div>
+            </div>
                 <!--===================================================-->
                 <!--END CONTENT CONTAINER-->
 
@@ -501,8 +478,8 @@
 
 
         <!-- MODALES -->
-
-
+        <div>@include('Modulos.Message.Modals.createMessage')</div>
+        <div>@include('Modulos.Message.Modals.editMessage')</div>
         <!--===================================================-->
         <!-- END OF CONTAINER -->
 
@@ -567,6 +544,11 @@
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
         <script src="{{ asset('js/JqueryMessage/JqueryMessage.js') }}"></script>
+
+        <script src="{{ asset('js/JqueryMessage/JqueryCreateMensaje.js') }}"></script>
+        <script src="{{ asset('js/JqueryMessage/JqueryDestroyMensaje.js') }}"></script>
+        <script src="{{ asset('js/JqueryMessage/JqueryEditMensaje.js') }}"></script>
+        <script src="{{ asset('js/JqueryMessage/JqueryUpdateMensaje.js') }}"></script>
 
 
 </body>

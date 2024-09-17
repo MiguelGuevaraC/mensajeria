@@ -15,16 +15,17 @@ class MessageWhatsappSeeder extends Seeder
     public function run()
     {
         DB::table('message_whasapps')->insert([
-
-            'title' => 'TITULO',
-            'block1' => 'BLOQUE 1',
-            'block2' => 'BLOQUE 2',
-            'block3' => 'BLOQUE 3',
-            'block4' => 'BLOQUE 4',
+            'title' => 'Invitación al Programa de Desarrollo de Habilidades',
+            'block1' => 'Mediante la presente comunicamos que han sido seleccionados desde la cátedra de Aplicaciones de Negocios Electrónicos semestre 2024I-UNPRG',
+            'block2' => 'Motivo por el cual los invitamos a participar en el Programa de Desarrollo de Habilidades de nuestra empresa GarzasoftLa sesión de presentación se llevará a cabo el martes 17/setiembre a horas 11am vía Google MeetCon una duración de 30 minutos Agenda',
+            'block3' => 'Objetivo del programaMétodo de aprendizajeTecnología de desarrollo de Garzasoft por perfil : Back-End / Front-EndCoordinar próxima reunión',
+            'block4' => 'Saludos Martín Ampuero P. | GerenteGarzasoft EIRL (Perú) | Nicolás la Torre 126 - Urb. Magisterial -Chiclayo',
+            'routeFile' => '/storage/documents/document.pdf',
             'state' => true,
-            'company_id' => null,
+            'company_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        
     }
 }
