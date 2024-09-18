@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('routeFile')->nullable();
 
             $table->boolean('state')->default(true);
-            $table->text('status')->default('Normal')->nullable();
+            $table->string('status')->nullable()->default('Normal');
             $table->timestamps();
             $table->foreignId('company_id')->nullable()->unsigned()->constrained('companies');
             $table->softDeletes();
