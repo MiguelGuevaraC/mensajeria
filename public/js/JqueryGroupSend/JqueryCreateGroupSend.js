@@ -1,115 +1,105 @@
-
 $(document).ready(function () {
-
-    $("#registroUsuario").submit(function (event) {
+    $("#registroGroupSend").submit(function (event) {
         event.preventDefault(); // Evita que el formulario se envíe por el método tradicional
-    
+
         var token = $('meta[name="csrf-token"]').attr("content");
-    
+
         $.ajax({
-            url: "user",
+            url: "groupSend",
             type: "POST",
             data: {
-                password: $("#pass").val(),
-                username: $("#username").val(),
-                typeofUser_id: $("#typeuser").val(),
-                company_id: $("#company").val(),
+                name: $("#name").val(),
+                comment: $("#comment").val(),
+
                 _token: token,
             },
             success: function (data) {
                 console.log("Respuesta del servidor:", data);
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Registro exitoso',
-                    text: 'El usuario ha sido registrado correctamente.',
+                    icon: "success",
+                    title: "Registro exitoso",
+                    text: "El groupSend ha sido registrado correctamente.",
+                }).then(() => {
+                    $("#tbGroupSends").DataTable().ajax.reload();
                 });
-                $("#tbUsuarios").DataTable().ajax.reload();
-                $("#cerrarModal").click();
+                $("#modalNuevoGroupSend").modal("hide");
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error("Error al registrar:", errorThrown);
-            
+
                 // Extraer errores del servidor
                 var errors = jqXHR.responseJSON;
-                var errorMessage = '<ul>';
-    
+                var errorMessage = "<ul>";
+
                 // Si el error es un mensaje de texto simple
                 if (errors.error) {
-                    errorMessage += '<li>' + errors.error + '</li>';
+                    errorMessage += "<li>" + errors.error + "</li>";
                 } else if (errors.errors) {
                     // Si el error es un array de mensajes
                     $.each(errors.errors, function (key, value) {
-                        errorMessage += '<li>' + value[0] + '</li>'; // Asume que los errores son arrays
+                        errorMessage += "<li>" + value[0] + "</li>"; // Asume que los errores son arrays
                     });
                 }
-    
-                errorMessage += '</ul>';
-    
+
+                errorMessage += "</ul>";
+
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Error al registrar',
+                    icon: "error",
+                    title: "Error al registrar",
                     html: errorMessage,
-                   
                 });
             },
         });
     });
-    
 
-    // Obtener opciones de tipos de usuario desde la ruta
+    // Obtener opciones de tipos de groupSend desde la ruta
     $.ajax({
         url: "allTypeUserAndCompanies", // Reemplaza con la ruta correcta en tu aplicación
         type: "GET",
         dataType: "json",
         success: function (response) {
-    
             // Limpiar opciones existentes
             $("#typeuser").empty();
             $("#company").empty();
-    
-  
-         
-            // Iterar sobre los tipos de usuario recibidos
-            $.each(response.typeuser, function (index, tipoUsuario) {
+
+            // Iterar sobre los tipos de groupSend recibidos
+            $.each(response.typeuser, function (index, tipoGroupSend) {
                 $("#typeuser").append(
                     $("<option>", {
-                        value: tipoUsuario.id,
-                        text: tipoUsuario.name
+                        value: tipoGroupSend.id,
+                        text: tipoGroupSend.name,
                     })
                 );
             });
-            $("#typeuser").val(2).trigger('change');
+            $("#typeuser").val(2).trigger("change");
             $("#company").append(
                 $("<option>", {
                     value: "",
                     text: "Selecciona una Empresa",
                 })
             );
-    
+
             $.each(response.company, function (index, company) {
                 $("#company").append(
                     $("<option>", {
                         value: company.id,
-                        text: company.tradeName + ' | ' + company.documentNumber
+                        text:
+                            company.tradeName + " | " + company.documentNumber,
                     })
                 );
             });
-         
-      
-     
         },
         error: function (xhr, status, error) {
-            console.error("Error al cargar tipos de usuario:", error);
+            console.error("Error al cargar tipos de groupSend:", error);
         },
     });
-    
 });
 
 $("#btonNuevo").click(function (e) {
-    $("#registroUsuario")[0].reset();
-    $("#modalNuevoUsuario").modal("show");
+    $("#registroGroupSend")[0].reset();
+    $("#modalNuevoGroupSend").modal("show");
 });
 
-$(document).on("click", "#cerrarModalUsuario", function () {
-    $("#modalNuevoUsuario").modal("hide");
+$(document).on("click", "#cerrarModalGroupSend", function () {
+    $("#modalNuevoGroupSend").modal("hide");
 });

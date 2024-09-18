@@ -1,6 +1,6 @@
 // Evento submit del formulario de edición
 // Evento submit del formulario de edición
-$("#registroUsuarioE").submit(function (event) {
+$("#registroGroupSendE").submit(function (event) {
     event.preventDefault(); // Evitar el comportamiento por defecto del formulario
 
     // Obtener el token CSRF
@@ -8,16 +8,15 @@ $("#registroUsuarioE").submit(function (event) {
 
     // Obtener los datos del formulario
     var formData = {
-        password: $("#passE").val(),
+        name: $("#nameE").val(),
         id: $("#idE").val(),
-        username: $("#usernameE").val(),
-        typeofUser_id: $("#typeuserE").val(),
-        company_id: $("#companyE").val(),
+        comment: $("#commentE").val(),
+
         _token: token,
     };
 
     $.ajax({
-        url: "user/" + formData.id,
+        url: "groupSend/" + formData.id,
         type: "PUT",
         data: formData,
         headers: {
@@ -25,22 +24,24 @@ $("#registroUsuarioE").submit(function (event) {
         },
         success: function (response) {
             // Cerrar el modal de edición
-            $("#modalNuevoUsuarioE").modal("hide");
-
-            // Recargar la tabla de usuarios
-            $("#tbUsuarios").DataTable().ajax.reload();
+            $("#modalNuevoGroupSendE").modal("hide");
 
             // Mostrar mensaje de éxito
             Swal.fire({
                 icon: "success",
                 title: "Actualización exitosa",
-                text: "El usuario ha sido actualizado correctamente.",
+                text: "El groupSend ha sido actualizado correctamente.",
+            }).then(() => {
+                $("#tbGroupSends").DataTable().ajax.reload();
             });
             $("#passE").val("");
-            $("#modalEditarUsuario").modal("hide");
+            $("#modalEditarGroupSend").modal("hide");
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Error al actualizar tipo de usuario:", errorThrown);
+            console.error(
+                "Error al actualizar tipo de groupSend:",
+                errorThrown
+            );
 
             // Extraer errores del servidor
             var errors = jqXHR.responseJSON;
@@ -68,5 +69,5 @@ $("#registroUsuarioE").submit(function (event) {
     });
 });
 $(document).on("click", "#cerrarModalEditar", function () {
-    $("#modalEditarUsuario").modal("hide");
+    $("#modalEditarGroupSend").modal("hide");
 });

@@ -11,39 +11,30 @@ function destroyRol(id) {
         cancelButtonText: "Cancelar",
     }).then((result) => {
         if (result.isConfirmed) {
-            // Usuario confirmó la eliminación, proceder con la solicitud AJAX
+            // GroupSend confirmó la eliminación, proceder con la solicitud AJAX
             var token = $('meta[name="csrf-token"]').attr("content");
 
             $.ajax({
-                url: "user/" + id,
+                url: "groupSend/" + id,
                 type: "DELETE",
                 headers: {
                     "X-CSRF-TOKEN": token,
                 },
                 success: function (data) {
-                    $.niftyNoty({
-                        type: "purple",
-                        icon: "fa fa-check",
-                        message: "Eliminación Exitosa",
-                        container: "floating",
-                        timer: 4000,
+                    Swal.fire({
+                        icon: "success",
+                        title: "Actualización exitosa",
+                        text: "El groupSend ha sido actualizado correctamente.",
+                    }).then(() => {
+                        $("#tbGroupSends").DataTable().ajax.reload();
                     });
-
-                    // Eliminar la fila correspondiente de la tabla DataTables
-                    var table = $("#tbUsuarios").DataTable();
-                    var row = table.row("#" + id);
-
-                    if (row.length > 0) {
-                        row.remove().draw(false);
-                    }
+               
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    $.niftyNoty({
-                        type: "danger",
-                        icon: "fa fa-times",
-                        message: "Error al Eliminar: " + textStatus + " - " + errorThrown,
-                        container: "floating",
-                        timer: 4000,
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error al actualizar",
+                        html: errorMessage,
                     });
                 },
             });

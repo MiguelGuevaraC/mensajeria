@@ -1,15 +1,15 @@
 <!-- Modal EDITAR -->
-<div class="modal fade" id="modalEditarUsuario" tabindex="-1" role="dialog" aria-labelledby="editarModalLabel" aria-hidden="true">
+<div class="modal fade" id="modalEditarGroupSend" tabindex="-1" role="dialog" aria-labelledby="editarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header text-white">
-                <h2 class="modal-title" id="editarModalLabel"><strong>EDITAR USUARIO</strong></h2>
+                <h2 class="modal-title" id="editarModalLabel"><strong>EDITAR GRUPO</strong></h2>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="registroUsuarioE" enctype="multipart/form-data">
+                <form id="registroGroupSendE" enctype="multipart/form-data">
                     <input type="hidden" id="idE">
                     @csrf
                     @method('PUT')

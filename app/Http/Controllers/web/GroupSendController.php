@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreGroupSendRequest;
+use App\Http\Requests\UpdateGroupSendRequest;
 use App\Models\GroupMenu;
 use App\Models\GroupSend;
 use App\Models\User;
@@ -40,7 +42,7 @@ class GroupSendController extends Controller
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
 
-        $query = GroupSend::
+        $query = GroupSend::where('state',1)->
             orderBy('id', 'desc');
 
         // Aplicar filtros por columna
@@ -75,5 +77,71 @@ class GroupSendController extends Controller
             'recordsFiltered' => $totalRecords, // Para filtros aplicados puedes calcular los registros filtrados
             'data' => $filteredRecords,
         ]);
+    }
+    public function show(int $id)
+    {
+
+        $object = GroupSend::find($id);
+        if ($object) {
+            return response()->json($object, 200);
+        }
+        return response()->json(
+            ['message' => 'Grupo No Encontrado'], 404
+        );
+
+    }
+    public function store(StoreGroupSendRequest $request)
+    {
+        $validatedData = $request->validated();
+        $company_id = Auth::user()->company->id;
+        // Crear el nuevo usuario
+        $data = [
+            'name' => $validatedData['name'],
+            'comment' => $validatedData['comment'],
+            'company_id' => $company_id,
+        ];
+        $object = GroupSend::create($data);
+
+        // Mostrar el nuevo usuario
+        $object = GroupSend::find($object->id);
+
+        return response()->json($object, 200);
+    }
+    public function update(UpdateGroupSendRequest $request, $id)
+    {
+        // Validar los datos
+        $validatedData = $request->validated();
+
+        // Buscar el groupSend por ID
+        $groupSend = GroupSend::findOrFail($id);
+
+        // Obtener el ID de la empresa del usuario autenticado
+        $company_id = Auth::user()->company->id;
+
+        // Preparar los datos a actualizar
+        $data = [
+            'name' => $validatedData['name'],
+            'comment' => $validatedData['comment'],
+            'company_id' => $company_id,
+        ];
+
+        // Actualizar el registro existente
+        $groupSend->update($data);
+
+        // Devolver el objeto actualizado
+        return response()->json($groupSend, 200);
+    }
+    public function destroy(int $id)
+    {
+        $object =GroupSend::find($id);
+        if (!$object) {
+            return response()->json(
+                ['message' => 'Grupo No Encontrado'], 404
+            );
+        }
+
+        $object->state = 0;
+        $object->save();
+
     }
 }

@@ -17,6 +17,7 @@ class TypeUserController extends Controller
     public function __construct()
     {
         $this->middleware('ensureTokenIsValid');
+      
     }
 
     /**
@@ -47,14 +48,32 @@ class TypeUserController extends Controller
      * )
      */
 
-    public function index()
+    public function index(Request $request)
     {
 
         $user = Auth::user();
         $groupMenu = GroupMenu::getFilteredGroupMenusSuperior($user->typeofUser_id);
         $groupMenuLeft = GroupMenu::getFilteredGroupMenus($user->typeofUser_id);
 
-        return view('Modulos.Roles.index', compact('user', 'groupMenu', 'groupMenuLeft'));
+        $user = Auth::user();
+        $typeUser = $user->typeUser;
+
+        $accesses = $typeUser->getAccess($typeUser->id);
+
+        $currentRoute = $request->path();
+        $currentRouteParts = explode('/', $currentRoute);
+        $lastPart = end($currentRouteParts);
+
+       
+        if (in_array($lastPart, $accesses)) {
+            $groupMenu = GroupMenu::getFilteredGroupMenusSuperior($user->typeofUser_id);
+            $groupMenuLeft = GroupMenu::getFilteredGroupMenus($user->typeofUser_id);
+
+            return view('Modulos.Roles.index', compact('user', 'groupMenu', 'groupMenuLeft'));
+        } else {
+            abort(403, 'Acceso no autorizado.');
+        }
+    
     }
 
     public function allTypeUserAndCompanies()

@@ -180,7 +180,7 @@ $("#tbGroupSends thead tr")
         var maxRetries = 3; // Número máximo de reintentos
         var retryCount = 0; // Contador de reintentos
     
-        // Configuración de DataTable para usuarios
+        // Configuración de DataTable para groupSends
         var table = $("#tbGroupSends").DataTable({
             processing: true,
             serverSide: true,

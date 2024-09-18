@@ -1,16 +1,16 @@
 <!-- Modal CREAR -->
-<div class="modal fade" id="modalNuevoUsuario" tabindex="-1" role="dialog" aria-labelledby="nuevoModalLabel"
+<div class="modal fade" id="modalNuevoGroupSend" tabindex="-1" role="dialog" aria-labelledby="nuevoModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header text-white">
-                <h2 class="modal-title" id="nuevoModalLabel"><strong>AGREGAR NUEVO USUARIO</strong></h2>
+                <h2 class="modal-title" id="nuevoModalLabel"><strong>AGREGAR NUEVO GRUPO</strong></h2>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="registroUsuario" enctype="multipart/form-data">
+                <form id="registroGroupSend" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <!-- Nombre Grupo -->
