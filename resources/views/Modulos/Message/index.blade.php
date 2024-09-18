@@ -299,144 +299,29 @@
 
                 <!--Page content-->
                 <!--===================================================-->
-                <div id="demo-custom-toolbar2" class="" style="text-align: left">
+                {{-- <div id="demo-custom-toolbar2" class="" style="text-align: left">
                     <button id="btonShowEtiquetas" style="margin: 12px" class="btn btn-success"><i class="demo-pli-plus"></i> Ver Etiquetas </button>
-                    <button id="btonStoreMensaje" style="margin: 12px" class="btn btn-danger"><i class="demo-pli-plus"></i> Añadir </button>
+                    <button id="btonStoreMensaje" style="margin: 12px" class="btn btn-danger"><i class="demo-pli-plus"></i> Añadir </button> --}}
                     {{-- <button id="btonShowView" style="margin: 12px" class="btn btn-warning"><i class="demo-pli-plus"></i> Vista Mensaje </button> --}}
-                </div>
-                <div class="container mt-2">
-                <div class="">
-                    @include('Modulos.Message.Tables.tablaMensaje')
-                </div>
+                {{-- </div> --}}
+              
+              
+
+                
             </div>
-                <!--===================================================-->
-                <!--END CONTENT CONTAINER-->
+       
+          
+            <div id="demo-custom-toolbar2" class="table-toolbar-left ">
 
-
-
-                <!--ASIDE-->
-                <!--===================================================-->
-
-                <!--===================================================-->
-                <!--END ASIDE-->
-
-
-                <!--MAIN NAVIGATION-->
-                <!--===================================================-->
-                <nav id="mainnav-container">
-                    <div id="mainnav">
-
-
-
-
-
-                        <!--Menu-->
-                        <!--================================-->
-                        <div id="mainnav-menu-wrap">
-                            <div class="nano">
-                                <div class="nano-content">
-
-                                    <!--Profile Widget-->
-
-
-
-                                    <!--Shortcut buttons-->
-                                    <!--================================-->
-
-                                    <!--================================-->
-                                    <!--End shortcut buttons-->
-                                    <div id="mainnav-profile" class="mainnav-profile">
-                                        <div class="profile-wrap text-center">
-                                            <div class="pad-btm">
-                                                <img class="img-circle img-md"
-                                                    src="plantillaNuevo\img\profile-photos\1.png"
-                                                    alt="Profile Picture">
-                                            </div>
-                                            <a href="#profile-nav" class="box-block" data-toggle="collapse"
-                                                aria-expanded="false">
-                                                <span class="pull-right dropdown-toggle">
-                                                    <i class="dropdown-caret"></i>
-                                                </span>
-                                                <p class="mnp-name">{{ $user->typeUser->name }}</p>
-                                                <span class="mnp-desc"></span>
-                                            </a>
-                                        </div>
-                                        <div id="profile-nav" class="collapse list-group bg-trans">
-                                            <a href='vistaInicio' class="list-group-item">
-                                                <i class="demo-pli-home icon-lg icon-fw"></i> Inicio
-                                            </a>
-                                            <a href="perfilD" class="list-group-item">
-                                                <i class="demo-pli-male icon-lg icon-fw"></i> Ver Perfil
-                                            </a>
-
-                                            <a href="logout" class="list-group-item">
-                                                <i class="demo-pli-unlock icon-lg icon-fw"></i> Salir
-                                            </a>
-                                        </div>
-                                    </div>
-
-
-                                    <ul id="mainnav-menu" class="list-group">
-                                        <?php foreach ($groupMenuLeft as $categoria): ?>
-                                        <?php if (!empty($categoria['option_menus']) && count($categoria['option_menus']) > 0): ?>
-                                        <li
-                                            class="<?= $categoria['nombre'] == $categoriaActual ? 'active-sub' : '' ?>">
-                                            <a href="#">
-                                                <i class="<?= $categoria['icon'] ?>"></i>
-                                                <span class="menu-title"><?= strtoupper($categoria['name']) ?></span>
-                                                <i class="arrow"></i>
-                                            </a>
-                                            <ul
-                                                class="<?= $categoria['name'] == $categoriaActual ? 'collapse in' : '' ?>">
-                                                <?php foreach ($categoria['option_menus'] as $item): ?>
-                                                <li
-                                                    class="<?= $item['route'] == $OpcionActual ? 'active-link' : '' ?>">
-                                                    <a class="optionsMenu" href="<?= $item['route'] ?>">
-                                                        <i class="<?= $item['icon'] ?>"></i> <?= $item['name'] ?>
-                                                    </a>
-                                                </li>
-                                                <?php endforeach; ?>
-                                            </ul>
-                                        </li>
-                                        <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    </ul>
-
-
-
-                                    <!--Widget-->
-                                    <!--================================-->
-                                    <div class="mainnav-widget">
-
-                                        <!-- Show the button on collapsed navigation -->
-                                        <div class="show-small">
-                                            <a href="#" data-toggle="menu-widget"
-                                                data-target="#demo-wg-server">
-                                                <i class="demo-pli-monitor-2"></i>
-                                            </a>
-                                        </div>
-
-                                        <!-- Hide the content on collapsed navigation -->
-
-                                        </ul>
-                                    </div>
-                                    <!--================================-->
-                                    <!--End widget-->
-
-                                </div>
-                            </div>
-                        </div>
-                        <!--================================-->
-                        <!--End menu-->
-
-                    </div>
-                </nav>
-                <!--===================================================-->
-                <!--END MAIN NAVIGATION-->
-
+                <button id="btonShowEtiquetas" style="margin: 12px" class="btn btn-success"><i class="demo-pli-plus"></i> Ver Etiquetas </button>
+                <button id="btonStoreMensaje" style="margin: 12px" class="btn btn-danger"><i class="demo-pli-plus"></i> Añadir </button> 
             </div>
-
-
+            <br>
+            <div id="page-content">
+                
+           
+                @include('Modulos.Message.Tables.tablaMensaje')
+            </div>
 
             <!-- FOOTER -->
             <!--===================================================-->

@@ -19,7 +19,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Escribe aquí..." name="documentNumber" id="documentNumber" required>
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" style="color:rgb(0, 0, 0); background:white">
+                                        <button id="search" name="search" class="btn btn-outline-secondary" type="button" style="color:rgb(0, 0, 0); background:white">
                                             <i class="fas fa-search"></i> Buscar
                                         </button>
                                     </div>

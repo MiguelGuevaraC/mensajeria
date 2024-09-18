@@ -35,10 +35,10 @@ $("#registroCompany").submit(function (event) {
     // Si hay errores, mostrarlos en SweetAlert
     if (errors.length > 0) {
         Swal.fire({
-            title: 'Error',
-            icon: 'error',
-            html: errors.join('<br>'), // Mostrar todos los errores en una sola ventana de SweetAlert
-            confirmButtonText: 'Aceptar'
+            title: "Error",
+            icon: "error",
+            html: errors.join("<br>"), // Mostrar todos los errores en una sola ventana de SweetAlert
+            confirmButtonText: "Aceptar",
         });
         return; // Detener la ejecución si hay errores
     }
@@ -75,10 +75,10 @@ $("#registroCompany").submit(function (event) {
 
             // Mostrar notificación de éxito
             Swal.fire({
-                title: 'Éxito',
-                icon: 'success',
-                text: 'Empresa registrada correctamente',
-                confirmButtonText: 'Aceptar'
+                title: "Éxito",
+                icon: "success",
+                text: "Empresa registrada correctamente",
+                confirmButtonText: "Aceptar",
             });
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -86,15 +86,69 @@ $("#registroCompany").submit(function (event) {
 
             // Mostrar notificación de error
             Swal.fire({
-                title: 'Error',
-                icon: 'error',
-                text: 'Error al registrar empresa: ' + errorThrown,
-                confirmButtonText: 'Aceptar'
+                title: "Error",
+                icon: "error",
+                text: "Error al registrar empresa: " + errorThrown,
+                confirmButtonText: "Aceptar",
             });
         },
     });
 });
 
+$(document).ready(function () {
+    $("#search").click(function () {
+        // Obtén el valor del campo de entrada
+        var documentNumber = $("#documentNumber").val();
 
+        // Verifica si el campo no está vacío
+        if (documentNumber.trim() === "") {
+            alert("Por favor ingresa un número de documento.");
+            return;
+        }
 
+        // Realiza la petición AJAX
+        $.ajax({
+            url: "searchByRuc/" + encodeURIComponent(documentNumber), // URL de la petición
+            method: "GET", // Método HTTP
+            success: function (response) {
+                var data = response[0];
+                $("#tradeName").val(data.RazonSocial);
+                $("#address").val(data.Direccion);
+                $("#businessName").val(data.RazonSocial);
 
+            },
+            error: function (xhr, status, error) {
+                console.error("Error en la solicitud:", error);
+            },
+        });
+    });
+});
+
+$(document).ready(function () {
+    $("#searchEdit").click(function () {
+        // Obtén el valor del campo de entrada
+        var documentNumber = $("#documentNumberEdit").val();
+
+        // Verifica si el campo no está vacío
+        if (documentNumber.trim() === "") {
+            alert("Por favor ingresa un número de documento.");
+            return;
+        }
+
+        // Realiza la petición AJAX
+        $.ajax({
+            url: "searchByRuc/" + encodeURIComponent(documentNumber), // URL de la petición
+            method: "GET", // Método HTTP
+            success: function (response) {
+                var data = response[0];
+                $("#tradeNameEdit").val(data.RazonSocial);
+                $("#addressEdit").val(data.Direccion);
+                $("#businessNameEdit").val(data.RazonSocial);
+
+            },
+            error: function (xhr, status, error) {
+                console.error("Error en la solicitud:", error);
+            },
+        });
+    });
+});
