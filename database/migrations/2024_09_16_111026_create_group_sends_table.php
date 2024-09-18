@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('comment', 255);
             $table->boolean('state')->default(true);
-            $table->text('status')->default('Normal')->nullable();
+            $table->text('status')->nullable();
 
             $table->foreignId('company_id')->nullable()->unsigned()->constrained('companies');
 
