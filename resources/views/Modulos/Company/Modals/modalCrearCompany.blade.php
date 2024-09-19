@@ -15,7 +15,7 @@
                         <!-- Número de Documento -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="documentNumber" class="form-label">Número de Documento:</label>
+                                <label for="documentNumber" class="form-label">RUC:</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Escribe aquí..." name="documentNumber" id="documentNumber" required>
                                     <div class="input-group-append">
@@ -92,6 +92,43 @@
                                 <div class="error-messageGrupo mt-2"></div>
                             </div>
                         </div>
+
+                            <!-- COSTO SERVICIO -->
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="costSend" class="form-label">Costo Servicio (S/.):</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+                                        </div>
+                                        <input type="number" class="form-control" 
+                                        placeholder="Escribe aquí..." 
+                                        name="costSend" 
+                                        id="costSend" 
+                                        step="0.01" 
+                                        required>
+                                 
+                                    </div>
+                                    <div class="error-messageGrupo mt-2"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="comment" class="form-label">NOTA:</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-regular fa-comment"></i></span>
+                                        </div>
+                                        <input style="font-weight: bold" type="text" class="form-control" 
+                                        value="Recuerde que su usuario y contraseña es el RUC de la empresa."
+                                        name="comment" id="comment" readonly>
+                                    </div>
+                                    <div class="error-messageGrupo mt-2"></div>
+                                </div>
+                            </div>
+                         
+                      
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>

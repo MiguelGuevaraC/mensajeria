@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Auth;
 
 class GroupSendController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('ensureTokenIsValid');
+    }
     public function index(Request $request)
     {
 
@@ -35,21 +39,43 @@ class GroupSendController extends Controller
         }
     }
 
+    public function allGroupSend()
+    {
+
+        $user = Auth::user();
+        $company_id = $user->company_id;
+
+        $groupSends = GroupSend::where('state', 1)
+            ->where('company_id', $company_id)
+            ->get();
+
+        $data = [
+            "groupSends" => $groupSends,
+        ];
+
+        return response()->json($data);
+    }
+
     public function all(Request $request)
     {
         $draw = $request->get('draw');
         $start = $request->get('start', 0);
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
-
-        $query = GroupSend::where('state',1)->
-            orderBy('id', 'desc');
-
+    
+        // Obtener el company_id del usuario autenticado
+        $company_id = Auth::user()->company_id;
+    
+        // Filtrar por el estado y el company_id del usuario
+        $query = GroupSend::where('state', 1)
+            ->where('company_id', $company_id) // Filtro por company_id
+            ->orderBy('id', 'desc');
+    
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
                 $searchValue = trim($column['search']['value'], '()'); // Quitar paréntesis adicionales
-
+    
                 switch ($column['data']) {
                     case 'name':
                         $query->where('name', 'like', '%' . $searchValue . '%');
@@ -60,17 +86,16 @@ class GroupSendController extends Controller
                     case 'created_at':
                         $query->where('created_at', 'like', '%' . $searchValue . '%');
                         break;
-
                 }
             }
         }
-
+    
         // Obtener el total de registros filtrados y totales
         $totalRecords = $query->count();
         $filteredRecords = $query->skip($start)
             ->take($length)
             ->get();
-
+    
         return response()->json([
             'draw' => $draw,
             'recordsTotal' => $totalRecords,
@@ -78,6 +103,7 @@ class GroupSendController extends Controller
             'data' => $filteredRecords,
         ]);
     }
+    
     public function show(int $id)
     {
 

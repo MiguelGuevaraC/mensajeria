@@ -45,6 +45,7 @@ $("#editarCompany").submit(function (event) {
         telephone: telephone,
         address: $("#addressEdit").val(),
         email: $("#emailEdit").val(),
+        costSend: $("#costSendE").val(),
         status: $("#statusEdit").prop('checked') ? 1 : 0, // Suponiendo que es un checkbox
     };
 

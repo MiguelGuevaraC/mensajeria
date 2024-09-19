@@ -42,9 +42,11 @@
                                     <textarea id="block4" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block4 ?? ''}}</textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label for="fileUpload">SUBIR ARCHIVO</label>
+                                    <label for="fileUpload">SUBIR ARCHIVO (JPG,PNG o PDF)</label>
                                     <input type="file" id="fileUpload" name="fileUpload" class="form-control">
+                                    <p>Opcional</p>
                                 </div>
+                                
                             </div>
 
                          

@@ -14,6 +14,7 @@ class Company extends Model
         'representativeName',
         'representativeDni',
         'telephone',
+        'costSend',
         'email',
         'address',
         'status',
@@ -29,4 +30,9 @@ class Company extends Model
     {
         return $this->hasMany(User::class);
     }
+    public function groupSend()
+    {
+        return $this->hasMany(GroupSend::class);
+    }
+    
 }

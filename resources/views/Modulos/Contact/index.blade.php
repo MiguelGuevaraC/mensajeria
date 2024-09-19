@@ -11,9 +11,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <?php
-    $vista = 'Messages';
+    $vista = 'Contact';
     $categoriaActual = 'Mantenimiento';
-    $OpcionActual = 'message';
+    $OpcionActual = 'contact';
     
     ?>
 
@@ -70,118 +70,10 @@
     <!-- CSS DEL DATATABLE -->
     <link rel="stylesheet" href="/mensajeria/Cdn-Locales/pkgDatatables/datatables.css">
     <link rel="stylesheet" href="/mensajeria/Cdn-Locales/pkgAwsome/css/all.css" />
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     
     <link rel="stylesheet" href="{{ asset('css/appPlantilla.css') }}">
-
-    <style>
-        .panel-container {
-            display: flex;
-            justify-content: space-between;
-
-        }
-
-        .panel-half {
-            width: 100%;
-            margin: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #000000;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .panel-half:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .media-left .pad-hor {
-            padding: 10px;
-            background-color: #25476a;
-            border-radius: 50%;
-        }
-
-        .text-2x {
-            font-size: 2em;
-        }
-
-        .text-semibold {
-            font-weight: 600;
-        }
-
-        .mar-no {
-            margin: 0;
-        }
-
-        .pad-all {
-            padding: 20px;
-        }
-
-        .panel-success {
-            border: 1px solid #004190;
-            background-color: #004190;
-            color: #fff;
-        }
-    </style>
-
-    <style>
-        .panel {
-            border: 1px solid #ccc;
-            padding: 20px;
-            color: white;
-            margin: 30px;
-            background-color: #003042;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .panel-container {
-            margin-bottom: 20px;
-        }
-
-        .panel-success {
-            background-color: #dff0d8;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .panel-body {
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-
-        .textarea-container {
-            margin: 20px 0;
-        }
-
-        textarea {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            color: black;
-            border-radius: 4px;
-            resize: vertical;
-            font-family: monospace;
-            box-sizing: border-box;
-        }
-
-        textarea.large {
-            height: 70px;
-        }
-
-        textarea.largTitle {
-            height: 40px;
-        }
-
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-    </style>
 
 
 </head>
@@ -297,34 +189,47 @@
                 </div>
 
 
-              <!--Page content-->
+                <!--Page content-->
                 <!--===================================================-->
-                {{-- <div id="demo-custom-toolbar2" class="" style="text-align: left">
-                    <button id="btonShowEtiquetas" style="margin: 12px" class="btn btn-success"><i class="demo-pli-plus"></i> Ver Etiquetas </button>
-                    <button id="btonStoreMensaje" style="margin: 12px" class="btn btn-danger"><i class="demo-pli-plus"></i> Añadir </button> --}}
-                    {{-- <button id="btonShowView" style="margin: 12px" class="btn btn-warning"><i class="demo-pli-plus"></i> Vista Mensaje </button> --}}
-                {{-- </div> --}}
-              
-              
+                <div id="page-content">
+
+                    <div class="panel">
+
+                        <div id="demo-custom-toolbar2" class="table-toolbar-left ">
+
+                            <button id="btonNuevo" style="margin: 5px; padding:5px" class="btn btn-success"><i
+                                    class="demo-pli-plus"></i>
+                             <i class="fa-solid fa-file-excel"></i>  IMPORTAR DATOS</button>
+                        </div>
+                        <br><br><br>
+
+                        <div class="panel-body">
+                            @include('Modulos.Contact.Tables.tablaContact')
+                        </div>
+                    </div>
 
 
 
-                
+                </div>
+                <!--===================================================-->
+                <!--End page content-->
+
             </div>
-       
-          
-            <div id="demo-custom-toolbar2" class="table-toolbar-left ">
+            <!--===================================================-->
+            <!--END CONTENT CONTAINER-->
 
-                <button id="btonShowEtiquetas" style="margin: 12px" class="btn btn-success"><i class="demo-pli-plus"></i> Ver Etiquetas </button>
-                <button id="btonStoreMensaje" style="margin: 12px" class="btn btn-danger"><i class="demo-pli-plus"></i> Añadir </button> 
-            </div>
-            <br>
-            <div id="page-content">
-                
-           
-                @include('Modulos.Message.Tables.tablaMensaje')
-            </div>
-  <nav id="mainnav-container">
+
+
+            <!--ASIDE-->
+            <!--===================================================-->
+
+            <!--===================================================-->
+            <!--END ASIDE-->
+
+
+            <!--MAIN NAVIGATION-->
+            <!--===================================================-->
+            <nav id="mainnav-container">
                 <div id="mainnav">
 
 
@@ -416,117 +321,122 @@
 
                 </div>
             </nav>
-            <!-- FOOTER -->
             <!--===================================================-->
-            <footer id="footer">
+            <!--END MAIN NAVIGATION-->
 
-                <!-- Visible when footer positions are fixed -->
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <div class="show-fixed pad-rgt pull-right">
-                    You have <a href="#" class="text-main"><span class="badge badge-danger">3</span> pending
-                        action.</a>
-                </div>
-
-
-
-                <!-- Visible when footer positions are static -->
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-
-
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- Remove the class "show-fixed" and "hide-fixed" to make the content always appears. -->
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-                <p class="pad-lft">&#0169; 2024 Garzasoft</p>
-
-
-
-            </footer>
-            <!--===================================================-->
-            <!-- END FOOTER -->
-
-
-            <!-- SCROLL PAGE BUTTON -->
-            <!--===================================================-->
-
-            <!--===================================================-->
         </div>
 
 
-        <!-- MODALES -->
-        <div>@include('Modulos.Message.Modals.createMessage')</div>
-        <div>@include('Modulos.Message.Modals.editMessage')</div>
+
+        <!-- FOOTER -->
         <!--===================================================-->
-        <!-- END OF CONTAINER -->
+        <footer id="footer">
+
+            <!-- Visible when footer positions are fixed -->
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <div class="show-fixed pad-rgt pull-right">
+                You have <a href="#" class="text-main"><span class="badge badge-danger">3</span> pending
+                    action.</a>
+            </div>
+
+
+
+            <!-- Visible when footer positions are static -->
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+
+
+
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <!-- Remove the class "show-fixed" and "hide-fixed" to make the content always appears. -->
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+            <p class="pad-lft">&#0169; 2024 Garzasoft</p>
+
+
+
+        </footer>
+        <!--===================================================-->
+        <!-- END FOOTER -->
+
+
+        <!-- SCROLL PAGE BUTTON -->
+        <!--===================================================-->
+
+        <!--===================================================-->
+    </div>
+
+
+    <!-- MODALES -->
+    <div>@include('Modulos.Contact.Modals.modalEditarContact')</div>
+
+    <div>@include('Modulos.Contact.Modals.modalCrearContact')</div>
+    <div>@include('Modulos.GroupSend.Modals.modalCrearGroupSend')</div>
+    <!--===================================================-->
+    <!-- END OF CONTAINER -->
 
 
 
 
 
-        <!--JAVASCRIPT-->
-        <!--=================================================-->
+    <!--JAVASCRIPT-->
+    <!--=================================================-->
 
-        <!--jQuery [ REQUIRED ]-->
-        <script src="plantillaNuevo\js\jquery.min.js"></script>
-
-
-        <!--BootstrapJS [ RECOMMENDED ]-->
-        <script src="plantillaNuevo\js\bootstrap.min.js"></script>
+    <!--jQuery [ REQUIRED ]-->
+    <script src="plantillaNuevo\js\jquery.min.js"></script>
 
 
-        <!--NiftyJS [ RECOMMENDED ]-->
-        <script src="plantillaNuevo\js\nifty.min.js"></script>
+    <!--BootstrapJS [ RECOMMENDED ]-->
+    <script src="plantillaNuevo\js\bootstrap.min.js"></script>
+
+
+    <!--NiftyJS [ RECOMMENDED ]-->
+    <script src="plantillaNuevo\js\nifty.min.js"></script>
 
 
 
 
-        <!--=================================================-->
+    <!--=================================================-->
 
-        <!--Demo script [ DEMONSTRATION ]-->
-        <script src="plantillaNuevo\js\demo\nifty-demo.min.js"></script>
-
-
-        <!-- JS DE DATATABLE -->
-        <script src="/mensajeria/Cdn-Locales/pkgDatatables/datatables.js"></script>
-
-        <script src="/mensajeria/Cdn-Locales/pkgAwsome/js/all.js"></script>
-
-        <!--Bootstrap Table Sample [ SAMPLE ]-->
-        <script src="plantillaNuevo\js\demo\tables-bs-table.js"></script>
+    <!--Demo script [ DEMONSTRATION ]-->
+    <script src="plantillaNuevo\js\demo\nifty-demo.min.js"></script>
 
 
-        <!--X-editable [ OPTIONAL ]-->
-        <script src="plantillaNuevo\plugins\x-editable\js\bootstrap-editable.min.js"></script>
+    <!-- JS DE DATATABLE -->
+    <script src="/mensajeria/Cdn-Locales/pkgDatatables/datatables.js"></script>
+
+    <script src="/mensajeria/Cdn-Locales/pkgAwsome/js/all.js"></script>
+
+    <!--Bootstrap Table Sample [ SAMPLE ]-->
+    <script src="plantillaNuevo\js\demo\tables-bs-table.js"></script>
 
 
-        <!--Bootstrap Table [ OPTIONAL ]-->
-        <script src="plantillaNuevo\plugins\bootstrap-table\bootstrap-table.min.js"></script>
+    <!--X-editable [ OPTIONAL ]-->
+    <script src="plantillaNuevo\plugins\x-editable\js\bootstrap-editable.min.js"></script>
 
 
-        <!--Bootstrap Table Extension [ OPTIONAL ]-->
-        <script src="plantillaNuevo\plugins\bootstrap-table\extensions\editable\bootstrap-table-editable.js"></script>
+    <!--Bootstrap Table [ OPTIONAL ]-->
+    <script src="plantillaNuevo\plugins\bootstrap-table\bootstrap-table.min.js"></script>
 
 
-        <!--Bootbox Modals [ OPTIONAL ]-->
-        <script src="plantillaNuevo\plugins\bootbox\bootbox.min.js"></script>
+    <!--Bootstrap Table Extension [ OPTIONAL ]-->
+    <script src="plantillaNuevo\plugins\bootstrap-table\extensions\editable\bootstrap-table-editable.js"></script>
 
 
-        <!-- SweetAlert JS -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
-
-        <!--Modals [ SAMPLE ]-->
-        {{-- <script src="{{ asset('js/JqueryMessage/JqueryIndexMessage.js') }}"></script> --}}
+    <!--Bootbox Modals [ OPTIONAL ]-->
+    <script src="plantillaNuevo\plugins\bootbox\bootbox.min.js"></script>
 
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-        <script src="{{ asset('js/JqueryMessage/JqueryMessage.js') }}"></script>
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
-        <script src="{{ asset('js/JqueryMessage/JqueryCreateMensaje.js') }}"></script>
-        <script src="{{ asset('js/JqueryMessage/JqueryDestroyMensaje.js') }}"></script>
-        <script src="{{ asset('js/JqueryMessage/JqueryEditMensaje.js') }}"></script>
-        <script src="{{ asset('js/JqueryMessage/JqueryUpdateMensaje.js') }}"></script>
+    <!--Modals [ SAMPLE ]-->
+    <script src="{{ asset('js/JqueryContact/JqueryIndexContact.js') }}"></script>
+    <script src="{{ asset('js/JqueryContact/JqueryDestroyContact.js') }}"></script>
+    <script src="{{ asset('js/JqueryContact/JqueryCreateContact.js') }}"></script>
+    <script src="{{ asset('js/JqueryContact/JqueryEditContact.js') }}"></script>
+    <script src="{{ asset('js/JqueryContact/JqueryUpdateContact.js') }}"></script>
+    <script src="{{ asset('js/JqueryContact/JqueryCreateGroupSend.js') }}"></script>
 
 
 </body>

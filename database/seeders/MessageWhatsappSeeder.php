@@ -26,6 +26,19 @@ class MessageWhatsappSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        DB::table('message_whasapps')->insert([
+            'title' => 'Invitación al Programa de Desarrollo de Habilidades - Backend',
+            'block1' => 'Mediante la presente comunicamos, que la primera reunión de desarrollo de habilidades backend, se llevará a cabo el 19 de septiembre a las 11:00 a.m',
+            'block2' => 'La reunión será virtual, y puede unirse a través del siguiente enlace: https://meet.google.com/tcj-jkdh-ymd.',
+            'block3' => 'Objetivo de reunión: Iniciar con el desarrollo de habilidades en PHP.',
+            'block4' => 'Saludos Martín Ampuero P. | GerenteGarzasoft EIRL (Perú) | Nicolás la Torre 126 - Urb. Magisterial -Chiclayo',
+            'routeFile' => '/storage/documents/document.pdf',
+            'state' => true,
+            'company_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         
     }
 }

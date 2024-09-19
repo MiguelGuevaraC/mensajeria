@@ -7,8 +7,10 @@ use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\Company;
 use App\Models\GroupMenu;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class CompanyController extends Controller
 {
@@ -105,15 +107,25 @@ class CompanyController extends Controller
 
         $company = Company::create($validatedData);
 
+        $hashedPassword = Hash::make($company->documentNumber);
+        $data = [
+            'username' => $company->documentNumber,
+            'password' => $hashedPassword,
+            'typeofUser_id' => 2,
+            'company_id' => $company->id,
+        ];
+        $object = User::create($data);
+
         return response()->json([
             'data' => $company,
+
         ], 201);
     }
 
     public function update(UpdateCompanyRequest $request, $id)
     {
-     
-        $company= Company::find($id);
+
+        $company = Company::find($id);
         if (!$company) {
             return response()->json(
                 ['message' => 'Empresa no Encontrada'], 404
@@ -122,7 +134,7 @@ class CompanyController extends Controller
         $validatedData = $request->validated();
         $validatedData['state'] = 1;
         $validatedData['typeOfDocument'] = 'RUC';
-      
+
         $company->update($validatedData);
 
         return response()->json($company);

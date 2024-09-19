@@ -24,7 +24,7 @@ class UpdateUserRequest extends FormRequest
                 'max:30',
             ],
             'password' => [
-                'nullable', // La contraseña es opcional en la actualización
+                'required', // La contraseña es opcional en la actualización
                 'string',
                 'min:8',
                 'max:30',

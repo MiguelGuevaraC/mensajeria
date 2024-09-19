@@ -38,4 +38,14 @@ class Contact extends Model
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+
+    public function contactByGroup()
+    {
+        return $this->hasMany(ContactByGroup::class);
+    }
+    public function groupSend()
+    {
+        return $this->belongsToMany(GroupSend::class, 'contact_by_groups', 'contact_id', 'groupSend_id');
+    }
+
 }

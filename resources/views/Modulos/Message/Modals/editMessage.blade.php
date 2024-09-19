@@ -43,8 +43,9 @@
                                 <input type="hidden" id="idE" name="idE" class="form-control">
 
                                 <div class="form-group">
-                                    <label for="fileUploadE">SUBIR ARCHIVO</label>
+                                    <label for="fileUploadE">SUBIR ARCHIVO (JPG,PNG o PDF)</label>
                                     <input type="file" id="fileUploadE" name="fileUpload" class="form-control">
+                                    <p>Opcional</p>
                                 </div>
                             </div>
                         </div>

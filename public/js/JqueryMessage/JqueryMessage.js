@@ -208,8 +208,8 @@ var lenguag = {
 };
 
 var lengthmenu = [
-    [5, 50, -1],
-    [5, 50, "Todos"],
+    [15, -1],
+    [15, "Todos"],
 ];
 var butomns = [
     {

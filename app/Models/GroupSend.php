@@ -30,5 +30,14 @@ class GroupSend extends Model
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+    public function contactByGroup()
+    {
+        return $this->hasMany(ContactByGroup::class);
+    }
+
+    public function contactos()
+    {
+        return $this->belongsToMany(Contact::class, 'contact_by_groups', 'groupSend_id', 'contact_id');
+    }
 
 }

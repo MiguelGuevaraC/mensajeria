@@ -2,9 +2,10 @@
 
 namespace App\Imports;
 
-use App\Models\Person;
+use App\Models\Contact;
+use App\Models\ContactByGroup;
+use App\Models\GroupSend;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -13,6 +14,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class PersonImport implements ToModel, WithHeadingRow
 {
     private $headerMap = [];
+    private $groupId; // Añadido para almacenar el ID del grupo
+
+    // Constructor para recibir el ID del grupo
+    public function __construct($groupId)
+    {
+        $this->groupId = $groupId;
+    }
 
     public function headingRow(): int
     {
@@ -26,42 +34,29 @@ class PersonImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-
         try {
             // Definir los encabezados esperados
             $expectedColumns = [
-                'codigoalumno' => 'codigo_alumno',
-                'nrodocdeidentidad' => 'numberIdenty',
-                'docdeidentidad' => 'doc_identidad',
-                'apellidopaterno' => 'apellido_paterno',
-                'apellidomaterno' => 'apellido_materno',
-                'nombres' => 'nombres',
-                'nivel' => 'nivel',
-                'grado' => 'grado',
-                'seccion' => 'seccion',
-                'nrodocumentoresponsabledepa' => 'nro_doc_responsable',
-                'nombreresponsabledepago' => 'nombre_responsable_pago',
-                'apellidomaternoresponsabled' => 'apellido_materno_responsable',
-                'celularresponsabledepago' => 'telefono_responsable_pago',
-                'telefonodelapoderado' => 'telefono_apoderado',
-                'telefonomadre' => 'telefono_madre',
-                'celularmadre' => 'celular_madre',
-                'telefonopadre' => 'telefono_padre',
-                'celularpadre' => 'celular_padre',
-                'telefono' => 'telefono',
+                'DOCUMENTO' => 'document',
+                'NOMBRES' => 'names',
+                'TELEFONO' => 'telephone',
+                'DIRECCION' => 'address',
+                'CONCEPTO' => 'concept',
+                'MONTO' => 'amount',
+                'FECHA_REFERENCIA' => 'date_reference',
             ];
 
-            // Si el mapeo de encabezados está vacío, significa que estamos en la fila de encabezado
+            // Si el mapeo de encabezados está vacío, estamos en la fila de encabezado
             if (empty($this->headerMap)) {
                 foreach ($row as $key => $value) {
                     if (!empty($value)) {
-                        $normalizedKey = strtolower(str_replace(' ', '', $value));
+                        $normalizedKey = strtoupper(str_replace(' ', '', $value)); // Convertir a mayúsculas
                         if (array_key_exists($normalizedKey, $expectedColumns)) {
                             $this->headerMap[$expectedColumns[$normalizedKey]] = $key;
                         }
                     }
                 }
-                return null; // Retornar null porque esta fila no contiene datos de estudiantes
+                return null; // Retornar null porque esta fila no contiene datos de contacto
             }
 
             // Crear un array con los datos normalizados
@@ -70,86 +65,88 @@ class PersonImport implements ToModel, WithHeadingRow
                 $normalizedRow[$columnName] = isset($row[$key]) ? trim($row[$key]) : null;
             }
 
-            // Validar el campo nro_doc_responsable
-            $nroDocResponsable = $normalizedRow['nro_doc_responsable'];
-            if (empty($nroDocResponsable) || !is_numeric($nroDocResponsable) || strlen($nroDocResponsable) < 6) {
-                // Log::warning('IMPORTACION: Invalid nro_doc_responsable value: ' . var_export($nroDocResponsable, true));
-                // return null; // Omitir la fila con valor inválido en nro_doc_responsable
-            }
-
-            // Combinar "nombre_responsable_pago" y "apellido_materno_responsable"
-            $normalizedRow['nombre_apellido_responsable'] = trim($normalizedRow['nombre_responsable_pago'] . ' ' . $normalizedRow['apellido_materno_responsable']);
-
-            // Verificar que las columnas no sean nulas
-            foreach ($expectedColumns as $columnName => $dbColumnName) {
-                if (is_null($normalizedRow[$dbColumnName]) && $dbColumnName != 'apellido_materno_responsable') {
-                    // Log::warning('IMPORTACION: Null value found in required columns: ' . $dbColumnName);
-                    // return null; // Omitir la fila con valor nulo en una columna requerida
-                }
-            }
-
+            // Limpiar el número de teléfono
             $phoneFields = [
-                // 'telefono_responsable_pago',
-
-                'celular_madre',
-                'telefono_apoderado',
-                'celular_padre',
-
-                'telefono_padre',
-                'telefono_madre',
                 'telefono',
+                'telephone',
+                'telefono1',
+                'telefono2',
+                'telefono3',
+                'telefono4',
             ];
-            $cleanedPhoneNumber = $normalizedRow['telefono_responsable_pago'];
-            if ($this->isValidPhoneNumber($cleanedPhoneNumber) == false) {
-
+            $cleanedPhoneNumber = $normalizedRow['telephone'];
+            if (!$this->isValidPhoneNumber($cleanedPhoneNumber)) {
                 $cleanedPhoneNumber = $this->cleanPhoneNumber($normalizedRow, $phoneFields);
-
             }
 
-            // Obtener el usuario autenticado y los estudiantes actuales
-            $user = Auth::user();
-            $currentStudents = $user->students;
+            // Convertir la fecha de Excel a formato Y-m-d (año-mes-día)
+            $dateReference = $normalizedRow['date_reference'];
+            if (is_numeric($dateReference)) {
+                $dateReference = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateReference)->format('Y-m-d');
+            } else {
+                // En caso de que la fecha no sea un número, mantenerla tal como está
+                $dateReference = date('Y-m-d', strtotime($dateReference));
+            }
 
-            // Almacenar números de documentos importados
-            static $importedDocumentNumbers = [];
-            $importedDocumentNumbers[] = $normalizedRow['codigo_alumno'];
+            $currentGroup = GroupSend::find($this->groupId);
+            if ($currentGroup) {
+                Log::error('no se encoentró el grupo');
+            }
 
-            // Crear o actualizar la persona
-            $person = Person::updateOrCreate(
-                ['documentNumber' => $normalizedRow['codigo_alumno']],
-                [
-                    'typeofDocument' => $normalizedRow['doc_identidad'],
-                    'identityNumber' => $normalizedRow['numberIdenty'],
-                    'names' => $normalizedRow['nombres'],
-                    'fatherSurname' => $normalizedRow['apellido_paterno'],
-                    'motherSurname' => $normalizedRow['apellido_materno'],
-                    'level' => $normalizedRow['nivel'],
-                    'grade' => $normalizedRow['grado'],
-                    'section' => $normalizedRow['seccion'],
-                    'representativeDni' => $nroDocResponsable ?? '', // Use empty string if null
-                    'representativeNames' => $normalizedRow['nombre_apellido_responsable'],
-                    'telephone' => $cleanedPhoneNumber,
-                    'state' => 1,
-                    'user_id' => $user->id,
-                ]
-            );
+            // Verificar si el teléfono ya está en el grupo
+            $existingContact = Contact::whereHas('groupSend', function ($query) use ($currentGroup) {
+                $query->where('groupSend_id', $currentGroup->id);
+            })->where('telephone', $cleanedPhoneNumber)->first();
 
-            // Verificar y actualizar el estado de los estudiantes actuales
-            static $importCompleted = false;
-            if (!$importCompleted) {
-                $importCompleted = true;
-                foreach ($currentStudents as $student) {
-                    if (!in_array($student->documentNumber, $importedDocumentNumbers)) {
-                        $student->state = 0;
-                        $student->save();
-                    }
+            if ($existingContact != null) {
+                // Si el teléfono ya existe en el grupo, actualizar el contacto
+                $existingContact->update([
+                    'documentNumber' => $normalizedRow['document'],
+                    'names' => $normalizedRow['names'],
+                    'address' => $normalizedRow['address'],
+                    'concept' => $normalizedRow['concept'],
+                    'amount' => $normalizedRow['amount'],
+                    'dateReference' => $dateReference,
+                    'groupSend_id' => $currentGroup->id, // Asegurar que el grupo es actualizado
+                ]);
+
+                return $existingContact; // Retornar el contacto actualizado
+            } else {
+                // Si el teléfono no existe en el grupo, crear un nuevo contacto y asociarlo al grupo
+                try {
+                    $newContact = Contact::create([
+                        'telephone' => $cleanedPhoneNumber,
+                        'documentNumber' => $normalizedRow['document'],
+                        'names' => $normalizedRow['names'],
+                        'address' => $normalizedRow['address'],
+                        'concept' => $normalizedRow['concept'],
+                        'amount' => $normalizedRow['amount'],
+                        'dateReference' => $dateReference,
+                        'groupSend_id' => $currentGroup->id,
+                    ]);
+                    $contactByGroup = ContactByGroup::create([
+                        'state' => 1,
+                        'groupSend_id' => $currentGroup->id,
+                        'contact_id' => $newContact->id,
+                    ]);
+
+                    // Registrar la creación del nuevo contacto
+                    Log::info('Nuevo contacto creado:', $newContact->toArray());
+
+                } catch (Exception $e) {
+                    // Registrar el error y lanzar una excepción
+                    Log::error('Error al crear el contacto: ' . $e->getMessage());
+
                 }
+
+                // Asociar el contacto al grupo
+                // $newContact->groups()->attach($currentGroup->id);
+
+                return $newContact; // Retornar el contacto recién creado
             }
 
-            // Retornar la persona
-            return $person;
         } catch (Exception $e) {
-            // Lanzar un error 500 en caso de cualquier excepción
+            // Registrar el error y lanzar una excepción
             Log::error('IMPORTACION: ' . $e->getMessage());
             throw new HttpException(500, 'Error processing the Excel file: ' . $e->getMessage());
         }

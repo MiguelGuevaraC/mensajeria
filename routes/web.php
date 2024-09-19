@@ -3,6 +3,7 @@
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\web\CompanyController;
+use App\Http\Controllers\web\ContactController;
 use App\Http\Controllers\web\DashboardController;
 use App\Http\Controllers\web\GroupMenuController;
 use App\Http\Controllers\web\GroupSendController;
@@ -12,7 +13,6 @@ use App\Http\Controllers\web\OptionMenuController;
 use App\Http\Controllers\web\TypeUserController;
 use App\Http\Controllers\web\UserController;
 use App\Http\Controllers\web\WhatsappSendController;
-use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -102,7 +102,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('message', [MessageController::class, 'index']);
     Route::get('messageAll', [MessageController::class, 'all']);
 
-
     Route::get('message/showExample/{id}', [MessageController::class, 'showExample']);
     Route::get('message/{id}', [MessageController::class, 'show']);
     Route::post('message', [MessageController::class, 'store']);
@@ -123,8 +122,17 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('groupSend/{id}', [GroupSendController::class, 'update']);
     Route::delete('groupSend/{id}', [GroupSendController::class, 'destroy']);
 
+    Route::get('allGroups', [GroupSendController::class, 'allGroupSend']);
 
     Route::get('searchByDni/{dni}', [UserController::class, 'searchByDni']);
     Route::get('searchByRuc/{ruc}', [UserController::class, 'searchByRuc']);
 
+    Route::get('contacts', [ContactController::class, 'index']);
+    Route::get('contactsAll', [ContactController::class, 'all']);
+    Route::get('contacts/{id}', [ContactController::class, 'show']);
+    Route::post('contacts', [ContactController::class, 'store']);
+    Route::put('contacts/{id}', [ContactController::class, 'update']);
+    Route::delete('contacts/{id}', [ContactController::class, 'destroy']);
+
+    Route::post('importExcel', [ContactController::class, 'importExcel']);
 });

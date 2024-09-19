@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('telephone', 200)->nullable();
             $table->string('email', 200)->nullable();
             $table->string('address', 200)->nullable();
+            $table->decimal('costSend', 8, 2)->nullable(); 
+            
             $table->string('status', 200)->nullable();
             $table->boolean('state')->default(true);
 

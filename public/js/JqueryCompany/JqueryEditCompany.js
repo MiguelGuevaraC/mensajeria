@@ -18,6 +18,7 @@ function editCompany(id) {
             $("#addressEdit").val(data.address);
             $("#representativeNameEdit").val(data.representativeName);
             $("#telephoneEdit").val(data.telephone);
+            $("#costSendE").val(data.costSend);
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.log("Error al cargar datos del company:", errorThrown);

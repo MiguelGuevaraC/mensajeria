@@ -33,23 +33,31 @@ $(document).ready(function() {
                     title: 'Éxito',
                     text: 'El mensaje se ha actualizado correctamente.',
                 }).then(() => {
-                    $("#tbMensajes").DataTable().ajax.reload();
+                    $("#tbMensajes").DataTable().ajax.reload(); // Recargar la tabla tras el éxito
                 });
             },
-            error: function(xhr) {
-                var errors = xhr.responseJSON.errors;
-                var errorMessages = '';
+            error: function (xhr) {
+                if (xhr.status === 422) {
+                    // Manejo de errores de validación
+                    var errors = xhr.responseJSON.error;
 
-                $.each(errors, function(key, value) {
-                    errorMessages += value + '<br>';
-                });
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    html: errorMessages,
-                });
-            }
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error Validación",
+                        text: errors,
+                        confirmButtonText: "Aceptar",
+                    });
+                } else {
+                    // Otros errores
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Hubo un problema al guardar el mensaje.",
+                        confirmButtonText: "Aceptar",
+                    });
+                }
+            },
         });
+        
     });
 });

@@ -370,8 +370,9 @@
     <!-- MODALES -->
     <div>@include('Modulos.GroupSend.Modals.modalEditarGroupSend')</div>
 
-    <div>@include('Modulos.GroupSend.Modals.modalCrearGroupSend')</div>
+  
 
+    <div>@include('Modulos.GroupSend.Modals.modalCrearGroupSend')</div>
     <!--===================================================-->
     <!-- END OF CONTAINER -->
 

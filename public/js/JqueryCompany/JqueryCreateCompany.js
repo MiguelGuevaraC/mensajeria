@@ -18,6 +18,7 @@ $("#registroCompany").submit(function (event) {
     var telephone = $("#telephone").val();
     var address = $("#address").val();
     var email = $("#emailEdit").val();
+    var costSend = $("#costSend").val();
 
     // Inicializar los mensajes de error
     var errors = [];
@@ -53,6 +54,7 @@ $("#registroCompany").submit(function (event) {
         telephone: telephone,
         address: address,
         email: email,
+        costSend: costSend,
     };
 
     // Obtener el token CSRF
@@ -69,10 +71,10 @@ $("#registroCompany").submit(function (event) {
         success: function (response) {
             // Cerrar el modal de creación
             $("#modalNuevoCompany").modal("hide");
-
+    
             // Recargar los datos en la tabla utilizando DataTables
             $("#tbCompanies").DataTable().ajax.reload();
-
+    
             // Mostrar notificación de éxito
             Swal.fire({
                 title: "Éxito",
@@ -83,16 +85,37 @@ $("#registroCompany").submit(function (event) {
         },
         error: function (jqXHR, textStatus, errorThrown) {
             console.log("Error al registrar empresa:", errorThrown);
-
+    
+            let errorMessage = "Error al registrar empresa";
+    
+            // Verificar si el error es 422 (Unprocessable Entity)
+            if (jqXHR.status === 422) {
+                const errors = jqXHR.responseJSON.errors;
+                errorMessage = "<ul>";
+    
+                // Iterar sobre los errores y construir el mensaje
+                $.each(errors, function (field, messages) {
+                    $.each(messages, function (index, message) {
+                        errorMessage += "<li>" + message + "</li>";
+                    });
+                });
+    
+                errorMessage += "</ul>";
+            } else {
+                // Mensaje genérico para otros errores
+                errorMessage += ": " + errorThrown;
+            }
+    
             // Mostrar notificación de error
             Swal.fire({
                 title: "Error",
                 icon: "error",
-                text: "Error al registrar empresa: " + errorThrown,
+                html: errorMessage, // Usar `html` para permitir etiquetas HTML
                 confirmButtonText: "Aceptar",
             });
         },
     });
+    
 });
 
 $(document).ready(function () {
