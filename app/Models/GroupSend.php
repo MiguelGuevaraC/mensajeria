@@ -15,7 +15,7 @@ class GroupSend extends Model
         'id',
         'name',
         'comment',
-        'company_id',
+        'user_id',
 
         'state',
         'status',

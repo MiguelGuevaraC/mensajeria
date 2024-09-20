@@ -180,7 +180,7 @@ class WhatsappSendController extends Controller
         $message_id = $request->input('message_id');
         $user = Auth::user();
         $company_id = $user->company_id;
-        $user_id = $user->_id;
+        $user_id = $user->id;
 
         // Iniciar el registro de logs
         Log::info('Iniciando el envío de mensajes', ['user_id' => $user->id, 'company_id' => $company_id]);

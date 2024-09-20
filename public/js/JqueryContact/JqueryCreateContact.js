@@ -108,6 +108,7 @@ $("#tbContacts").on("change", "input.checkCompro", function () {
 
 $(document).ready(function () {
     $("#contactsForSend").on("click", function () {
+        var idMensaje='';
         // Realiza la solicitud Ajax a summarySend
         $.ajax({
             url: "summarySend", // Asegúrate de que esta URL apunte correctamente a tu API
@@ -200,6 +201,7 @@ $(document).ready(function () {
                     cancelButtonColor: "#d33",
                     preConfirm: () => {
                         const mensajeId = $("#message_id").val();
+
 
                         if (!mensajeId || mensajeId == "") {
                             Swal.showValidationMessage(
@@ -357,6 +359,7 @@ $(document).ready(function () {
                                 confirmButtonText: "Deshabilitar",
                             }).then((result) => {
                                 if (result.isConfirmed) {
+                                    
                                     // Llamar a la API para deshabilitar el grupo
                                     $.ajax({
                                         url: `disabledSendByGroup/${groupId}`, // Cambia esta URL según tu implementación
@@ -385,6 +388,7 @@ $(document).ready(function () {
                     },
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        idMensaje= result.value.mensajeId;
                         Swal.fire({
                             title: "¿Confirmar el envío?",
                             html: `
@@ -402,6 +406,7 @@ $(document).ready(function () {
                             cancelButtonColor: "#d33",
                         }).then((result) => {
                             if (result.isConfirmed) {
+                              
                                 $.ajax({
                                     url: "sendApi", // Cambia esta URL si es necesario
                                     method: "POST",
@@ -411,7 +416,7 @@ $(document).ready(function () {
                                         ).attr("content"), // Asegúrate de tener el token en tu meta
                                     },
                                     data: {
-                                        message_id: result.value.mensajeId,
+                                        message_id: idMensaje,
                                     },
                                     success: function (response) {
                                         Swal.fire({

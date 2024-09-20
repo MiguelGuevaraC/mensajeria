@@ -17,7 +17,7 @@ class MessageWhasapp extends Model
         'block2',
         'block3',
         'block4',
-        'company_id',
+        'user_id',
         'routeFile',
         'state',
         'created_at',
