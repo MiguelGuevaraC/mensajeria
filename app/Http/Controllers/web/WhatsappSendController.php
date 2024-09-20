@@ -162,53 +162,67 @@ class WhatsappSendController extends Controller
 
     public function store(Request $request)
     {
-        $message_id = 1;
+        $validator = validator()->make(
+            $request->all(),
+            [
+                'message_id' => 'required|exists:message_whasapps,id', // 'exists' valida que el id exista en la tabla 'message_whasapps'
+            ],
+            [
+                'message_id.required' => 'El campo de mensaje es obligatorio.',
+                'message_id.exists' => 'El mensaje seleccionado no existe en la base de datos.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->first()], 422);
+        }
+
+        $message_id = $request->input('message_id');
         $user = Auth::user();
         $company_id = $user->company_id;
-    
+
         // Iniciar el registro de logs
         Log::info('Iniciando el envío de mensajes', ['user_id' => $user->id, 'company_id' => $company_id]);
-    
+
         $contactsByGroups = ContactByGroup::where('stateSend', 1) // Solo envíos activos
             ->whereHas('groupSend', function ($query) use ($company_id) {
                 $query->where('company_id', $company_id)
                     ->where('state', 1); // Solo grupos con estado activo
             })
             ->get();
-    
+
         // Verificar si no se encontraron contactos
         if ($contactsByGroups->isEmpty()) {
             Log::warning('No se encontraron contactos marcados', ['user_id' => $user->id]);
             return response()->json(['error' => 'No se encontraron contactos marcados'], 422);
         }
-    
+
         $contactByGroupPaquete = []; // Inicializar el array para los contactos
-    
+
         foreach ($contactsByGroups as $contactByGroup) {
             $contactByGroupBD = ContactByGroup::find($contactByGroup->id);
             $contact = Contact::find($contactByGroupBD->contact_id);
-    
+
             if ($contactByGroupBD && $contact->telephone) {
                 $contactByGroupPaquete[] = $contactByGroupBD;
                 Log::info('Contacto agregado', ['contact_id' => $contactByGroupBD->contact_id]);
             }
-    
+
             if (count($contactByGroupPaquete) >= 50) {
                 SendWhatsappJob::dispatch($contactByGroupPaquete, $user, $message_id);
                 Log::info('Enviando paquete de mensajes', ['cantidad' => count($contactByGroupPaquete)]);
                 $contactByGroupPaquete = [];
             }
         }
-    
+
         if (count($contactByGroupPaquete) > 0) {
             SendWhatsappJob::dispatch($contactByGroupPaquete, $user, $message_id);
             Log::info('Enviando último paquete de mensajes', ['cantidad' => count($contactByGroupPaquete)]);
         }
-    
+
         // Respuesta 200
         return response()->json(['message' => 'Mensajes enviados correctamente.'], 200);
     }
-    
 
     public function excelExport(Request $request)
     {

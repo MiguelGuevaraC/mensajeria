@@ -7,6 +7,7 @@ use App\Imports\PersonImport;
 use App\Models\ContactByGroup;
 use App\Models\GroupMenu;
 use App\Models\GroupSend;
+use App\Models\MessageWhasapp;
 use App\Models\MigrationExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -63,11 +64,16 @@ class ContactController extends Controller
         $totalGroups = $groupSends->count();
         $totalContacts = $groupSends->sum('contactCount');
 
+        $mensajes = MessageWhasapp::where('state', 1)
+            ->where('company_id', $company_id) // Filtro por company_id
+            ->orderBy('id', 'desc')->get();
+
         // Preparar el array de respuesta
         $data = [
             "countTotalgroupSends" => $totalGroups, // Cantidad total de grupos
             "countTotalContact" => $totalContacts, // Cantidad total de contactos
             "arrayGroups" => $groupSends, // Grupos con su nombre y cantidad de contactos
+            "mensajes" => $mensajes,
         ];
 
         return response()->json($data);
@@ -125,7 +131,7 @@ class ContactController extends Controller
         ])->whereHas('groupSend', function ($query) use ($company_id) {
             // Asegurar que el filtro company_id esté en todos los groupSend
             $query->where('company_id', $company_id);
-        })->where('state', 1);
+        })->where('state', 1)->orderBy('contact_id', 'asc');
 
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {
@@ -195,7 +201,7 @@ class ContactController extends Controller
         // Paginación
         $list = $query->skip($start)
             ->take($length)
-            ->orderBy('id', 'desc')
+
             ->get();
 
         return response()->json([
@@ -296,6 +302,15 @@ class ContactController extends Controller
             })->update(['stateSend' => 1]);
 
             return response()->json(['success' => 'Estado actualizado para contactos de la empresa'], 200);
+        } else if ($id == -2) {
+            $company_id = Auth::user()->company_id;
+
+            $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($company_id) {
+                $query->where('company_id', $company_id);
+            })->update(['stateSend' => 0]);
+
+            return response()->json(['success' => 'Estado actualizado para contactos de la empresa'], 200);
+
         } else {
             // Buscar el grupo por ID
             $groupSend = GroupSend::find($id);

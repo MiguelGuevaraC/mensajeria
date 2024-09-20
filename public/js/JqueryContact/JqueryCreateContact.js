@@ -117,19 +117,21 @@ $(document).ready(function () {
                 const groups = response.arrayGroups; // Datos devueltos con nombre del grupo y cantidad
                 const totalGroups = response.countTotalgroupSends; // Total de grupos
                 const totalContacts = response.countTotalContact; // Total de contactos
-
+                const messages = response.mensajes;
                 // Resumen con íconos Font Awesome
                 const summaryHtml = `
-                    <div style="display: flex; justify-content: space-around; margin-bottom: 15px;">
-                        <div style="text-align: center;">
-                            <i class="fas fa-users" style="font-size: 24px; color: #3085d6;"></i>
-                            <p style="margin: 5px 0;">${totalGroups} Grupos</p>
-                        </div>
-                        <div style="text-align: center;">
-                            <i class="fas fa-paper-plane" style="font-size: 24px; color: #3085d6;"></i>
-                            <p style="margin: 5px 0;">${totalContacts} Envíos</p>
-                        </div>
-                    </div>`;
+                <div style="display: flex; justify-content: space-around; margin-bottom: 15px;">
+                    <div style="text-align: center;">
+                        <i class="fas fa-users" style="font-size: 24px; color: #3085d6;"></i>
+                        <p style="margin: 5px 0;">${totalGroups} Grupos</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <i class="fas fa-paper-plane" style="font-size: 24px; color: #3085d6;"></i>
+                        <p style="margin: 5px 0;">${totalContacts} Envíos</p>
+                    </div>
+                </div>
+ 
+            `;
 
                 // Construir tabla con datos
                 let tableContent = `
@@ -157,8 +159,30 @@ $(document).ready(function () {
                         </tr>`;
                 });
 
-                tableContent += `</tbody></table>`;
-
+                tableContent += `</tbody></table><br>`;
+                tableContent += `
+                <div class="form-group mb-4">
+                    <label for="message_id" class="form-label"><b>Mensaje:</b></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                        </div>
+                        <select name="message_id" id="message_id" class="form-control select2" required>
+                            ${messages
+                                .map(
+                                    (msg) => `<option value="${msg.id}">${msg.title}</option>`
+                                )
+                                .join("")}
+                        </select>
+                        <div class="input-group-append">
+                            <button style="background-color: green;" class="btn btn-outline btn-primary btonNuevoMessage" type="button">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <button id="btonShowView" class="btn btn-warning" data-id="${messages[0].id}">Ver Mensaje</button>
+                        </div>
+                    </div>
+                    <div class="error-message mt-2"></div>
+                </div>`;
 
                 Swal.fire({
                     title: "Resumen de Envío",
@@ -168,19 +192,49 @@ $(document).ready(function () {
                     confirmButtonText: "Enviar Mensajes",
                     confirmButtonColor: "green",
                     cancelButtonColor: "#d33",
+                    preConfirm: () => {
+                        const mensajeId = $("#message_id").val();
+
+                        if (!mensajeId || mensajeId == "") {
+                            Swal.showValidationMessage(
+                                "El campo Mensaje es obligatorio"
+                            );
+                            return false;
+                        }
+
+                        return { mensajeId: mensajeId }; // Retorna el valor para usarlo en el then
+                    },
                     didRender: () => {
                         // Hacer la tabla responsive
                         $(".swal2-popup").css("overflow-x", "auto");
+
+                        $('#message_id').on('change', function() {
+                         
+                            let selectedId = $(this).val();
+                            $('#btonShowView').attr('data-id', selectedId);
+                            
+                        });
+
+                       
+
+                        $(".btonNuevoMessage").on("click", function () {
+                            Swal.close(); // Cierra la alerta de SweetAlert
+                            $("#modalNuevoMensaje").modal("show"); // Abre el modal
+
+                            // Evento que se dispara cuando se cierra el modal
+                        });
+
                         $(".viewGroupBtn").on("click", function () {
                             const groupId = $(this).data("id");
-                        
+
                             // Aquí realizarías una solicitud Ajax para obtener los contactos del grupo usando el ID
                             $.ajax({
                                 url: `contactsForGroup/${groupId}`, // Cambia esta URL según tu implementación
-                                method: 'GET',
-                                success: function(response) {
-                                    const contacts = response.arrayContactsByGroup; // Suponiendo que la respuesta tiene un array de contactos
-                        
+                                method: "GET",
+                                success: function (response) {
+                                    const contacts =
+                                        response.arrayContactsByGroup; // Suponiendo que la respuesta tiene un array de contactos
+
                                     // Construir la tabla con los detalles del grupo
                                     let contactsTableContent = `
                                         <table style="width:100%; text-align: left; border-collapse: collapse;" class="swal2-table">
@@ -192,8 +246,8 @@ $(document).ready(function () {
                                                 </tr>
                                             </thead>
                                             <tbody>`;
-                        
-                                    contacts.forEach(contact => {
+
+                                    contacts.forEach((contact) => {
                                         contactsTableContent += `
                                             <tr>
                                                 <td style="padding: 8px; border: 1px solid #ddd;">${contact.name}</td>
@@ -205,61 +259,86 @@ $(document).ready(function () {
                                                 </td>
                                             </tr>`;
                                     });
-                        
+
                                     contactsTableContent += `</tbody></table>`;
-                        
+
                                     // Mostrar SweetAlert con los envíos del grupo
                                     Swal.fire({
                                         title: `Grupo: ${response.groupName}`,
                                         html: contactsTableContent,
-                                        width: '600px',
+                                        width: "600px",
                                         showCancelButton: true,
-                                        confirmButtonText: 'Cerrar',
-                                        confirmButtonColor: '#3085d6',
-                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: "Cerrar",
+                                        confirmButtonColor: "#3085d6",
+                                        cancelButtonColor: "#d33",
                                         didClose: () => {
                                             // Cuando se cierra el modal, abrir el resumen
                                             $("#contactsForSend").click(); // Llama al evento original
                                         },
                                         didRender: () => {
                                             // Acción para el botón "Eliminar"
-                                            $(".deleteContactBtn").on("click", function () {
-                                                const contactId = $(this).data("id");
-                                                Swal.fire({
-                                                    title: '¿Estás seguro?',
-                                                    text: 'Este contacto será deshabilitado.',
-                                                    icon: 'warning',
-                                                    showCancelButton: true,
-                                                    confirmButtonColor: '#d33',
-                                                    cancelButtonColor: '#3085d6',
-                                                    confirmButtonText: 'Deshabilitar',
-                                                }).then((result) => {
-                                                    if (result.isConfirmed) {
-                                                        // Llamar a la API para deshabilitar el contacto
-                                                        $.ajax({
-                                                            url: `stateSend/${contactId}`, // Cambia esta URL según tu implementación
-                                                            method: 'GET',
-                                                            success: function() {
-                                                                Swal.fire('Deshabilitado', 'Se desmarcó con Éxito', 'success');
-                                                                $("#tbContacts").DataTable().ajax.reload();
-                                                            },
-                                                            error: function() {
-                                                                Swal.fire('Error', 'No se pudo deshabilitar el contacto.', 'error');
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            });
-                                        }
+                                            $(".deleteContactBtn").on(
+                                                "click",
+                                                function () {
+                                                    const contactId =
+                                                        $(this).data("id");
+                                                    Swal.fire({
+                                                        title: "¿Estás seguro?",
+                                                        text: "Este contacto será deshabilitado.",
+                                                        icon: "warning",
+                                                        showCancelButton: true,
+                                                        confirmButtonColor:
+                                                            "#d33",
+                                                        cancelButtonColor:
+                                                            "#3085d6",
+                                                        confirmButtonText:
+                                                            "Deshabilitar",
+                                                    }).then((result) => {
+                                                        if (
+                                                            result.isConfirmed
+                                                        ) {
+                                                            // Llamar a la API para deshabilitar el contacto
+                                                            $.ajax({
+                                                                url: `stateSend/${contactId}`, // Cambia esta URL según tu implementación
+                                                                method: "GET",
+                                                                success:
+                                                                    function () {
+                                                                        Swal.fire(
+                                                                            "Deshabilitado",
+                                                                            "Se desmarcó con Éxito",
+                                                                            "success"
+                                                                        );
+                                                                        $(
+                                                                            "#tbContacts"
+                                                                        )
+                                                                            .DataTable()
+                                                                            .ajax.reload();
+                                                                        $(
+                                                                            `.viewGroupBtn`
+                                                                        ).click();
+                                                                    },
+                                                                error: function () {
+                                                                    Swal.fire(
+                                                                        "Error",
+                                                                        "No se pudo deshabilitar el contacto.",
+                                                                        "error"
+                                                                    );
+                                                                },
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            );
+                                        },
                                     });
                                 },
-                                error: function(xhr, status, error) {
+                                error: function (xhr, status, error) {
                                     Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: 'No se pudo obtener los contactos del grupo.',
+                                        icon: "error",
+                                        title: "Error",
+                                        text: "No se pudo obtener los contactos del grupo.",
                                     });
-                                }
+                                },
                             });
                         });
 
@@ -267,64 +346,95 @@ $(document).ready(function () {
                         $(".deleteGroupBtn").on("click", function () {
                             const groupId = $(this).data("id");
                             Swal.fire({
-                                title: '¿Estás seguro?',
-                                text: 'Este grupo será deshabilitado.',
-                                icon: 'warning',
+                                title: "¿Estás seguro?",
+                                text: "Este grupo será deshabilitado.",
+                                icon: "warning",
                                 showCancelButton: true,
-                                confirmButtonColor: '#d33',
-                                cancelButtonColor: '#3085d6',
-                                confirmButtonText: 'Deshabilitar',
+                                confirmButtonColor: "#d33",
+                                cancelButtonColor: "#3085d6",
+                                confirmButtonText: "Deshabilitar",
                             }).then((result) => {
                                 if (result.isConfirmed) {
                                     // Llamar a la API para deshabilitar el grupo
                                     $.ajax({
                                         url: `disabledSendByGroup/${groupId}`, // Cambia esta URL según tu implementación
-                                        method: 'GET',
-                                        success: function() {
-                                            Swal.fire('Deshabilitado', 'Grupo deshabilitado con éxito', 'success');
-                                            $("#tbContacts").DataTable().ajax.reload(); // Recargar la tabla si es necesario
+                                        method: "GET",
+                                        success: function () {
+                                            Swal.fire(
+                                                "Deshabilitado",
+                                                "Grupo deshabilitado con éxito",
+                                                "success"
+                                            );
+                                            $("#tbContacts")
+                                                .DataTable()
+                                                .ajax.reload(); // Recargar la tabla si es necesario
                                         },
-                                        error: function() {
-                                            Swal.fire('Error', 'No se pudo deshabilitar el grupo.', 'error');
-                                        }
+                                        error: function () {
+                                            Swal.fire(
+                                                "Error",
+                                                "No se pudo deshabilitar el grupo.",
+                                                "error"
+                                            );
+                                        },
                                     });
                                 }
                             });
                         });
-                        
                     },
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Enviar solicitud AJAX a la API sendApi
-                        $.ajax({
-                            url: 'sendApi', // Cambia esta URL si es necesario
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Asegúrate de tener el token en tu meta
-                            },
-                            data: {
-                                // Agrega aquí los datos que necesitas enviar
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Éxito',
-                                    text: 'Mensajes enviados con éxito.',
+                        Swal.fire({
+                            title: "¿Confirmar el envío?",
+                            html: `
+                                <div style="text-align: center;">
+                                    <i class="fas fa-paper-plane" style="font-size: 24px; color: #3085d6;"></i>
+                                    <p style="margin: 5px 0;">Se han registrado ${totalContacts} envíos</p>
+                                    <p style="color: #555;">¿Estás seguro de que deseas proceder?</p>
+                                </div>
+                            `,
+                            icon: "question",
+                            showCancelButton: true,
+                            confirmButtonText: "Sí, enviar ahora",
+                            cancelButtonText: "Revisar de nuevo",
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "sendApi", // Cambia esta URL si es necesario
+                                    method: "POST",
+                                    headers: {
+                                        "X-CSRF-TOKEN": $(
+                                            'meta[name="csrf-token"]'
+                                        ).attr("content"), // Asegúrate de tener el token en tu meta
+                                    },
+                                    data: {
+                                        message_id: result.value.mensajeId,
+                                    },
+                                    success: function (response) {
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: "Éxito",
+                                            text: "Mensajes enviados con éxito.",
+                                        });
+                                        // Aquí puedes hacer otras acciones, como recargar tablas o actualizar el UI
+                                    },
+                                    error: function (xhr) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Error",
+                                            text:
+                                                xhr.responseJSON.error ||
+                                                "No se pudo enviar los mensajes.",
+                                        });
+                                    },
                                 });
-                                // Aquí puedes hacer otras acciones, como recargar tablas o actualizar el UI
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON.error || 'No se pudo enviar los mensajes.',
-                                });
+                            } else {
+                                $("#contactsForSend").click();
                             }
                         });
                     }
                 });
-
-                
             },
             error: function (xhr, status, error) {
                 Swal.fire({
@@ -337,4 +447,105 @@ $(document).ready(function () {
     });
 });
 
+$(document).ready(function () {
+    $("#modalNuevoMensaje").on("hidden.bs.modal", function () {
+        // Vuelve a abrir la alerta de resumen de envío
+        $("#contactsForSend").click();
+    });
+});
 
+$("#btonSaveMessage").on("click", function () {
+    // Crear un objeto FormData
+    var formData = new FormData();
+
+    // Agregar los valores de los campos del formulario
+    formData.append("title", $("#title").val());
+    formData.append("block1", $("#block1").val());
+    formData.append("block2", $("#block2").val());
+    formData.append("block3", $("#block3").val());
+    formData.append("block4", $("#block4").val());
+
+    formData.append("_token", $('input[name="_token"]').val());
+
+    var fileInput = $("#fileUpload")[0]; // Seleccionar el elemento DOM
+    if (fileInput.files.length > 0) {
+        formData.append("fileUpload", fileInput.files[0]); // Añadir el archivo al formData
+    }
+
+    $.ajax({
+        url: "message", // Ruta del controlador
+        type: "POST", // Usar PUT en lugar de POST
+        data: formData,
+        processData: false, // No procesar los datos
+        contentType: false, // No establecer el contentType
+        success: function (response) {
+            Swal.fire({
+                icon: "success",
+                title: "Registro actualizado exitosamente",
+                text: "El mensaje se ha guardado correctamente.",
+                confirmButtonText: "Aceptar",
+            });
+            $("#modalNuevoMensaje").modal("hide");
+            $("#tbMensajes").DataTable().ajax.reload();
+            $("#registroMensajeNuevo").trigger("reset");
+        },
+        error: function (xhr) {
+            if (xhr.status === 422) {
+                // Manejo de errores de validación
+                var errors = xhr.responseJSON.error;
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Error Validación",
+                    text: errors,
+                    confirmButtonText: "Aceptar",
+                });
+            } else {
+                // Otros errores
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Hubo un problema al guardar el mensaje.",
+                    confirmButtonText: "Aceptar",
+                });
+            }
+        },
+    });
+});
+$(document).on("click", '#btonShowView', function () {
+    // Obtén el ID del botón
+    var id = $(this).data("id");
+
+    // Realiza la solicitud AJAX
+    $.ajax({
+        url: "message/showExample/" + id,
+        method: "GET",
+        success: function (response) {
+            console.log(response);
+            let data = response;
+            Swal.fire({
+                title: "VISTA MENSAJE",
+                html: `
+                    <div style='text-align:left;'><b>${data.title}</b></div><br>
+                    <div style='text-align:left'>
+                        <div>${data.block1}</div><br>
+                        <div>${data.block2}</div><br>
+                        <div>${data.block3}</div><br>
+                        <div>${data.block4}</div>
+                    </div>
+                `,
+            }).then(() => {
+                // Cierra el modal de Sweet Alert y dispara el evento de clic
+                $("#contactsForSend").click();
+            });
+            
+        },
+        error: function () {
+            Swal.fire({
+                title: "Error",
+                text: "Hubo un problema al obtener los datos.",
+                icon: "error",
+            });
+        },
+    });
+});

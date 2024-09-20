@@ -28,18 +28,18 @@ var columns = [
     {
         data: "contact.names",
         render: function (data, type, row, meta) {
-            return (
-                data +
-                " - " +
-                row.contact.documentNumber +
-                " - " +
-                row.contact.telephone +
-                " - " +
-                row.contact.address
-            );
+            const parts = [];
+            
+            if (data) parts.push(data);
+            if (row.contact.documentNumber) parts.push(row.contact.documentNumber);
+            if (row.contact.telephone) parts.push(row.contact.telephone);
+            if (row.contact.address) parts.push(row.contact.address);
+            
+            return parts.join(" - ");
         },
         orderable: false,
     },
+    
 
     {
         data: "contact.concept",
@@ -361,7 +361,10 @@ $(document).ready(function () {
             success: function (data) {
                 // Verifica que 'data' sea un array
                 let options = `
-                    <option value="-1">Marcar Todos los Grupos</option>`; // Opción para marcar todos los grupos
+                    <option value="-1">Marcar Todos los Grupos</option>
+                    
+                    <option value="-2">Desmarcar Todos los Grupos</option>
+                    `;
 
                 // Usa forEach para construir las opciones del select
                 data.groupSends.forEach((group) => {
@@ -373,12 +376,12 @@ $(document).ready(function () {
                 });
 
                 Swal.fire({
-                    title: "Selecciona un grupo",
+                    title: "Marcar por grupo",
                     html: `<select id="groupSelect" style="width: 100%; padding: 5px; border-radius: 4px;">
                                ${options}
                            </select>`,
                     showCancelButton: true,
-                    confirmButtonText: "Marcar",
+                    confirmButtonText: "Cambiar Estado",
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
                     preConfirm: () => {

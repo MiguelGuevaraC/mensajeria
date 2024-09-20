@@ -380,6 +380,7 @@
 
     <div>@include('Modulos.Contact.Modals.modalCrearContact')</div>
     <div>@include('Modulos.Contact.Modals.modalCrearGroupSend')</div>
+    <div>@include('Modulos.Contact.Modals.createMessage')</div>
     <!--===================================================-->
     <!-- END OF CONTAINER -->
 
