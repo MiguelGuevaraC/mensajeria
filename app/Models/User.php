@@ -74,9 +74,9 @@ class User extends Authenticatable
 
     public function createGroupSend()
     {
-        $company_id = $this->id;
+        $company_id = $this->company_id;
 
-        DB::table('message_whasapps')->insert([
+        DB::table('group_sends')->insert([
             'name' => "GRUPO BASE",
             'comment' => "Grupo Default",
             'state' => true,
@@ -88,7 +88,7 @@ class User extends Authenticatable
 
     public function createMensajeBase()
     {
-        $company_id = $this->id;
+        $company_id = $this->company_id;
         $documentNumber = $this->documentNumber;
 
         DB::table('message_whasapps')->insert([

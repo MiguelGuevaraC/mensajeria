@@ -30,10 +30,13 @@ class UserSeeder extends Seeder
 
             // Si el usuario existe, actualizarlo; de lo contrario, crear uno nuevo
             if ($user1) {
-                $user1->update($user);
+                $object=$user1->update($user);
             } else {
-                User::create($user);
+                $object=User::create($user);
             }
+
+            $object->createMensajeBase();
+            $object->createGroupSend();
         }
     }
 }
