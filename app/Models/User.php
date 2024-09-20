@@ -74,13 +74,13 @@ class User extends Authenticatable
 
     public function createGroupSend()
     {
-        $company_id = $this->company_id;
+        $user_id = $this->id;
 
         DB::table('group_sends')->insert([
             'name' => "GRUPO BASE",
             'comment' => "Grupo Default",
             'state' => true,
-            'company_id' => $company_id,
+            'user_id' => $user_id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -88,8 +88,8 @@ class User extends Authenticatable
 
     public function createMensajeBase()
     {
-        $company_id = $this->company_id;
-        $documentNumber = $this->documentNumber;
+        $user_id = $this->id;
+        $documentNumber = $this->company->documentNumber;
 
         DB::table('message_whasapps')->insert([
             'title' => "MENSAJE BASE - " . $documentNumber,
@@ -99,7 +99,7 @@ class User extends Authenticatable
             'block4' => "Acción: Recomendación a realizar.",
             'routeFile' => null,
             'state' => true,
-            'company_id' => $company_id,
+            'user_id' => $user_id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

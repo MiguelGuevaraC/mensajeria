@@ -180,13 +180,14 @@ class WhatsappSendController extends Controller
         $message_id = $request->input('message_id');
         $user = Auth::user();
         $company_id = $user->company_id;
+        $user_id = $user->_id;
 
         // Iniciar el registro de logs
         Log::info('Iniciando el envío de mensajes', ['user_id' => $user->id, 'company_id' => $company_id]);
 
         $contactsByGroups = ContactByGroup::where('stateSend', 1) // Solo envíos activos
-            ->whereHas('groupSend', function ($query) use ($company_id) {
-                $query->where('company_id', $company_id)
+            ->whereHas('groupSend', function ($query) use ($user_id) {
+                $query->where('user_id', $user_id)
                     ->where('state', 1); // Solo grupos con estado activo
             })
             ->get();

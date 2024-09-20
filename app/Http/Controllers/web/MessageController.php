@@ -114,13 +114,19 @@ class MessageController extends Controller
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
 
-        // Obtener el company_id del usuario autenticado
-        $company_id = Auth::user()->company_id;
+        $user = Auth::user();
 
-        // Filtrar por el estado y el company_id del usuario
-        $query = MessageWhasapp::where('state', 1)
-            ->where('company_id', $company_id) // Filtro por company_id
-            ->orderBy('id', 'desc');
+
+        $query = MessageWhasapp::with(['user'])
+            ->where('state', 1);
+        if ($user->typeofUser_id == 1) {
+            $query->whereHas('user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+        } else {
+            $query->where('user_id', $user->id);
+        }
+        $query->orderBy('id', 'desc');
 
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {
@@ -166,49 +172,48 @@ class MessageController extends Controller
             'data' => $list,
         ]);
     }
-function countSpecialChars($text)
-        {
-            $specialChars = [
-                'á' => 5, 'é' => 5, 'í' => 5, 'ó' => 5, 'ú' => 5,
-                'ü' => 5, 'ñ' => 5,
-                'Á' => 5, 'É' => 5, 'Í' => 5, 'Ó' => 5, 'Ú' => 5,
-                'Ü' => 5, 'Ñ' => 5,
-                '/' => 3, '\\' => 3,
-            ];
+    public function countSpecialChars($text)
+    {
+        $specialChars = [
+            'á' => 5, 'é' => 5, 'í' => 5, 'ó' => 5, 'ú' => 5,
+            'ü' => 5, 'ñ' => 5,
+            'Á' => 5, 'É' => 5, 'Í' => 5, 'Ó' => 5, 'Ú' => 5,
+            'Ü' => 5, 'Ñ' => 5,
+            '/' => 3, '\\' => 3,
+        ];
 
-            // Mapa de etiquetas y su peso en caracteres
-            $tagsCount = [
-                '{{names}}' => 40,
-                '{{documentNumber}}' => 12,
-                '{{telephone}}' => 9,
-                '{{address}}' => 50,
-                '{{concept}}' => 30,
-                '{{amount}}' => 7,
-                '{{dateReference}}' => 10,
-            ];
+        // Mapa de etiquetas y su peso en caracteres
+        $tagsCount = [
+            '{{names}}' => 40,
+            '{{documentNumber}}' => 12,
+            '{{telephone}}' => 9,
+            '{{address}}' => 50,
+            '{{concept}}' => 30,
+            '{{amount}}' => 7,
+            '{{dateReference}}' => 10,
+        ];
 
-            $length = mb_strlen($text); // Largo total del texto
-            $specialCount = 0;
+        $length = mb_strlen($text); // Largo total del texto
+        $specialCount = 0;
 
-            // Contar caracteres especiales
-            foreach (preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY) as $char) {
-                if (isset($specialChars[$char])) {
-                    $specialCount += $specialChars[$char] - 1; // Restar 1 porque ya cuenta como 1
-                }
+        // Contar caracteres especiales
+        foreach (preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY) as $char) {
+            if (isset($specialChars[$char])) {
+                $specialCount += $specialChars[$char] - 1; // Restar 1 porque ya cuenta como 1
             }
-
-            // Contar etiquetas y sumar caracteres según corresponda
-            foreach ($tagsCount as $tag => $count) {
-                $occurrences = substr_count($text, $tag);
-                $specialCount += $occurrences * ($count - mb_strlen($tag)); // Restar longitud real de la etiqueta
-            }
-
-            return $length + $specialCount;
         }
+
+        // Contar etiquetas y sumar caracteres según corresponda
+        foreach ($tagsCount as $tag => $count) {
+            $occurrences = substr_count($text, $tag);
+            $specialCount += $occurrences * ($count - mb_strlen($tag)); // Restar longitud real de la etiqueta
+        }
+
+        return $length + $specialCount;
+    }
     public function store(Request $request)
     {
         // Función para contar caracteres teniendo en cuenta caracteres especiales y etiquetas
-        
 
         // Validar la solicitud
         $validator = validator()->make($request->all(), [
@@ -295,7 +300,7 @@ function countSpecialChars($text)
             'block2' => $request->input('block2', 'Bloque 2 por defecto'),
             'block3' => $request->input('block3', 'Bloque 3 por defecto'),
             'block4' => $request->input('block4', 'Bloque 4 por defecto'),
-            'company_id' => $user->company_id,
+            'user_id' => $user->id,
         ];
 
         // Validar etiquetas permitidas
@@ -333,200 +338,9 @@ function countSpecialChars($text)
         return response()->json($message, 200);
     }
 
-//     public function store(Request $request)
-//     {
-//         $validator = validator()->make($request->all(), [
-//             'title' => 'required|string|max:65',
-//             'block1' => 'required|string|max:400',
-//             'block2' => 'required|string|max:400',
-//             'block3' => 'required|string|max:400',
-//             'block4' => 'required|string|max:400',
-//             'fileUpload' => 'nullable|file|mimes:pdf,png,jpg,jpeg|max:2048',
-//         ], [
-//             'title.required' => 'El título es obligatorio.',
-//             'title.string' => 'El título debe ser una cadena de texto.',
-//             'title.max' => 'El título no debe exceder los 65 caracteres.',
-//             'block1.required' => 'El párrafo 1 es obligatorio.',
-//             'block1.string' => 'El párrafo 1 debe ser una cadena de texto.',
-//             'block1.max' => 'El párrafo 1 no debe exceder los 400 caracteres.',
-//             'block2.required' => 'El párrafo 2 es obligatorio.',
-//             'block2.string' => 'El párrafo 2 debe ser una cadena de texto.',
-//             'block2.max' => 'El párrafo 2 no debe exceder los 400 caracteres.',
-//             'block3.required' => 'El párrafo 3 es obligatorio.',
-//             'block3.string' => 'El párrafo 3 debe ser una cadena de texto.',
-//             'block3.max' => 'El párrafo 3 no debe exceder los 400 caracteres.',
-//             'block4.required' => 'El párrafo 4 es obligatorio.',
-//             'block4.string' => 'El párrafo 4 debe ser una cadena de texto.',
-//             'block4.max' => 'El párrafo 4 no debe exceder los 400 caracteres.',
-//             'fileUpload.mimes' => 'El archivo debe ser un PDF, PNG, JPG o JPEG.',
-//             'fileUpload.max' => 'El archivo no debe ser mayor a 2MB.',
-
-//         ]);
-
-//         if ($validator->fails()) {
-//             return response()->json([
-//                 'error' => $validator->errors()->first(),
-//             ], 422);
-//         }
-
-//         $user = Auth::user();
-
-//         // Preparar los datos para actualizar o crear
-//         $messageData = [
-//             'title' => $request->input('title' ?? 'titulo'),
-//             'block1' => $request->input('block1' ?? 'block1'),
-//             'block2' => $request->input('block2' ?? 'block2'),
-//             'block3' => $request->input('block3' ?? 'block3'),
-//             'block4' => $request->input('block4' ?? 'block4'),
-//         ];
-
-//         // Validar etiquetas permitidas
-//         $allowedTags = [
-//             '{{names}}',
-//             '{{documentNumber}}',
-//             '{{telephone}}',
-//             '{{address}}',
-//             '{{concept}}',
-//             '{{amount}}',
-//             '{{dateReference}}',
-
-//         ];
-
-//         foreach ($messageData as $key => $value) {
-//             if (preg_match_all('/{{(.*?)}}/', $value, $matches)) {
-//                 foreach ($matches[1] as $tag) {
-//                     if (!in_array('{{' . $tag . '}}', $allowedTags)) {
-//                         return response()->json(['error' => 'Etiqueta no permitida: ' . $tag], 422);
-//                     }
-//                 }
-//             }
-//         }
-//         // Añadir el company_id al array $messageData
-//         $messageData['company_id'] = Auth::user()->company_id;
-
-// // Actualizar o crear el mensaje
-//         $message = MessageWhasapp::create($messageData);
-
-//         if ($request->hasFile('fileUpload')) {
-//             $file = $request->file('fileUpload');
-
-//             // Almacena el archivo en la carpeta 'uploads/messages' del disco 'public'
-//             $filePath = $file->store('uploads/messages', 'public');
-
-//             $message->routeFile = 'storage/app/public/' . $filePath;
-//             $message->save(); // Guarda los cambios en la base de datos
-//         }
-
-//         return response()->json($message, 200);
-//     }
-
-//     public function update(Request $request, $id)
-//     {
-
-//         // Validación de datos
-//         $validator = validator()->make($request->all(), [
-//             'title' => 'required|string|max:400',
-//             'block1' => 'required|string|max:400',
-//             'block2' => 'required|string|max:400',
-//             'block3' => 'required|string|max:400',
-//             'block4' => 'required|string|max:400',
-//             'fileUpload' => 'nullable|file|mimes:pdf,png,jpg,jpeg|max:2048',
-//         ], [
-//             'title.required' => 'El título es obligatorio.',
-//             'title.string' => 'El título debe ser una cadena de texto.',
-//             'title.max' => 'El título no debe exceder los 400 caracteres.',
-//             'block1.required' => 'El párrafo 1 es obligatorio.',
-//             'block1.string' => 'El párrafo 1 debe ser una cadena de texto.',
-//             'block1.max' => 'El párrafo 1 no debe exceder los 400 caracteres.',
-//             'block2.required' => 'El párrafo 2 es obligatorio.',
-//             'block2.string' => 'El párrafo 2 debe ser una cadena de texto.',
-//             'block2.max' => 'El párrafo 2 no debe exceder los 400 caracteres.',
-//             'block3.required' => 'El párrafo 3 es obligatorio.',
-//             'block3.string' => 'El párrafo 3 debe ser una cadena de texto.',
-//             'block3.max' => 'El párrafo 3 no debe exceder los 400 caracteres.',
-//             'block4.required' => 'El párrafo 4 es obligatorio.',
-//             'block4.string' => 'El párrafo 4 debe ser una cadena de texto.',
-//             'block4.max' => 'El párrafo 4 no debe exceder los 400 caracteres.',
-//             'fileUpload.mimes' => 'El archivo debe ser un PDF, PNG, JPG o JPEG.',
-//             'fileUpload.max' => 'El archivo no debe ser mayor a 2MB.',
-//         ]);
-
-//         if ($validator->fails()) {
-//             return response()->json([
-//                 'error' => $validator->errors()->first(),
-//             ], 422);
-//         }
-
-//         $message = MessageWhasapp::find($id);
-
-//         if (!$message) {
-//             return response()->json(['error' => 'Mensaje no encontrado.'], 404);
-//         }
-
-//         // Preparar los datos para actualizar
-//         $messageData = [
-//             'title' => $request->input('title'),
-//             'block1' => $request->input('block1'),
-//             'block2' => $request->input('block2'),
-//             'block3' => $request->input('block3'),
-//             'block4' => $request->input('block4'),
-//         ];
-
-//         // Validar etiquetas permitidas
-//         $allowedTags = [
-//             '{{names}}',
-//             '{{documentNumber}}',
-//             '{{telephone}}',
-//             '{{address}}',
-//             '{{concept}}',
-//             '{{amount}}',
-//             '{{dateReference}}',
-//         ];
-
-//         foreach ($messageData as $key => $value) {
-//             if (preg_match_all('/{{(.*?)}}/', $value, $matches)) {
-//                 foreach ($matches[1] as $tag) {
-//                     if (!in_array('{{' . $tag . '}}', $allowedTags)) {
-//                         return response()->json(['error' => 'Etiqueta no permitida: ' . $tag], 422);
-//                     }
-//                 }
-//             }
-//         }
-
-//         $filePath = $message->routeFile;
-
-// // Eliminar la parte 'public/' de la ruta si está al principio
-//         $filePath = preg_replace('/^.*public\//', '', $filePath);
-
-//         // Actualizar los datos del mensaje
-//         $message->update($messageData);
-
-//         // Manejar la subida de archivos
-//         if ($request->hasFile('fileUpload')) {
-//             // Eliminar el archivo anterior si existe
-//             if ($filePath && Storage::disk('public')->exists($filePath)) {
-
-//                 Storage::disk('public')->delete($filePath);
-//             }
-
-//             $file = $request->file('fileUpload');
-
-//             // Almacena el archivo en la carpeta 'uploads/messages' del disco 'public'
-//             $filePath = $file->store('uploads/messages', 'public');
-
-//             // Guardar la ruta del archivo en la base de datos
-//             $message->routeFile = 'storage/app/public/' . $filePath;
-//         }
-
-//         // Guardar los cambios en la base de datos
-//         $message->save();
-
-//         return response()->json($message, 200);
-//     }
     public function update(Request $request, $id)
     {
         // Función para contar caracteres teniendo en cuenta caracteres especiales y etiquetas
-     
 
         // Validar la solicitud
         $validator = validator()->make($request->all(), [
@@ -616,7 +430,7 @@ function countSpecialChars($text)
             'block2' => $request->input('block2', $message->block2),
             'block3' => $request->input('block3', $message->block3),
             'block4' => $request->input('block4', $message->block4),
-            'company_id' => $user->company_id,
+            'user_id' => $user->id,
         ];
 
         // Validar etiquetas permitidas
@@ -643,7 +457,6 @@ function countSpecialChars($text)
         // Actualizar el mensaje
         $message->update($messageData);
         $filePath = $message->routeFile;
-
 
         $filePath = preg_replace('/^.*public\//', '', $filePath);
 

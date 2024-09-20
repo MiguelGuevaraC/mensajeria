@@ -35,10 +35,12 @@ class Contact extends Model
         'deleted_at',
     ];
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class, 'company_id');
-    }
+    // public function company()
+    // {
+    //     return $this->belongsTo(Company::class, 'company_id');
+    // }
+
+  
 
     public function contactByGroup()
     {

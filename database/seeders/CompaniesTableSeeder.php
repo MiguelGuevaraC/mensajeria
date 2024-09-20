@@ -15,6 +15,17 @@ class CompaniesTableSeeder extends Seeder
     public function run()
     {
         $companies = [
+            $data = [
+                'businessName' => 'EMPRESA DEMO',
+                'documentNumber' => '11111111111',
+                'tradeName' => 'Empresa DEMO',
+                'representativeName' => 'Demo',
+                'telephone' => '999999999',
+                'email' => 'demo@gmail.com',
+                'address' => 'Dirección Demo',
+                'costSend' => 0.0,
+            ],
+            
             [
                 'businessName' => 'GARZASOFT E.I.R.L.',
                 'documentNumber' => '20602871119',

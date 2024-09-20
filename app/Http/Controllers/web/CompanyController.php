@@ -46,6 +46,14 @@ class CompanyController extends Controller
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
 
+        $user = Auth::user();
+
+        if ($user->typeofUser_id != 1) {
+            return response()->json([
+                'error' => 'No tiene permiso para ver las empresas',
+            ], 422);
+        }
+
         $query = Company::where('state', 1)
             ->orderBy('id', 'desc');
 

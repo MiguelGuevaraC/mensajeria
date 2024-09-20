@@ -53,7 +53,7 @@ class ContactController extends Controller
         $groupSends = ContactByGroup::selectRaw('group_sends.id as idGroupSend,group_sends.name as groupName, COUNT(contact_by_groups.contact_id) as contactCount')
             ->join('group_sends', 'contact_by_groups.groupSend_id', '=', 'group_sends.id')
             ->join('contacts', 'contact_by_groups.contact_id', '=', 'contacts.id')
-            ->where('group_sends.company_id', $company_id)
+            ->where('group_sends.user_id', $user->id)
             ->where('group_sends.state', 1) // Solo grupos con estado activo
             ->where('contacts.state', 1) // Solo contactos con estado activo
             ->where('contact_by_groups.stateSend', 1) // Solo envíos activos
@@ -65,7 +65,7 @@ class ContactController extends Controller
         $totalContacts = $groupSends->sum('contactCount');
 
         $mensajes = MessageWhasapp::where('state', 1)
-            ->where('company_id', $company_id) // Filtro por company_id
+            ->where('user_id', $user->id) // Filtro por company_id
             ->orderBy('id', 'desc')->get();
 
         // Preparar el array de respuesta
@@ -98,7 +98,7 @@ class ContactController extends Controller
         )
             ->join('group_sends', 'contact_by_groups.groupSend_id', '=', 'group_sends.id')
             ->join('contacts', 'contact_by_groups.contact_id', '=', 'contacts.id')
-            ->where('group_sends.company_id', $company_id)
+            ->where('group_sends.user_id', $user->id)
             ->where('group_sends.state', 1) // Solo grupos con estado activo
             ->where('group_sends.id', $id)
             ->where('contacts.state', 1) // Solo contactos con estado activo
@@ -121,16 +121,16 @@ class ContactController extends Controller
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
         $company_id = Auth::user()->company_id;
-
+        $user_id = Auth::user()->id;
         // Filtrar por company_id para asegurar que solo se obtengan los registros relacionados con esa compañía
         $query = ContactByGroup::with([
             'contact',
-            'groupSend' => function ($query) use ($company_id) {
-                $query->where('company_id', $company_id);
+            'groupSend' => function ($query) use ($user_id) {
+                $query->where('user_id', $user_id);
             },
-        ])->whereHas('groupSend', function ($query) use ($company_id) {
-            // Asegurar que el filtro company_id esté en todos los groupSend
-            $query->where('company_id', $company_id);
+        ])->whereHas('groupSend', function ($query) use ($user_id) {
+            // Asegurar que el filtro user_id esté en todos los groupSend
+            $query->where('user_id', $user_id);
         })->where('state', 1)->orderBy('contact_id', 'asc');
 
         // Aplicar filtros por columna
@@ -296,17 +296,19 @@ class ContactController extends Controller
         // Verificar si el ID es -1
         if ($id == -1) {
             $company_id = Auth::user()->company_id;
+            $user_id = Auth::user()->id;
 
-            $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($company_id) {
-                $query->where('company_id', $company_id);
+            $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($user_id) {
+                $query->where('user_id', $user_id);
             })->update(['stateSend' => 1]);
 
             return response()->json(['success' => 'Estado actualizado para contactos de la empresa'], 200);
         } else if ($id == -2) {
             $company_id = Auth::user()->company_id;
+            $user_id = Auth::user()->id;
 
-            $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($company_id) {
-                $query->where('company_id', $company_id);
+            $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($user_id) {
+                $query->where('user_id', $user_id);
             })->update(['stateSend' => 0]);
 
             return response()->json(['success' => 'Estado actualizado para contactos de la empresa'], 200);

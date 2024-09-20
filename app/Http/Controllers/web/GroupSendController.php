@@ -5,7 +5,6 @@ namespace App\Http\Controllers\web;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGroupSendRequest;
 use App\Http\Requests\UpdateGroupSendRequest;
-use App\Models\ContactByGroup;
 use App\Models\GroupMenu;
 use App\Models\GroupSend;
 use App\Models\User;
@@ -44,10 +43,10 @@ class GroupSendController extends Controller
     {
 
         $user = Auth::user();
-        $company_id = $user->company_id;
+        $user_id = $user->id;
 
         $groupSends = GroupSend::where('state', 1)
-            ->where('company_id', $company_id)
+            ->where('user_id', $user_id)
             ->get();
 
         $data = [
@@ -60,25 +59,21 @@ class GroupSendController extends Controller
     public function groupsWithContacts()
     {
         $user = Auth::user();
-        $company_id = $user->company_id;
-    
-        $groupSends = GroupSend::where('group_sends.state', 1) 
-            ->where('company_id', $company_id)
+        $user_id = $user->id;
+
+        $groupSends = GroupSend::where('group_sends.state', 1)
+            ->where('user_id', $user_id)
             ->whereHas('contactos', function ($query) {
-                $query->where('contacts.state', 1); 
+                $query->where('contacts.state', 1);
             })
             ->get();
-    
+
         $data = [
             "groupSends" => $groupSends,
         ];
-    
+
         return response()->json($data);
     }
-
-  
-    
-    
 
     public function all(Request $request)
     {
@@ -86,20 +81,26 @@ class GroupSendController extends Controller
         $start = $request->get('start', 0);
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
-    
-        // Obtener el company_id del usuario autenticado
-        $company_id = Auth::user()->company_id;
-    
-        // Filtrar por el estado y el company_id del usuario
-        $query = GroupSend::where('state', 1)
-            ->where('company_id', $company_id) // Filtro por company_id
-            ->orderBy('id', 'desc');
-    
+
+        $user = Auth::user();
+
+        $query = GroupSend::with(['user'])->where('state', 1);
+
+        if ($user->typeofUser_id == 1) {
+            $query->whereHas('user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+        } else {
+            $query->where('user_id', $user->id);
+        }
+
+        $query->orderBy('id', 'desc');
+
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
                 $searchValue = trim($column['search']['value'], '()'); // Quitar paréntesis adicionales
-    
+
                 switch ($column['data']) {
                     case 'name':
                         $query->where('name', 'like', '%' . $searchValue . '%');
@@ -113,13 +114,13 @@ class GroupSendController extends Controller
                 }
             }
         }
-    
+
         // Obtener el total de registros filtrados y totales
         $totalRecords = $query->count();
         $filteredRecords = $query->skip($start)
             ->take($length)
             ->get();
-    
+
         return response()->json([
             'draw' => $draw,
             'recordsTotal' => $totalRecords,
@@ -127,7 +128,7 @@ class GroupSendController extends Controller
             'data' => $filteredRecords,
         ]);
     }
-    
+
     public function show(int $id)
     {
 
@@ -143,12 +144,14 @@ class GroupSendController extends Controller
     public function store(StoreGroupSendRequest $request)
     {
         $validatedData = $request->validated();
-        $company_id = Auth::user()->company->id;
+        // $company_id = Auth::user()->company->id;
+        $user = Auth::user();
+        $user_id = $user->id;
         // Crear el nuevo usuario
         $data = [
             'name' => $validatedData['name'],
             'comment' => $validatedData['comment'],
-            'company_id' => $company_id,
+            'user_id' => $user_id,
         ];
         $object = GroupSend::create($data);
 
@@ -161,18 +164,19 @@ class GroupSendController extends Controller
     {
         // Validar los datos
         $validatedData = $request->validated();
-
+        $user = Auth::user();
+        $user_id = $user->id;
         // Buscar el groupSend por ID
         $groupSend = GroupSend::findOrFail($id);
 
         // Obtener el ID de la empresa del usuario autenticado
-        $company_id = Auth::user()->company->id;
+        // $company_id = Auth::user()->company->id;
 
         // Preparar los datos a actualizar
         $data = [
             'name' => $validatedData['name'],
             'comment' => $validatedData['comment'],
-            'company_id' => $company_id,
+            'user_id' => $user_id,
         ];
 
         // Actualizar el registro existente
@@ -183,7 +187,7 @@ class GroupSendController extends Controller
     }
     public function destroy(int $id)
     {
-        $object =GroupSend::find($id);
+        $object = GroupSend::find($id);
         if (!$object) {
             return response()->json(
                 ['message' => 'Grupo No Encontrado'], 404

@@ -26,7 +26,7 @@ return new class extends Migration
             $table->boolean('state')->default(true);
             $table->text('status')->nullable(); // Sin valor por defecto
             $table->timestamps();
-            $table->foreignId('company_id')->nullable()->unsigned()->constrained('companies');
+            $table->foreignId('user_id')->nullable()->unsigned()->constrained('users');
             $table->softDeletes();
         });
     }

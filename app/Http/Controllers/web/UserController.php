@@ -77,9 +77,13 @@ class UserController extends Controller
         $start = $request->get('start', 0);
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
+        $user = Auth::user();
+        $query = User::with(['typeUser', 'company']);
+        if ($user->typeofUser_id != 1) {
+            $query->where('company_id', $user->company_id);
+        }
 
-        $query = User::with(['typeUser', 'company'])
-            ->whereNotIn('id', [1, 2]) // Excluye ciertos usuarios si es necesario
+        $query->whereNotIn('id', [1, 2]) // Excluye ciertos usuarios si es necesario
             ->orderBy('id', 'desc');
 
         // Aplicar filtros por columna
