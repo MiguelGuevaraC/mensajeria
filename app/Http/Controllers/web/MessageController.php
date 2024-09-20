@@ -116,7 +116,6 @@ class MessageController extends Controller
 
         $user = Auth::user();
 
-
         $query = MessageWhasapp::with(['user'])
             ->where('state', 1);
         if ($user->typeofUser_id == 1) {
@@ -136,6 +135,11 @@ class MessageController extends Controller
                 switch ($column['data']) {
                     case 'title':
                         $query->where('title', 'like', '%' . $searchValue . '%');
+                        break;
+                    case 'user.username':
+                        $query->whereHas('user', function ($query) use ($searchValue) {
+                            $query->where('username', 'like', '%' . $searchValue . '%');
+                        });
                         break;
                     case 'block1':
                         $query->where('block1', 'like', '%' . $searchValue . '%');

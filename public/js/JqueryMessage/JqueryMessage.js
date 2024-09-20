@@ -73,7 +73,6 @@ $(document).ready(function () {
                         </div>
                     `,
                 });
-                
             },
             error: function () {
                 Swal.fire({
@@ -95,14 +94,14 @@ $(document).ready(function () {
         formData.append("block2", $("#block2").val());
         formData.append("block3", $("#block3").val());
         formData.append("block4", $("#block4").val());
-        
+
         formData.append("_token", $('input[name="_token"]').val());
 
-        var fileInput = $('#fileUpload')[0]; // Seleccionar el elemento DOM
-        if(fileInput.files.length > 0) {
+        var fileInput = $("#fileUpload")[0]; // Seleccionar el elemento DOM
+        if (fileInput.files.length > 0) {
             formData.append("fileUpload", fileInput.files[0]); // Añadir el archivo al formData
         }
-    
+
         $.ajax({
             url: "message", // Ruta del controlador
             type: "POST", // Usar PUT en lugar de POST
@@ -118,8 +117,7 @@ $(document).ready(function () {
                 });
                 $("#modalNuevoMensaje").modal("hide");
                 $("#tbMensajes").DataTable().ajax.reload();
-                $('#registroMensajeNuevo').trigger('reset');
-
+                $("#registroMensajeNuevo").trigger("reset");
             },
             error: function (xhr) {
                 if (xhr.status === 422) {
@@ -148,6 +146,8 @@ $(document).ready(function () {
 
 var columns = [
     { data: "title" },
+
+    { data: "user.username" },
 
     {
         data: "created_at",
@@ -180,19 +180,18 @@ var columns = [
 // Función para formatear fecha
 function formatDate(dateString) {
     const date = new Date(dateString);
-    
+
     // Obtener los componentes de la fecha
     const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Añadir 1 al mes porque es 0-based
-    const day = ('0' + date.getDate()).slice(-2);
-    const hours = ('0' + date.getHours()).slice(-2);
-    const minutes = ('0' + date.getMinutes()).slice(-2);
-    const seconds = ('0' + date.getSeconds()).slice(-2);
+    const month = ("0" + (date.getMonth() + 1)).slice(-2); // Añadir 1 al mes porque es 0-based
+    const day = ("0" + date.getDate()).slice(-2);
+    const hours = ("0" + date.getHours()).slice(-2);
+    const minutes = ("0" + date.getMinutes()).slice(-2);
+    const seconds = ("0" + date.getSeconds()).slice(-2);
 
     // Formatear la fecha
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
-
 
 var lenguag = {
     lengthMenu: "Mostrar _MENU_ Registros por paginas",
@@ -260,12 +259,10 @@ var init = function () {
     var toggleAllCheckbox = $(
         '<input type="checkbox" id="toggleAll" checked="true" class="form-check-input" style="width: 20px; height: 20px;background:red">'
     );
-  
 
     var headerCell = $(".filters th").eq(0);
     $(headerCell).html(toggleAllCheckbox);
 
-   
     // Configuración de DataTables
     api.columns()
         .eq(0)
@@ -274,7 +271,7 @@ var init = function () {
             var header = $(column.header());
 
             // Configurar filtro para columnas específicas
-            if (colIdx == 0 || colIdx == 1) {
+            if (colIdx == 0 || colIdx == 1|| colIdx == 2) {
                 var cell = $(".filters th").eq(header.index());
                 var title = header.text();
                 $(cell).html(

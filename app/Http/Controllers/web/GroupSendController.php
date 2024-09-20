@@ -105,6 +105,11 @@ class GroupSendController extends Controller
                     case 'name':
                         $query->where('name', 'like', '%' . $searchValue . '%');
                         break;
+                    case 'user.username':
+                        $query->whereHas('user', function ($query) use ($searchValue) {
+                            $query->where('username', 'like', '%' . $searchValue . '%');
+                        });
+                        break;
                     case 'comment':
                         $query->where('comment', 'like', '%' . $searchValue . '%');
                         break;

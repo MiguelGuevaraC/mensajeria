@@ -6,7 +6,7 @@
         
         <tr class="custom-header-bg">
             <th scope="col">Titulo</th>
-
+            <th scope="col">Usuario</th>
             <th scope="col">Fecha Creación</th>
             <th scope="col">Acciones</th>
         </tr>

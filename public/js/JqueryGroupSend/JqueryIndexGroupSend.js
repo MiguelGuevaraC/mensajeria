@@ -16,6 +16,7 @@ var columns = [
         },
         orderable: false,
     },
+    { data: "user.username" },
     {
         data: "created_at",
         render: function (data, type, row, meta) {
@@ -120,7 +121,7 @@ var init = function () {
         .eq(0)
         .each(function (colIdx) {
             if (colIdx == 0 || colIdx == 1
-                || colIdx == 2 
+                || colIdx == 2  || colIdx == 3
                
             ) {
                 var cell = $(".filters th").eq(

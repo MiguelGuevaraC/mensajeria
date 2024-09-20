@@ -4,7 +4,7 @@
        
         <th scope="col">Name</th>
         <th scope="col">Comentario</th>
-
+        <th scope="col">Usuario</th>
         <th scope="col">Fecha Creación</th>
 
         
