@@ -13,6 +13,7 @@ use App\Http\Controllers\web\OptionMenuController;
 use App\Http\Controllers\web\TypeUserController;
 use App\Http\Controllers\web\UserController;
 use App\Http\Controllers\web\WhatsappSendController;
+use App\Models\ContactByGroup;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -123,6 +124,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('groupSend/{id}', [GroupSendController::class, 'destroy']);
 
     Route::get('allGroups', [GroupSendController::class, 'allGroupSend']);
+    Route::get('stateSendByGroup/{id}', [ContactController::class, 'stateSendByGroup']);
+    Route::get('groupsWithContacts', [GroupSendController::class, 'groupsWithContacts']);
+
+    Route::get('summarySend', [ContactController::class, 'summarySend']);
 
     Route::get('searchByDni/{dni}', [UserController::class, 'searchByDni']);
     Route::get('searchByRuc/{ruc}', [UserController::class, 'searchByRuc']);
@@ -132,7 +137,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('contacts/{id}', [ContactController::class, 'show']);
     Route::post('contacts', [ContactController::class, 'store']);
     Route::put('contacts/{id}', [ContactController::class, 'update']);
+    Route::get('stateSend/{id}', [ContactController::class, 'stateSend']);
+    Route::get('disabledSendByGroup/{id}', [ContactController::class, 'disabledSendByGroup']);
+
+    Route::get('contactsForGroup/{id}', [ContactController::class, 'contactsForSendByGroup']);
+    
     Route::delete('contacts/{id}', [ContactController::class, 'destroy']);
 
     Route::post('importExcel', [ContactController::class, 'importExcel']);
+    Route::post('sendApi', [WhatsappSendController::class, 'store']);
 });

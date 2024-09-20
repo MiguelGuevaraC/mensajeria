@@ -81,12 +81,16 @@ class PersonImport implements ToModel, WithHeadingRow
 
             // Convertir la fecha de Excel a formato Y-m-d (año-mes-día)
             $dateReference = $normalizedRow['date_reference'];
-            if (is_numeric($dateReference)) {
+
+            if (empty($dateReference)) {
+                $dateReference = null; // Asigna null si está vacío
+            } elseif (is_numeric($dateReference)) {
                 $dateReference = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateReference)->format('Y-m-d');
             } else {
                 // En caso de que la fecha no sea un número, mantenerla tal como está
                 $dateReference = date('Y-m-d', strtotime($dateReference));
             }
+            
 
             $currentGroup = GroupSend::find($this->groupId);
             if ($currentGroup) {

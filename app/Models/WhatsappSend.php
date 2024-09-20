@@ -29,8 +29,9 @@ class WhatsappSend extends Model
         'status',
         'created_at',
         'updated_at',
-        'contact_id', 
+        'contac_id', 
         'user_id', 
+        'sendApi_id',
         'messageWhasapp_id', 
     ];
     
@@ -52,5 +53,9 @@ class WhatsappSend extends Model
     public function messageWhasapp()
     {
         return $this->belongsTo(MessageWhasapp::class, 'messageWhasapp_id');
+    }
+    public function sendApi()
+    {
+        return $this->belongsTo(SendApi::class, 'sendApi_id');
     }
 }

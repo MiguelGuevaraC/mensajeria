@@ -14,6 +14,7 @@ class ContactByGroup extends Model
         'contact_id',
         'groupSend_id',
         'state',
+        'stateSend',
         'created_at',
     ];
 

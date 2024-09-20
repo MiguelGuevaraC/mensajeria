@@ -24,6 +24,7 @@ class Contact extends Model
         'migration_id',
         'groupSend_id',
         'state',
+       
         'status',
         'created_at',
 

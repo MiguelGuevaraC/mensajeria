@@ -32,7 +32,7 @@ return new class extends Migration
             $table->foreignId('contac_id')->nullable()->unsigned()->constrained('contacts');
             $table->foreignId('user_id')->nullable()->unsigned()->constrained('users');
             $table->foreignId('messageWhasapp_id')->nullable()->unsigned()->constrained('message_whasapps');
-    
+            $table->foreignId('sendApi_id')->nullable()->unsigned()->constrained('send_apis');
     
             // Timestamps (created_at, updated_at)
             $table->timestamps(); 

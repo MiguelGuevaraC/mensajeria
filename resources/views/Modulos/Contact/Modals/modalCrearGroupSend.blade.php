@@ -30,12 +30,12 @@
                         <!-- Comentario -->
                         <div class="col-md-6 mb-3">
                             <div class="form-group">
-                                <label for="comment" class="form-label">Comentario:</label>
+                                <label for="commentGroup" class="form-label">Comentario:</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-comment"></i></span>
                                     </div>
-                                    <textarea class="form-control" placeholder="Escribe aquí..." name="comment" id="comment" required></textarea>
+                                    <textarea class="form-control" placeholder="Escribe aquí..." name="commentGroup" id="commentGroup" ></textarea>
                                 </div>
                                 <div class="error-message mt-2"></div>
                             </div>

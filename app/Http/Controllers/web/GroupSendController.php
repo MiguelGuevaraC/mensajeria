@@ -5,6 +5,7 @@ namespace App\Http\Controllers\web;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGroupSendRequest;
 use App\Http\Requests\UpdateGroupSendRequest;
+use App\Models\ContactByGroup;
 use App\Models\GroupMenu;
 use App\Models\GroupSend;
 use App\Models\User;
@@ -55,6 +56,29 @@ class GroupSendController extends Controller
 
         return response()->json($data);
     }
+
+    public function groupsWithContacts()
+    {
+        $user = Auth::user();
+        $company_id = $user->company_id;
+    
+        $groupSends = GroupSend::where('group_sends.state', 1) 
+            ->where('company_id', $company_id)
+            ->whereHas('contactos', function ($query) {
+                $query->where('contacts.state', 1); 
+            })
+            ->get();
+    
+        $data = [
+            "groupSends" => $groupSends,
+        ];
+    
+        return response()->json($data);
+    }
+
+  
+    
+    
 
     public function all(Request $request)
     {

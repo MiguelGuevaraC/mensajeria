@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('contact_by_groups', function (Blueprint $table) {
             $table->id();
-            $table->boolean('state')->nullable(); // Campo 'state'
-
+            $table->boolean('state')->nullable()->default(1); // Campo 'state'
+            $table->boolean('stateSend')->nullable()->default(0); // Campo 'state'
             $table->foreignId('contact_id')->nullable()->unsigned()->constrained('contacts');
             $table->foreignId('groupSend_id')->nullable()->unsigned()->constrained('group_sends');
 

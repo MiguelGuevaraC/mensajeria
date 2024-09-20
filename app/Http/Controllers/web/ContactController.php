@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\PersonImport;
 use App\Models\ContactByGroup;
 use App\Models\GroupMenu;
+use App\Models\GroupSend;
 use App\Models\MigrationExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,6 +43,71 @@ class ContactController extends Controller
         }
     }
 
+    public function summarySend()
+    {
+        $user = Auth::user();
+        $company_id = $user->company_id;
+
+        // Agrupar y contar contactos por grupo directamente en la base de datos
+        $groupSends = ContactByGroup::selectRaw('group_sends.id as idGroupSend,group_sends.name as groupName, COUNT(contact_by_groups.contact_id) as contactCount')
+            ->join('group_sends', 'contact_by_groups.groupSend_id', '=', 'group_sends.id')
+            ->join('contacts', 'contact_by_groups.contact_id', '=', 'contacts.id')
+            ->where('group_sends.company_id', $company_id)
+            ->where('group_sends.state', 1) // Solo grupos con estado activo
+            ->where('contacts.state', 1) // Solo contactos con estado activo
+            ->where('contact_by_groups.stateSend', 1) // Solo envíos activos
+            ->groupBy('group_sends.id', 'group_sends.name') // Agrupamos por grupo
+            ->get();
+
+        // Contar el total de grupos y el total de contactos
+        $totalGroups = $groupSends->count();
+        $totalContacts = $groupSends->sum('contactCount');
+
+        // Preparar el array de respuesta
+        $data = [
+            "countTotalgroupSends" => $totalGroups, // Cantidad total de grupos
+            "countTotalContact" => $totalContacts, // Cantidad total de contactos
+            "arrayGroups" => $groupSends, // Grupos con su nombre y cantidad de contactos
+        ];
+
+        return response()->json($data);
+    }
+
+    public function contactsForSendByGroup($id)
+    {
+        $user = Auth::user();
+        $company_id = $user->company_id;
+
+        $groupSend = GroupSend::find($id);
+        if (!$groupSend) {
+            return response()->json(
+                ['message' => 'Grupo No Encontrado'], 404
+            );
+        }
+
+        $contactsByGroup = ContactByGroup::select(
+            'contact_by_groups.id as idContactByGroup',
+            'contacts.names as name',
+            'contacts.telephone as telephone'
+        )
+            ->join('group_sends', 'contact_by_groups.groupSend_id', '=', 'group_sends.id')
+            ->join('contacts', 'contact_by_groups.contact_id', '=', 'contacts.id')
+            ->where('group_sends.company_id', $company_id)
+            ->where('group_sends.state', 1) // Solo grupos con estado activo
+            ->where('group_sends.id', $id)
+            ->where('contacts.state', 1) // Solo contactos con estado activo
+            ->where('contact_by_groups.stateSend', 1) // Solo envíos activos
+            ->get();
+
+        $data = [
+            "arrayContactsByGroup" => $contactsByGroup, // Contactos por grupo
+            "totalContacts" => $contactsByGroup->count(), // Total de contactos
+            "groupName" => $groupSend->name ?? '',
+        ];
+
+        return response()->json($data);
+    }
+
     public function all(Request $request)
     {
         $draw = $request->get('draw');
@@ -49,90 +115,89 @@ class ContactController extends Controller
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
         $company_id = Auth::user()->company_id;
-    
+
         // Filtrar por company_id para asegurar que solo se obtengan los registros relacionados con esa compañía
         $query = ContactByGroup::with([
             'contact',
             'groupSend' => function ($query) use ($company_id) {
                 $query->where('company_id', $company_id);
-            }
+            },
         ])->whereHas('groupSend', function ($query) use ($company_id) {
             // Asegurar que el filtro company_id esté en todos los groupSend
             $query->where('company_id', $company_id);
         })->where('state', 1);
-    
+
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
                 $searchValue = trim($column['search']['value'], '()'); // Quitar paréntesis adicionales
-    
+
                 switch ($column['data']) {
                     case 'group_send.name':
                         // Filtrar por el nombre del grupo, asegurando el company_id
                         $query->whereHas('groupSend', function ($query) use ($searchValue, $company_id) {
                             $query->where('name', 'like', '%' . $searchValue . '%')
-                                  ->where('company_id', $company_id);
+                                ->where('company_id', $company_id);
                         });
                         break;
-    
+
                     case 'contact.names':
                         // Filtrar por el nombre del contacto
                         $query->whereHas('contact', function ($query) use ($searchValue) {
                             $query->where('names', 'like', '%' . $searchValue . '%')
-                                  ->orWhere('documentNumber', 'like', '%' . $searchValue . '%');
+                                ->orWhere('documentNumber', 'like', '%' . $searchValue . '%');
                         });
                         break;
-    
+
                     case 'contact.telephone':
                         $query->whereHas('contact', function ($query) use ($searchValue) {
                             $query->where('telephone', 'like', '%' . $searchValue . '%');
                         });
                         break;
-    
+
                     case 'contact.address':
                         $query->whereHas('contact', function ($query) use ($searchValue) {
                             $query->where('address', 'like', '%' . $searchValue . '%');
                         });
                         break;
-    
+
                     case 'contact.concept':
                         $query->whereHas('contact', function ($query) use ($searchValue) {
                             $query->where('concept', 'like', '%' . $searchValue . '%');
                         });
                         break;
-    
+
                     case 'contact.amount':
                         $query->whereHas('contact', function ($query) use ($searchValue) {
                             $query->where('amount', 'like', '%' . $searchValue . '%');
                         });
                         break;
-    
+
                     case 'contact.dateReference':
-                      
+
                         $query->whereHas('contact', function ($query) use ($searchValue) {
                             $query->whereRaw("DATE_FORMAT(dateReference, '%Y-%m-%d') like ?", ['%' . $searchValue . '%']);
                         });
-                        
+
                         break;
-                        
-    
+
                     case 'created_at':
-                    
+
                         $query->where('created_at', 'like', '%' . $searchValue . '%');
                         break;
                 }
             }
         }
-    
+
         // Contar el total de registros después de aplicar los filtros
         $totalRecords = $query->count();
-    
+
         // Paginación
         $list = $query->skip($start)
-                      ->take($length)
-                      ->orderBy('id','desc')
-                      ->get();
-    
+            ->take($length)
+            ->orderBy('id', 'desc')
+            ->get();
+
         return response()->json([
             'draw' => $draw,
             'recordsTotal' => $totalRecords,
@@ -140,7 +205,6 @@ class ContactController extends Controller
             'data' => $list,
         ]);
     }
-    
 
     public function importExcel(Request $request)
     {
@@ -207,4 +271,62 @@ class ContactController extends Controller
             return redirect()->back()->with('error', 'Error al importar el archivo: ' . $e->getMessage());
         }
     }
+
+    public function stateSend($id)
+    {
+        $contactByGroup = ContactByGroup::find($id);
+
+        if (!$contactByGroup) {
+            return response()->json(['error' => 'Contacto no encontrado'], 404);
+        }
+
+        $contactByGroup->stateSend = !$contactByGroup->stateSend;
+        $contactByGroup->save();
+
+        return response()->json(['success' => 'Estado actualizado'], 200);
+    }
+    public function stateSendByGroup($id)
+    {
+        // Verificar si el ID es -1
+        if ($id == -1) {
+            $company_id = Auth::user()->company_id;
+
+            $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($company_id) {
+                $query->where('company_id', $company_id);
+            })->update(['stateSend' => 1]);
+
+            return response()->json(['success' => 'Estado actualizado para contactos de la empresa'], 200);
+        } else {
+            // Buscar el grupo por ID
+            $groupSend = GroupSend::find($id);
+
+            if (!$groupSend) {
+                return response()->json(['error' => 'Grupo no encontrado'], 404);
+            }
+
+            // Actualizar contactos del grupo
+            $updatedRows = ContactByGroup::where('groupSend_id', $id)
+                ->update(['stateSend' => 1]);
+
+            return response()->json(['success' => 'Estado actualizado para el grupo'], 200);
+        }
+    }
+
+    public function disabledSendByGroup($id)
+    {
+
+        $groupSend = GroupSend::find($id);
+
+        if (!$groupSend) {
+            return response()->json(['error' => 'Grupo no encontrado'], 404);
+        }
+
+        // Actualizar contactos del grupo
+        $updatedRows = ContactByGroup::where('groupSend_id', $id)
+            ->update(['stateSend' => 0]);
+
+        return response()->json(['success' => 'Estado actualizado para el grupo'], 200);
+
+    }
+
 }

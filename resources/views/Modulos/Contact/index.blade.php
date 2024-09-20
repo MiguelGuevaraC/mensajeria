@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -71,8 +69,9 @@
     <link rel="stylesheet" href="/mensajeria/Cdn-Locales/pkgDatatables/datatables.css">
     <link rel="stylesheet" href="/mensajeria/Cdn-Locales/pkgAwsome/css/all.css" />
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
     <link rel="stylesheet" href="{{ asset('css/appPlantilla.css') }}">
 
 
@@ -197,9 +196,18 @@
 
                         <div id="demo-custom-toolbar2" class="table-toolbar-left ">
 
-                            <button id="btonNuevo" style="margin: 5px; padding:5px" class="btn btn-success"><i
+                            <button id="btonNuevo" style="margin: 5px; padding:5px" class="btn btn-danger"><i
                                     class="demo-pli-plus"></i>
-                             <i class="fa-solid fa-file-excel"></i>  IMPORTAR DATOS</button>
+                                <i class="fa-solid fa-file-excel"></i> IMPORTAR DATOS</button>
+
+                            <button id="marcarByGroup" style="margin: 5px; padding:5px" class="btn btn-warning"><i
+                                    class="demo-pli-plus"></i>
+                                <i class="fa-regular fa-square-check"></i> MARCAR POR GRUPO</button>
+
+                            <button id="contactsForSend" style="margin: 5px; padding:5px" 
+                            class="btn btn-success">
+                            <i class="fa-solid fa-list-check"></i> RESUMEN ENVÍO</button>
+
                         </div>
                         <br><br><br>
 
@@ -266,7 +274,7 @@
                                             <span class="mnp-desc"></span>
                                         </a>
                                     </div>
-                                    
+
                                 </div>
 
 
@@ -371,7 +379,7 @@
     <div>@include('Modulos.Contact.Modals.modalEditarContact')</div>
 
     <div>@include('Modulos.Contact.Modals.modalCrearContact')</div>
-    <div>@include('Modulos.GroupSend.Modals.modalCrearGroupSend')</div>
+    <div>@include('Modulos.Contact.Modals.modalCrearGroupSend')</div>
     <!--===================================================-->
     <!-- END OF CONTAINER -->
 

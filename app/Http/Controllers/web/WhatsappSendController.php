@@ -5,14 +5,15 @@ namespace App\Http\Controllers\web;
 use App\Exports\ExportExcel;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendWhatsappJob;
-use App\Models\Compromiso;
+use App\Models\Contact;
+use App\Models\ContactByGroup;
 use App\Models\GroupMenu;
-use App\Models\Person;
 use App\Models\WhatsappSend;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class WhatsappSendController extends Controller
@@ -161,34 +162,53 @@ class WhatsappSendController extends Controller
 
     public function store(Request $request)
     {
-
-        $compromissoSendActive = Compromiso::where('state', 1)
-            ->whereHas('student', function ($query) {
-                $query->where('user_id', Auth::user()->id);
-                $query->where('state', 1);
+        $message_id = 1;
+        $user = Auth::user();
+        $company_id = $user->company_id;
+    
+        // Iniciar el registro de logs
+        Log::info('Iniciando el envío de mensajes', ['user_id' => $user->id, 'company_id' => $company_id]);
+    
+        $contactsByGroups = ContactByGroup::where('stateSend', 1) // Solo envíos activos
+            ->whereHas('groupSend', function ($query) use ($company_id) {
+                $query->where('company_id', $company_id)
+                    ->where('state', 1); // Solo grupos con estado activo
             })
-            ->where('stateSend', 1)->get();
-
-        foreach ($compromissoSendActive as $compromiso) {
-            $compromisoBD = Compromiso::find($compromiso->id);
-            $student = Person::find($compromisoBD->student_id);
-
-            if ($compromisoBD && $student->telephone) {
-                $compromisoPaquete[] = $compromisoBD;
-            }
-
-            if (count($compromisoPaquete) >= 100) {
-                SendWhatsappJob::dispatch($compromisoPaquete, Auth::user());
-                $compromisoPaquete = [];
-            }
-
+            ->get();
+    
+        // Verificar si no se encontraron contactos
+        if ($contactsByGroups->isEmpty()) {
+            Log::warning('No se encontraron contactos marcados', ['user_id' => $user->id]);
+            return response()->json(['error' => 'No se encontraron contactos marcados'], 422);
         }
-
-        if (count($compromisoPaquete) > 0) {
-            SendWhatsappJob::dispatch($compromisoPaquete, Auth::user());
+    
+        $contactByGroupPaquete = []; // Inicializar el array para los contactos
+    
+        foreach ($contactsByGroups as $contactByGroup) {
+            $contactByGroupBD = ContactByGroup::find($contactByGroup->id);
+            $contact = Contact::find($contactByGroupBD->contact_id);
+    
+            if ($contactByGroupBD && $contact->telephone) {
+                $contactByGroupPaquete[] = $contactByGroupBD;
+                Log::info('Contacto agregado', ['contact_id' => $contactByGroupBD->contact_id]);
+            }
+    
+            if (count($contactByGroupPaquete) >= 50) {
+                SendWhatsappJob::dispatch($contactByGroupPaquete, $user, $message_id);
+                Log::info('Enviando paquete de mensajes', ['cantidad' => count($contactByGroupPaquete)]);
+                $contactByGroupPaquete = [];
+            }
         }
-
+    
+        if (count($contactByGroupPaquete) > 0) {
+            SendWhatsappJob::dispatch($contactByGroupPaquete, $user, $message_id);
+            Log::info('Enviando último paquete de mensajes', ['cantidad' => count($contactByGroupPaquete)]);
+        }
+    
+        // Respuesta 200
+        return response()->json(['message' => 'Mensajes enviados correctamente.'], 200);
     }
+    
 
     public function excelExport(Request $request)
     {

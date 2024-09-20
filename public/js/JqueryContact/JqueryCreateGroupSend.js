@@ -54,7 +54,7 @@ $(document).ready(function () {
             type: "POST",
             data: {
                 name: $("#name").val(),
-                comment: $("#comment").val(),
+                comment: $("#commentGroup").val(),
                 _token: token,
             },
             success: function (data) {

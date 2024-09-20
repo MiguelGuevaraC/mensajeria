@@ -2,8 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Models\Contact;
 use App\Models\MessageWhasapp;
-use App\Models\Person;
+use App\Models\SendApi;
 use App\Models\User;
 use App\Models\WhatsappSend;
 use Exception;
@@ -19,17 +20,19 @@ use Illuminate\Support\Facades\Log;
 class SendWhatsappJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $comminments;
+    protected $contactsByGroups;
     protected $user;
+    protected $message_id;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($comminments, $user)
+    public function __construct($contactsByGroups, $user, $message_id)
     {
-        $this->comminments = $comminments;
+        $this->contactsByGroups = $contactsByGroups;
         $this->user = $user;
+        $this->message_id = $message_id;
     }
 
     /**
@@ -43,202 +46,155 @@ class SendWhatsappJob implements ShouldQueue
         try {
             $mensajes = [];
             $user = $this->user;
-            $costSend = 0.20;
+            $costSend = $this->user->company->costSend ?? '0';
+            $companyTradeName = $this->user->company->tradeName ?? '';
+            $companyName = $this->user->company->documentNumber . '-' . $this->user->company->businessName;
 
-            $messageBase = MessageWhasapp::where('responsable_id', $user->person_id)->first() ?? (object) [
+            $messageBase = MessageWhasapp::where('id', $this->message_id)->first() ?? (object) [
                 'title' => 'titulo',
                 'block1' => 'block1',
                 'block2' => 'block2',
                 'block3' => 'block3',
             ];
 
-            foreach ($this->comminments as $comminment) {
-                $concept = $comminment->conceptDebt ?? 'AVISO DE PAGO';
-                $concept = strtoupper($concept);
+            $whatsappSends = []; // Array para almacenar los envíos realizados
 
-                $student = Person::find($comminment->student_id);
+            foreach ($this->contactsByGroups as $contactByGroup) {
 
-                $cadenaNombres = $student->typeofDocument != 'RUC'
-                ? $student->names . ' ' . $student->fatherSurname . ' ' . $student->motherSurname
-                : ($student->typeofDocument == 'RUC' ? $student->businessName : '');
+                $contact = Contact::find($contactByGroup->contact_id);
 
-                $studentParent = $student->representativeNames ?? 'Apoderado';
-                $studentParentDni = $student->representativeDni ?? '';
-                // $telephoneStudent = '903017426';
-                $telephoneStudent = $student->telephone ?? '903017426';
-                $tags = ['{{numCuotas}}', '{{nombreApoderado}}', '{{dniApoderado}}', '{{nombreAlumno}}', '{{codigoAlumno}}', '{{grado}}', '{{seccion}}', '{{nivel}}', '{{meses}}', '{{montoPago}}'];
-                $values = [$comminment->cuotaNumber, $studentParent, $studentParentDni, $cadenaNombres, $student->documentNumber, $student->grade, $student->section, $student->level, $comminment->conceptDebt, $comminment->paymentAmount];
+                $cadenaNombres = $contact->names ?? '';
+                $documentNumber = $contact->documentNumber ?? '';
+                $telephoneStudent = $contact->telephone ?? '903017426';
+                $address = $contact->address ?? '';
+                $concept = $contact->concept ?? '';
+                $amount = $contact->amount ?? 0;
+                $dateReference = $contact->dateReference ?? null;
+
+                $tags = [
+                    '{{names}}',
+                    '{{documentNumber}}',
+                    '{{telephone}}',
+                    '{{address}}',
+                    '{{concept}}',
+                    '{{amount}}',
+                    '{{dateReference}}',
+                ];
+                $values = [$cadenaNombres,
+                    $documentNumber,
+                    $telephoneStudent,
+                    $address,
+                    $concept,
+                    $amount,
+                    $dateReference];
 
                 $title = str_replace($tags, $values, $messageBase->title);
 
-                $block1 = str_replace($tags, $values, $messageBase->block1);
-                $block2 = str_replace($tags, $values, $messageBase->block2);
-                $block3 = str_replace($tags, $values, $messageBase->block3);
-                $block4 = str_replace($tags, $values, $messageBase->block4);
+                // Elimina caracteres especiales de los bloques
+                $specialChars = ["\n", "\r", "\t", "\\"];
+                $block1 = str_replace($specialChars, '', str_replace($tags, $values, $messageBase->block1));
+                $block2 = str_replace($specialChars, '', str_replace($tags, $values, $messageBase->block2));
+                $block3 = str_replace($specialChars, '', str_replace($tags, $values, $messageBase->block3));
+                $block4 = str_replace($specialChars, '', str_replace($tags, $values, $messageBase->block4));
 
                 $mensajes[] = [
                     "cellphone_number" => $telephoneStudent,
                     "title" => $title,
                     "content" => [$block1, $block2, $block3, $block4],
                 ];
-
-                $person = Person::find($user->person_id);
-                $cadenaNombres = $person->typeofDocument == 'DNI'
-                ? $person->names . ' ' . $person->fatherSurname . ' ' . $person->motherSurname
-                : ($person->typeofDocument == 'RUC' ? $person->businessName : '');
-
-                $tipo = 'ENVI';
-                $resultado = DB::select('SELECT COALESCE(MAX(CAST(SUBSTRING(number, LOCATE("-", number) + 1) AS SIGNED)), 0) + 1 AS siguienteNum FROM whatsapp_sends a WHERE SUBSTRING(number, 1, 4) = ?', [$tipo])[0]->siguienteNum;
+                $user_id = $this->user->id;
+                $tipo = 'E' . str_pad($user_id, 3, '0', STR_PAD_LEFT); // Rellenar con ceros a la izquierda
+                $resultado = DB::select('SELECT COALESCE(MAX(CAST(SUBSTRING(sequentialNumber, LOCATE("-", sequentialNumber) + 1) AS SIGNED)), 0) + 1 AS siguienteNum FROM whatsapp_sends a WHERE SUBSTRING(sequentialNumber, 1, 4) = ?', [$tipo])[0]->siguienteNum;
                 $siguienteNum = (int) $resultado;
 
                 $data = [
-                    'number' => $tipo . "-" . str_pad($siguienteNum, 8, '0', STR_PAD_LEFT),
-                    'userResponsability' => $cadenaNombres,
-                    'namesStudent' => $student->names . ' ' . $student->fatherSurname,
-                    'dniStudent' => $student->documentNumber,
-                    'namesParent' => $student->representativeDni . ' | ' . $student->representativeNames,
-                    'infoStudent' => $student->level . ' ' . $student->grade . ' ' . $student->section,
+                    'sequentialNumber' => $tipo . "-" . str_pad($siguienteNum, 8, '0', STR_PAD_LEFT),
+                    'messageSend' => $title . "\n\n" . $block1 . "\n\n" . $block2 . "\n\n" . $block3 . "\n\n" . $block4,
+                    'userResponsability' => $user_id . '-' . $this->user->username,
+                    'namesPerson' => $cadenaNombres ?? '',
+                    'bussinesName' => $companyName ?? '',
+                    'trade_name' => $companyTradeName ?? '',
+                    'documentNumber' => $documentNumber ?? '',
                     'telephone' => $telephoneStudent,
-                    'description' => $title . "\n\n" . $block1 . "\n\n" . $block2 . "\n\n" . $block3. "\n\n" . $block4,
-                    'conceptSend' => $comminment->conceptDebt,
-                    'paymentAmount' => $comminment->paymentAmount,
-                    'expirationDate' => $comminment->expirationDate,
-                    'cuota' => $comminment->cuotaNumber,
+                    'amount' => $amount,
                     'costSend' => $costSend,
-
-                    'student_id' => $student->id,
+                    'routeFile' => $messageBase->routeFile,
+                    'contac_id' => $contact->id,
                     'user_id' => $user->id,
-                    'comminment_id' => $comminment->id,
+                    'messageWhasapp_id' => $messageBase->id,
+
                 ];
 
-                WhatsappSend::create($data);
+                $messageSend = WhatsappSend::create($data);
+                $whatsappSends[$telephoneStudent][] = $messageSend; // Guardar el envío por número de teléfono
             }
 
+            // Llamada a la API
             $url = 'https://sistema.gesrest.net/api/send-massive-wa-messages';
 
             $response = Http::withHeaders([
                 'Authorization' => '}*rA3>#pyM<dITk]]DFP2,/wc)1md_Y/',
-            ])->post($url, [
+            ])->timeout(120)->post($url, [
                 "messages" => $mensajes,
             ]);
 
+            $data = [
+                'quantitySend' => null,
+                'errors' => null,
+                'success' => null,
+                'dateSend' => now(),
+                'user_id' => $user->id,
+
+            ];
+
+            $sendApi = SendApi::create($data);
+            $totalErrors = 0;
+            $totalSuccess = 0;
+            $totalSend = 0;
+
             if ($response->successful()) {
-                Log::info('WhatsApp message sent successfully to ' . $student->telephone);
+                $responseData = $response->json();
+
+                foreach ($responseData['messages'] as $phone => $status) {
+                    if (isset($whatsappSends[$phone])) {
+                        foreach ($whatsappSends[$phone] as $messageSend) {
+                            $messageSend->status = $status === 'success' ? 'Envio Exitoso' : 'Envio Fallido';
+                            $messageSend->sendApi_id = $sendApi->id;
+                            $messageSend->save();
+                            $totalSuccess++;
+                            $totalSend++;
+                        }
+                    }
+                }
+                $jsonMensajes = json_encode($mensajes);
+                Log::info($jsonMensajes);
+                Log::info($response);
+                Log::info('WhatsApp messages sent successfully');
             } else {
-                Log::info('Mensajes ' . json_encode($mensajes));
-                Log::error('Failed to send WhatsApp message to ' . $student->telephone . '. Status: ' . $response->status() . '. Response: ' . $response->body());
+                foreach ($whatsappSends as $phone => $messages) {
+                    foreach ($messages as $messageSend) {
+                        $messageSend->status = 'Envio Fallido';
+                        $messageSend->sendApi_id = $sendApi->id;
+                        $messageSend->save();
+                        
+                        $totalErrors++;
+                        $totalSend++;
+                    }
+                }
+                Log::info($response);
+                Log::error('Failed to send WhatsApp messages. Response: ' . $response->body());
             }
+
+            $sendApi->quantitySend = $totalSend;
+            $sendApi->errors = $totalErrors;
+            $sendApi->success = $totalSuccess;
+            $sendApi->save();
+
             return response()->json(['message' => 'El mensaje de WhatsApp se ha enviado correctamente'], 200);
         } catch (Exception $e) {
-            Log::error('Error to send Whatsapp, Student: ' . $comminment->telephoneStudent
-                . 'Compromiso : id=>' . $comminment->id . ' | cuota=>' . $comminment->cuotaNumber .
-                ' | conceptDebt=>' . $comminment->conceptDebt . ' | error=>'
-                . $e->getMessage());
+            Log::error('Error al enviar WhatsApp: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al enviar el mensaje de WhatsApp'], 500);
         }
     }
 
-    // public function handle()
-    // {
-
-    //     try {
-    //         $mensajes = [];
-    //         $user = $this->user;
-
-    //         $menssageBase= MessageWhasapp::where('responsable_id', $user->person_id)->first() ?? (object)[
-    //             'title' => 'titulo',
-    //             'block1' => 'block1',
-    //             'block2' => 'block2',
-    //             'block3' => 'block3'
-    //         ];
-
-    //         foreach ($this->comminments as $comminment) {
-    //             $concept = $comminment->conceptDebt ?? 'AVISO DE PAGO';
-    //             $concept = strtoupper($concept);
-
-    //             $student = Person::find($comminment->student_id);
-
-    //             // $telephoneStudent = $student->telephone;
-
-    //             $cadenaNombres = '';
-    //             if ($student->typeofDocument == 'DNI') {
-    //                 $cadenaNombres = $student->names . ' ' . $student->fatherSurname . ' ' . $student->motherSurname;
-    //             } else if ($student->typeofDocument == 'RUC') {
-    //                 $cadenaNombres = $student->businessName;
-    //             }
-    //             $studentParent = $student->representativeNames ?? 'Apoderado';
-    //             $studentParentDni = $student->representativeDni ?? '';
-    //             $telephoneStudent = '903017426'; //MOMENTANEO MI NUMERO TELEFÓNICO
-
-    //             $mensajes[] =
-    //                 [
-    //                 "cellphone_number" => $telephoneStudent,
-    //                 "title" => $concept,
-    //                 "content" => [
-    //                     "Estimado(a) {$studentParent} ({$studentParentDni}),",
-    //                     "Le recordamos que la cuota de pensión escolar de su hijo(a) {$cadenaNombres} por un monto de {$comminment->paymentAmount} soles está pendiente de pago",
-    //                     "Por favor, realice el pago a la brevedad posible para evitar recargos. Gracias por su cooperación. Atentamente, Colegio Manuel Pardo",
-    //                 ],
-
-    //             ];
-
-    //             $person = Person::find($user->person_id);
-    //             $cadenaNombres = '';
-    //             if ($person->typeofDocument == 'DNI') {
-    //                 $cadenaNombres = $person->names . ' ' . $person->fatherSurname . ' ' . $person->motherSurname;
-    //             } else if ($person->typeofDocument == 'RUC') {
-    //                 $cadenaNombres = $person->businessName;
-    //             }
-
-    //             $tipo = 'ENVI';
-    //             $resultado = DB::select('SELECT COALESCE(MAX(CAST(SUBSTRING(number, LOCATE("-", number) + 1) AS SIGNED)), 0) + 1 AS siguienteNum FROM whatsapp_sends a WHERE SUBSTRING(number, 1, 4) = ?', [$tipo])[0]->siguienteNum;
-    //             $siguienteNum = (int) $resultado;
-
-    //             $data = [
-    //                 'number' => $tipo . "-" . str_pad($siguienteNum, 8, '0', STR_PAD_LEFT),
-    //                 'userResponsability' => $cadenaNombres,
-    //                 'namesStudent' => $student->names . ' ' . $student->fatherSurname,
-    //                 'dniStudent' => $student->documentNumber,
-    //                 'namesParent' => $student->representativeDni . ' | ' . $student->representativeNames,
-    //                 'infoStudent' => $student->level . ' ' . $student->grade . ' ' . $student->section,
-    //                 'telephone' => $telephoneStudent,
-    //                 'description' => $comminment->conceptDebt,
-    //                 'conceptSend' => $comminment->conceptDebt,
-    //                 'paymentAmount' => $comminment->paymentAmount,
-    //                 'expirationDate' => $comminment->expirationDate,
-    //                 'cuota' => $comminment->cuotaNumber,
-
-    //                 'student_id' => $student->id,
-    //                 'user_id' => $user->id,
-    //                 'comminment_id' => $comminment->id,
-
-    //             ];
-    //             WhatsappSend::create($data);
-
-    //         }
-
-    //         $url = 'https://sistema.gesrest.net/api/send-massive-wa-messages';
-
-    //         $response = Http::withHeaders([
-    //             'Authorization' => '}*rA3>#pyM<dITk]]DFP2,/wc)1md_Y/',
-    //         ])->post($url, [
-    //             "messages" => $mensajes,
-    //         ]);
-    //         if ($response->successful()) {
-    //             // Log success
-    //             Log::info('WhatsApp message sent successfully to ' . $student->telephone);
-    //         } else {
-    //             // Log error
-    //             Log::error('Failed to send WhatsApp message to ' . $student->phone . '. Status: ' . $response->status() . '. Response: ' . $response->body());
-    //         }
-    //         return response()->json(['message' => 'El mensaje de WhatsApp se ha enviado correctamente'], 200);
-    //     } catch (Exception $e) {
-
-    //         Log::error('Error to send Whatsapp, Student: ' . $comminment->telephoneStudent
-    //             . 'Compromiso : id=>' . $comminment->id . ' | cuota=>' . $comminment->cuota .
-    //             ' | conceptDebt=>' . $comminment->conceptDebt . ' | error=>'
-    //             . $e->getMessage());
-    //         return response()->json(['error' => 'Hubo un error al enviar el mensaje de WhatsApp'], 500);
-    //     }
-    // }
 }

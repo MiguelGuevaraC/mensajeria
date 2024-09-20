@@ -39,7 +39,7 @@
                                 <label for="excelFile" class="form-label labelFormato">Cargar Archivo Excel:</label>
                                 <input type="file" class="form-control ajuste" name="excelFile" id="excelFile" accept=".xls,.xlsx">
                                 <div class="error-messageGrupo"></div>
-                                <a href="/ruta/a/la/plantilla.xlsx" target="_blank" style="color:#fffb00" class="btn btn-link ">Descargar plantilla de Excel</a>
+                                <a href="https://develop.garzasoft.com/mensajeria/storage/app/public/plantilla_contacts.xlsx" target="_blank" style="color:#fffb00" class="btn btn-link ">Descargar plantilla de Excel</a>
                             
                             </div>
                             

@@ -26,7 +26,7 @@ return new class extends Migration
 
             // Campos adicionales
         
-            $table->boolean('state')->nullable(); // Campo 'state'
+            $table->boolean('state')->nullable()->default(1); // Campo 'state'
             $table->string('status')->nullable(); // Campo 'status'
 
             $table->foreignId('migration_id')->nullable()->unsigned()->constrained('migration_exports');
