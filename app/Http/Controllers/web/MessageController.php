@@ -116,16 +116,25 @@ class MessageController extends Controller
 
         $user = Auth::user();
 
-        $query = MessageWhasapp::with(['user'])
+        $query = MessageWhasapp::with(['user.company'])
             ->where('state', 1);
+
         if ($user->typeofUser_id == 1) {
-            $query->whereHas('user', function ($q) use ($user) {
-                $q->where('company_id', $user->company_id);
-            });
+            // $query->whereHas('user', function ($q) use ($user) {
+            //     $q->where('company_id', $user->company_id);
+            // });
+        } else if ($user->typeofUser_id == 2) {
+            if ($user->typeofUser_id == 1) {
+                $query->whereHas('user', function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id);
+                });
+            }
         } else {
             $query->where('user_id', $user->id);
         }
-        $query->orderBy('id', 'desc');
+
+        // Ejecutar la consulta y obtener los resultados
+        $messages = $query->orderBy('id', 'desc')->get();
 
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {
@@ -136,9 +145,18 @@ class MessageController extends Controller
                     case 'title':
                         $query->where('title', 'like', '%' . $searchValue . '%');
                         break;
+
                     case 'user.username':
-                        $query->whereHas('user', function ($query) use ($searchValue) {
-                            $query->where('username', 'like', '%' . $searchValue . '%');
+                        $query->where(function ($q) use ($searchValue) {
+                            // Filtro por username
+                            $q->whereHas('user', function ($query) use ($searchValue) {
+                                $query->where('username', 'like', '%' . $searchValue . '%');
+                            })
+                            // Filtro por businessName y documentNumber
+                            ->orWhereHas('user.company', function ($query) use ($searchValue) {
+                                $query->where('businessName', 'like', '%' . $searchValue . '%')
+                                      ->orWhere('documentNumber', 'like', '%' . $searchValue . '%');
+                            });
                         });
                         break;
                     case 'block1':

@@ -147,7 +147,13 @@ $(document).ready(function () {
 var columns = [
     { data: "title" },
 
-    { data: "user.username" },
+    {
+        data: "user.username",
+        render: function (data, type, row, meta) {
+            return data+' | '+row.user.company.businessName+' | '+row.user.company.documentNumber; // Formato de fecha
+        },
+        orderable: true,
+    },
 
     {
         data: "created_at",

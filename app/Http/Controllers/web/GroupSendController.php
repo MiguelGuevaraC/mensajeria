@@ -84,9 +84,13 @@ class GroupSendController extends Controller
 
         $user = Auth::user();
 
-        $query = GroupSend::with(['user'])->where('state', 1);
+        $query = GroupSend::with(['user.company'])->where('state', 1);
 
         if ($user->typeofUser_id == 1) {
+            // $query->whereHas('user', function ($q) use ($user) {
+            //     $q->where('company_id', $user->company_id);
+            // });
+        } else if ($user->typeofUser_id == 2) {
             $query->whereHas('user', function ($q) use ($user) {
                 $q->where('company_id', $user->company_id);
             });
@@ -106,8 +110,16 @@ class GroupSendController extends Controller
                         $query->where('name', 'like', '%' . $searchValue . '%');
                         break;
                     case 'user.username':
-                        $query->whereHas('user', function ($query) use ($searchValue) {
-                            $query->where('username', 'like', '%' . $searchValue . '%');
+                        $query->where(function ($q) use ($searchValue) {
+                            // Filtro por username
+                            $q->whereHas('user', function ($query) use ($searchValue) {
+                                $query->where('username', 'like', '%' . $searchValue . '%');
+                            })
+                            // Filtro por businessName y documentNumber
+                                ->orWhereHas('user.company', function ($query) use ($searchValue) {
+                                    $query->where('businessName', 'like', '%' . $searchValue . '%')
+                                        ->orWhere('documentNumber', 'like', '%' . $searchValue . '%');
+                                });
                         });
                         break;
                     case 'comment':
