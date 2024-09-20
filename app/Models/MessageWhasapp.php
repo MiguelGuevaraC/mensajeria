@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MessageWhasapp extends Model
 {
@@ -31,4 +33,6 @@ class MessageWhasapp extends Model
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+
+   
 }

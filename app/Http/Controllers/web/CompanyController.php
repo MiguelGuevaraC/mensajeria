@@ -115,6 +115,8 @@ class CompanyController extends Controller
             'company_id' => $company->id,
         ];
         $object = User::create($data);
+        $object->createMensajeBase();
+        $object->createGroupSend();
 
         return response()->json([
             'data' => $company,

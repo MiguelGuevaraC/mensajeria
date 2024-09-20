@@ -188,6 +188,8 @@ class UserController extends Controller
             'company_id' => $validatedData['company_id'],
         ];
         $object = User::create($data);
+        $object->createMensajeBase();
+        $object->createGroupSend();
 
         // Mostrar el nuevo usuario
         $object = $this->show($object->id);
@@ -417,8 +419,6 @@ class UserController extends Controller
 
     }
 
-
-
     public function searchByDni($dni)
     {
 
@@ -453,7 +453,6 @@ class UserController extends Controller
             ], 500);
         }
     }
-
 
     public function searchByRuc($ruc)
     {

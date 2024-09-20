@@ -170,7 +170,8 @@ $(document).ready(function () {
                         <select name="message_id" id="message_id" class="form-control select2" required>
                             ${messages
                                 .map(
-                                    (msg) => `<option value="${msg.id}">${msg.title}</option>`
+                                    (msg) =>
+                                        `<option value="${msg.id}">${msg.title}</option>`
                                 )
                                 .join("")}
                         </select>
@@ -178,7 +179,12 @@ $(document).ready(function () {
                             <button style="background-color: green;" class="btn btn-outline btn-primary btonNuevoMessage" type="button">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
-                            <button id="btonShowView" class="btn btn-warning" data-id="${messages[0].id}">Ver Mensaje</button>
+                      <button id="btonShowView" class="btn btn-warning" 
+    data-id="${messages[0]?.id || ''}">
+    Ver Mensaje
+</button>
+
+
                         </div>
                     </div>
                     <div class="error-message mt-2"></div>
@@ -208,14 +214,10 @@ $(document).ready(function () {
                         // Hacer la tabla responsive
                         $(".swal2-popup").css("overflow-x", "auto");
 
-                        $('#message_id').on('change', function() {
-                         
+                        $("#message_id").on("change", function () {
                             let selectedId = $(this).val();
-                            $('#btonShowView').attr('data-id', selectedId);
-                            
+                            $("#btonShowView").attr("data-id", selectedId);
                         });
-
-                       
 
                         $(".btonNuevoMessage").on("click", function () {
                             Swal.close(); // Cierra la alerta de SweetAlert
@@ -512,7 +514,7 @@ $("#btonSaveMessage").on("click", function () {
         },
     });
 });
-$(document).on("click", '#btonShowView', function () {
+$(document).on("click", "#btonShowView", function () {
     // Obtén el ID del botón
     var id = $(this).data("id");
 
@@ -538,7 +540,6 @@ $(document).on("click", '#btonShowView', function () {
                 // Cierra el modal de Sweet Alert y dispara el evento de clic
                 $("#contactsForSend").click();
             });
-            
         },
         error: function () {
             Swal.fire({

@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class GroupSend extends Model
 {
@@ -39,5 +41,7 @@ class GroupSend extends Model
     {
         return $this->belongsToMany(Contact::class, 'contact_by_groups', 'groupSend_id', 'contact_id');
     }
+
+  
 
 }

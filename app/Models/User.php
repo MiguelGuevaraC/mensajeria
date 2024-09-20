@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Faker\Provider\ar_EG\Person;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -71,6 +71,38 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
- 
+
+    public function createGroupSend()
+    {
+        $company_id = $this->id;
+
+        DB::table('message_whasapps')->insert([
+            'name' => "GRUPO BASE",
+            'comment' => "Grupo Default",
+            'state' => true,
+            'company_id' => $company_id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function createMensajeBase()
+    {
+        $company_id = $this->id;
+        $documentNumber = $this->documentNumber;
+
+        DB::table('message_whasapps')->insert([
+            'title' => "MENSAJE BASE - " . $documentNumber,
+            'block1' => "Objetivo: Notificar sobre un evento importante.",
+            'block2' => "Destinatarios: Todos los usuarios.",
+            'block3' => "Detalles: Aviso a enviar.",
+            'block4' => "Acción: Recomendación a realizar.",
+            'routeFile' => null,
+            'state' => true,
+            'company_id' => $company_id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
 
 }
