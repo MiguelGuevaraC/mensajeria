@@ -124,11 +124,11 @@ class MessageController extends Controller
             //     $q->where('company_id', $user->company_id);
             // });
         } else if ($user->typeofUser_id == 2) {
-            if ($user->typeofUser_id == 1) {
+           
                 $query->whereHas('user', function ($q) use ($user) {
                     $q->where('company_id', $user->company_id);
                 });
-            }
+            
         } else {
             $query->where('user_id', $user->id);
         }

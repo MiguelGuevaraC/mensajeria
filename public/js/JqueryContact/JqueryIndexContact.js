@@ -6,18 +6,29 @@ var columns = [
         visible: false, // Oculta esta columna
     },
     {
-        data: "stateSend", // Asegúrate de que este es el nombre del campo en tus datos
+        data: "stateSend", 
         render: function (data, type, row, meta) {
-            // Retorna el checkbox con estado según el valor de data
+            // Determina si el checkbox está marcado
+            const isChecked = data === 1 ? "checked" : "";
+            
+            // Retorna el checkbox personalizado con sus estilos
             return `
-                <input class="checkCompro" type="checkbox" ${
-                    data === 1 ? "checked" : ""
-                } ${data === 0 ? "" : ""} value="${row.id}">
+                <div class="checkbox-wrapper">
+                    <input 
+                        class="checkCompro styled-checkbox" 
+                        type="checkbox" 
+                        id="checkbox-${row.id}" 
+                        value="${row.id}" 
+                        ${isChecked}
+                    >
+                    <label for="checkbox-${row.id}" class="checkbox-label"></label>
+                </div>
             `;
-            return "";
         },
-        orderable: false,
+        orderable: false, // Deshabilitar la ordenación en esta columna
     },
+    
+    
     {
         data: "group_send.name",
         render: function (data, type, row, meta) {

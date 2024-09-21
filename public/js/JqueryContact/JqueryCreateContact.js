@@ -90,10 +90,13 @@ $("#tbContacts").on("change", "input.checkCompro", function () {
 
     $.ajax({
         url: "stateSend/" + id,
-        method: "GET",
+        method: "PUT", // Cambiar a método PUT
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Incluir el token CSRF
+        },
         success: function (response) {
             var table = $("#tbContacts").DataTable();
-            table.column(1).search(null, true, false).draw();
+            table.column(1).search(null, true, false).draw(); // Actualizar la tabla
         },
         error: function (xhr) {
             // Ocultar el modal de espera y mostrar mensaje de error
@@ -104,6 +107,7 @@ $("#tbContacts").on("change", "input.checkCompro", function () {
             });
         },
     });
+    
 });
 
 $(document).ready(function () {
@@ -304,23 +308,19 @@ $(document).ready(function () {
                                                             // Llamar a la API para deshabilitar el contacto
                                                             $.ajax({
                                                                 url: `stateSend/${contactId}`, // Cambia esta URL según tu implementación
-                                                                method: "GET",
-                                                                success:
-                                                                    function () {
-                                                                        Swal.fire(
-                                                                            "Deshabilitado",
-                                                                            "Se desmarcó con Éxito",
-                                                                            "success"
-                                                                        );
-                                                                        $(
-                                                                            "#tbContacts"
-                                                                        )
-                                                                            .DataTable()
-                                                                            .ajax.reload();
-                                                                        $(
-                                                                            `.viewGroupBtn`
-                                                                        ).click();
-                                                                    },
+                                                                method: "PUT", // Cambiar a método PUT
+                                                                headers: {
+                                                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Incluir el token CSRF
+                                                                },
+                                                                success: function () {
+                                                                    Swal.fire(
+                                                                        "Deshabilitado",
+                                                                        "Se desmarcó con Éxito",
+                                                                        "success"
+                                                                    );
+                                                                    $("#tbContacts").DataTable().ajax.reload(); // Recargar la tabla
+                                                                    $(".viewGroupBtn").click(); // Hacer clic en el botón del grupo
+                                                                },
                                                                 error: function () {
                                                                     Swal.fire(
                                                                         "Error",
@@ -329,6 +329,7 @@ $(document).ready(function () {
                                                                     );
                                                                 },
                                                             });
+                                                             
                                                         }
                                                     });
                                                 }
@@ -363,16 +364,17 @@ $(document).ready(function () {
                                     // Llamar a la API para deshabilitar el grupo
                                     $.ajax({
                                         url: `disabledSendByGroup/${groupId}`, // Cambia esta URL según tu implementación
-                                        method: "GET",
+                                        method: "PUT", // Cambiar a método PUT
+                                        headers: {
+                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Incluir el token CSRF
+                                        },
                                         success: function () {
                                             Swal.fire(
                                                 "Deshabilitado",
                                                 "Grupo deshabilitado con éxito",
                                                 "success"
                                             );
-                                            $("#tbContacts")
-                                                .DataTable()
-                                                .ajax.reload(); // Recargar la tabla si es necesario
+                                            $("#tbContacts").DataTable().ajax.reload(); // Recargar la tabla si es necesario
                                         },
                                         error: function () {
                                             Swal.fire(
@@ -382,6 +384,7 @@ $(document).ready(function () {
                                             );
                                         },
                                     });
+                                    
                                 }
                             });
                         });

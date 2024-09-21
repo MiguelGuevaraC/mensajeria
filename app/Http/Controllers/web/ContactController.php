@@ -131,7 +131,7 @@ class ContactController extends Controller
         ])->whereHas('groupSend', function ($query) use ($user_id) {
             // Asegurar que el filtro user_id esté en todos los groupSend
             $query->where('user_id', $user_id);
-        })->where('state', 1)->orderBy('contact_id', 'asc');
+        })->where('state', 1)->orderBy('contact_id', 'desc');
 
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {

@@ -3,6 +3,7 @@
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\web\CompanyController;
+use App\Http\Controllers\web\ContactByGroupController;
 use App\Http\Controllers\web\ContactController;
 use App\Http\Controllers\web\DashboardController;
 use App\Http\Controllers\web\GroupMenuController;
@@ -137,8 +138,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('contacts/{id}', [ContactController::class, 'show']);
     Route::post('contacts', [ContactController::class, 'store']);
     Route::put('contacts/{id}', [ContactController::class, 'update']);
-    Route::get('stateSend/{id}', [ContactController::class, 'stateSend']);
-    Route::get('disabledSendByGroup/{id}', [ContactController::class, 'disabledSendByGroup']);
+    Route::put('stateSend/{id}', [ContactController::class, 'stateSend']);
+    Route::put('disabledSendByGroup/{id}', [ContactController::class, 'disabledSendByGroup']);
+
+    Route::get('contactByGroup/{id}', [ContactByGroupController::class, 'show']);
+    Route::put('updateContact/{id}', [ContactByGroupController::class, 'update']);
 
     Route::get('contactsForGroup/{id}', [ContactController::class, 'contactsForSendByGroup']);
     
@@ -146,4 +150,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('importExcel', [ContactController::class, 'importExcel']);
     Route::post('sendApi', [WhatsappSendController::class, 'store']);
+
+
 });
