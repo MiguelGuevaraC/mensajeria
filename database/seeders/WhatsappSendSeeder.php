@@ -13,6 +13,6 @@ class WhatsappSendSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\WhatsappSend::factory(100)->create();
+        \App\Models\WhatsappSend::factory(100)->create();
     }
 }

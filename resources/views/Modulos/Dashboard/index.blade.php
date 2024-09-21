@@ -281,7 +281,7 @@
                                     <div class="icon mb-3">
                                         <i class="fa fa-dollar fa-2x" style="color: #004190"></i>
                                     </div>
-                                    <h4 class="card-title">Costo Unitario</h4>
+                                    <h4 class="card-title">Costo Actual</h4>
                                     <p class="card-text display-4" id="costoUnitario">0</p>
                                 </div>
                             </div>

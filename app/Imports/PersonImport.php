@@ -93,12 +93,13 @@ class PersonImport implements ToModel, WithHeadingRow
             
 
             $currentGroup = GroupSend::find($this->groupId);
-            if ($currentGroup) {
+            if (!$currentGroup) {
                 Log::error('no se encoentró el grupo');
             }
 
             // Verificar si el teléfono ya está en el grupo
-            $existingContact = Contact::whereHas('groupSend', function ($query) use ($currentGroup) {
+            $existingContact = Contact::whereHas('groupSend',
+             function ($query) use ($currentGroup) {
                 $query->where('groupSend_id', $currentGroup->id);
             })->where('telephone', $cleanedPhoneNumber)->first();
 
@@ -111,8 +112,13 @@ class PersonImport implements ToModel, WithHeadingRow
                     'concept' => $normalizedRow['concept'],
                     'amount' => $normalizedRow['amount'],
                     'dateReference' => $dateReference,
+                    'state' => 1,
                     'groupSend_id' => $currentGroup->id, // Asegurar que el grupo es actualizado
                 ]);
+                ContactByGroup::updateOrCreate(
+                    ['contact_id' => $existingContact->id, 'groupSend_id' => $currentGroup->id],
+                    ['state' => 1]
+                );
 
                 return $existingContact; // Retornar el contacto actualizado
             } else {
@@ -127,6 +133,7 @@ class PersonImport implements ToModel, WithHeadingRow
                         'amount' => $normalizedRow['amount'],
                         'dateReference' => $dateReference,
                         'groupSend_id' => $currentGroup->id,
+                        'state' => 1,
                     ]);
                     $contactByGroup = ContactByGroup::create([
                         'state' => 1,
