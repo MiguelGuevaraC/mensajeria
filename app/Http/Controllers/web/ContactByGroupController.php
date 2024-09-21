@@ -43,4 +43,16 @@ class ContactByGroupController extends Controller
 
         return response()->json($contact);
     }
+
+    public function destroy(int $id)
+    {
+        $cobtactByGroup = ContactByGroup::find($id);
+        if (!$cobtactByGroup) {
+            return response()->json(
+                ['message' => 'Contacto no Encontrado'], 404
+            );
+        }
+        $cobtactByGroup->state=0;
+        $cobtactByGroup->save();
+    }
 }

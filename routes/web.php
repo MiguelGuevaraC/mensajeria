@@ -143,6 +143,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('contactByGroup/{id}', [ContactByGroupController::class, 'show']);
     Route::put('updateContact/{id}', [ContactByGroupController::class, 'update']);
+    Route::delete('contactByGroup/{id}', [ContactByGroupController::class, 'destroy']);
 
     Route::get('contactsForGroup/{id}', [ContactController::class, 'contactsForSendByGroup']);
     
