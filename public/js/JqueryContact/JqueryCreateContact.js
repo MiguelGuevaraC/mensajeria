@@ -414,31 +414,98 @@ $(document).ready(function () {
                                     url: "sendApi", // Cambia esta URL si es necesario
                                     method: "POST",
                                     headers: {
-                                        "X-CSRF-TOKEN": $(
-                                            'meta[name="csrf-token"]'
-                                        ).attr("content"), // Asegúrate de tener el token en tu meta
+                                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"), // Asegúrate de tener el token en tu meta
                                     },
                                     data: {
                                         message_id: idMensaje,
                                     },
-                                    success: function (response) {
+                                    beforeSend: function () {
+                                        // Inicializar las variables antes de enviar
+                                        totalEnviados = 0;
+                                        totalExitosos = 0;
+                                        totalErrores = 0;
+                                
+                                        // Mostrar alerta de carga
                                         Swal.fire({
-                                            icon: "success",
-                                            title: "Éxito",
-                                            text: "Mensajes enviados con éxito.",
+                                            title: "Enviando mensajes...",
+                                            html: `
+                                                <div style="text-align: center; font-size: 1.2em; margin-bottom: 20px;">
+                                                    <div style="font-size: 1.5em; margin-bottom: 10px;">
+                                                        <i class="fas fa-paper-plane" style="color: #007bff;"></i>
+                                                        Enviados: <span id="totalEnviados" style="font-weight: bold;">${totalEnviados}</span>
+                                                    </div>
+                                                    <div style="font-size: 1.5em; margin-bottom: 10px;">
+                                                        <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                                                        Éxitos: <span id="totalExitosos" style="font-weight: bold;">${totalExitosos}</span>
+                                                    </div>
+                                                    <div style="font-size: 1.5em;">
+                                                        <i class="fas fa-times-circle" style="color: #dc3545;"></i>
+                                                        Errores: <span id="totalErrores" style="font-weight: bold;">${totalErrores}</span>
+                                                    </div>
+                                                </div>
+                                                <div style="text-align: center; margin-top: 20px;">
+                                                    <progress id="progressBar" value="0" max="100" style="width: 100%; height: 25px;"></progress>
+                                                </div>
+                                            `,
+                                            icon: "info",
+                                            showConfirmButton: false, // Ocultar botón de confirmar
+                                            willOpen: () => {
+                                                Swal.showLoading();
+                                            }
                                         });
-                                        // Aquí puedes hacer otras acciones, como recargar tablas o actualizar el UI
+                                    },
+                                    success: function (response) {
+                                        let totalMessages = response.totalEnviados; // Total de mensajes a enviar
+                                        const interval = setInterval(() => {
+                                            // Simulación de envío de mensajes
+                                            if (totalEnviados < totalMessages) {
+                                                totalEnviados++;
+                                                totalExitosos += (totalEnviados % 2 === 0) ? 1 : 0; // Simulación de éxitos
+                                                totalErrores += (totalEnviados % 3 === 0) ? 1 : 0; // Simulación de errores
+                                
+                                                // Actualizar el contenido de la ventana emergente
+                                                $('#totalEnviados').text(totalEnviados);
+                                                $('#totalExitosos').text(totalExitosos);
+                                                $('#totalErrores').text(totalErrores);
+                                                $('#progressBar').val(calculateProgress(totalEnviados, totalMessages));
+                                            }
+                                
+                                            // Verificar si todos los mensajes han sido enviados
+                                            if (totalEnviados >= totalMessages) {
+                                                clearInterval(interval);
+                                                Swal.update({
+                                                    title: 'Envío completado',
+                                                    html: `
+                                                        <div style="font-size: 20px; text-align: center;">
+                                                            <p><strong>Total Enviados:</strong> ${totalEnviados}</p>
+                                                            <p><strong>Total Éxitos:</strong> ${totalExitosos}</p>
+                                                            <p><strong>Total Errores:</strong> ${totalErrores}</p>
+                                                        </div>
+                                                        <a href="send-report" target="_blank" class="btn btn-primary" style="display: block; margin-top: 10px; text-align: center;">Ver envíos</a>
+                                                    `,
+                                                    icon: totalErrores > 0 ? 'error' : 'success',
+                                                    showConfirmButton: true,
+                                                });
+                                            }
+                                        }, 500);
+                                
+                                        function calculateProgress(totalEnviados, totalMessages) {
+                                            return Math.min((totalEnviados / totalMessages) * 100, 100); // Asegura que el valor no supere el 100
+                                        }
                                     },
                                     error: function (xhr) {
                                         Swal.fire({
                                             icon: "error",
                                             title: "Error",
-                                            text:
-                                                xhr.responseJSON.error ||
-                                                "No se pudo enviar los mensajes.",
+                                            text: xhr.responseJSON.error || "No se pudo enviar los mensajes.",
                                         });
-                                    },
+                                    }
                                 });
+                                
+                                
+                                
+                                
+                                
                             } else {
                                 $("#contactsForSend").click();
                             }

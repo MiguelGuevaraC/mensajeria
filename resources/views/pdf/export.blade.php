@@ -26,8 +26,8 @@
         }
 
         body {
-            padding-top: 10px;
-            padding-bottom: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
 
         }
 
@@ -53,7 +53,7 @@
         }
 
         .content {
-            margin-top: 50px;
+            margin-top: 30px;
             padding-left: 30px;
             padding-right: 30px;
         }
@@ -69,10 +69,10 @@
         }
 
         .titlePresupuesto {
-            font-size: 32px;
+            font-size: 18px;
             font-weight: bolder;
             text-align: center;
-            margin-top: 5px;
+            margin-top: 1px;
             /*margin-bottom: 20px;*/
             color: #100046;
             ;
@@ -84,18 +84,18 @@
 
             width: 95%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 10px;
         }
 
         .tableInfo {
 
-            margin-top: 10px;
+            margin-top: 1px;
 
         }
 
         .tablePeople {
-            margin-top: 10px;
-            font-size: 16px;
+            margin-top: 5px;
+            font-size: 1px;
             border: 1px solid black;
         }
 
@@ -112,7 +112,7 @@
         }
 
         .tableDetail {
-            margin-top: 10px;
+            margin-top: 5px;
             border-collapse: collapse;
         }
 
@@ -131,7 +131,12 @@
         .center {
             text-align: center;
         }
-
+        .font-8 {
+            font-size: 8px;
+        }
+        .font-10 {
+            font-size: 10px;
+        }
         .font-12 {
             font-size: 12px;
         }
@@ -222,6 +227,9 @@
         .w30 {
             width: 30%;
         }
+        .justify{
+            text-align: justify;
+        }
     </style>
 </head>
 
@@ -229,9 +237,6 @@
 
     <table class="tableInfo">
         <tr>
-            <div class="contentImage">
-                <img class="logoImage" src="{{ asset('storage/img/logo.png') }}" alt="logoTransporte">
-            </div>
             <td class="">
                 <div class="titlePresupuesto">REPORTE DE MENSAJERÍA ({{ $dateStart }} | {{ $dateEnd }})</div>
             </td>
@@ -241,35 +246,32 @@
     <table class="tableDetail font-12">
         <thead>
             <tr>
-                <th>Cuotas Vencidas</th>
-                <th>Estudiante</th>
-                <th>Padres</th>
-                <th>Info Estudiante</th>
-                <th>Teléfono</th>
-                <th>Meses</th>
-                <th>Monto Pago</th>
+                <th>Grupo</th>
+                <th>Contacto</th>
+                <th>Concepto</th>
+                <th>Monto</th>
+                <th>Fecha Referencia</th>
                 <th>Fecha Envío</th>
+                <th>Estado</th>
+                <th>Mensaje</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($data as $moviment)
                 <tr>
-                    <td>{{ $moviment->cuota }}</td>
-                    <td>{{ $moviment->dniStudent }} | {{ $moviment->namesStudent }}</td>
-                    <td>{{ $moviment->namesParent ?? '-' }}</td>
-                    <td>{{ $moviment->infoStudent ?? '' }}</td>
-                    <td>{{ $moviment->telephone ?? '-' }}</td>
-                    <td>{{ $moviment->conceptSend ?? '-' }}</td>
-                    <td>{{ $moviment->paymentAmount ?? '-' }}</td>
-                    <td>{{ $moviment->created_at ? \Carbon\Carbon::parse($moviment->created_at)->format('Y-m-d H:i:s') : '-' }}</td>
-
-                  
+                    <td class="font-8">{{ $moviment->contact->group->name ?? 'N/A' }}</td> <!-- Grupo -->
+                    <td class="font-8">{{ $moviment->namesPerson . ' | ' . $moviment->documentNumber . ' | ' . $moviment->telephone }}</td> <!-- Contacto -->
+                    <td class="font-8">{{ $moviment->concept ?? '-' }}</td> <!-- Concepto -->
+                    <td class="font-8">{{ $moviment->amount ?? '' }}</td> <!-- Monto -->
+                    <td class="font-8">{{ $moviment->contact->concept ?? '-' }}</td> <!-- FechaReferencia -->
+                    <td class="font-8">{{ $moviment->created_at ? \Carbon\Carbon::parse($moviment->created_at)->format('Y-m-d H:i:s') : '-' }}</td> <!-- FechaEnvio -->
+                    <td class="font-8">{{ $moviment->status ?? '-' }}</td> <!-- Estado -->
+                    <td class="font-8 justify">{{ $moviment->messageSend ?? '-' }}</td> <!-- Mensaje -->
+                </tr>
             @endforeach
-
-
-
         </tbody>
     </table>
+    
 
 
 

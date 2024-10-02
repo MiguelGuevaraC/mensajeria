@@ -1,67 +1,46 @@
 //DATATABLE
 
 var columns = [
-    { data: "conminmnet.cuotaNumber" },
-    // {
-    //     data: "user.person.names",
-    //     render: function (data, type, row, meta) {
-    //         if (row.user.person.typeofDocument === "DNI") {
-    //             return `${row.user.person.documentNumber} | ${row.user.person.names} ${row.user.person.fatherSurname} ${row.user.person.motherSurname}`;
-    //         } else if (row.user.person.typeofDocument === "RUC") {
-    //             return `${row.user.person.documentNumber} | ${row.user.person.businessName}`;
-    //         }
-    //     },
-    //     orderable: false,
-    // },
     {
-        data: "student.names",
-        render: function (data, type, row, meta) {
-            if (row.student.typeofDocument === "RUC") {
-                return `${row.student.documentNumber} | ${row.student.businessName}`;
-            }else{
-                    return `${row.student.documentNumber} | ${row.student.identityNumber} | ${row.student.names} ${row.student.fatherSurname} ${row.student.motherSurname}`;
-            }
-        },
-        orderable: true,
-    },
-    {
-        data: "student.representativeDni",
-        render: function (data, type, row, meta) {
-            return `${row.student.representativeDni} | ${row.student.representativeNames}`;
-        },
-        orderable: false,
-    },
-
-    {
-        data: "student.level",
-        render: function (data, type, row, meta) {
-            return `${row.student.level} ${row.student.grade} ${row.student.section}`;
-        },
-        orderable: false,
-    },
-    {
-        data: "student.telephone",
+        data: "contact.group.name",
         render: function (data, type, row, meta) {
             return data;
         },
         orderable: false,
     },
-
     {
-        data: "conminmnet.conceptDebt",
+        data: "namesPerson",
         render: function (data, type, row, meta) {
             return data;
         },
         orderable: false,
     },
-
-    { data: "conminmnet.paymentAmount" },
-
+    {
+        data: "concept",
+        render: function (data, type, row, meta) {
+            return data;
+        },
+        orderable: false,
+    },
+    {
+        data: "amount",
+        render: function (data, type, row, meta) {
+            return data;
+        },
+        orderable: false,
+    },
+    {
+        data: "contact.dateReference",
+        render: function (data, type, row, meta) {
+            return data;
+        },
+        orderable: false,
+    },
     {
         data: "created_at",
         render: function (data, type, row, meta) {
             if (!data) return "";
-
+    
             const date = new Date(data);
             const day = ("0" + date.getDate()).slice(-2);
             const month = ("0" + (date.getMonth() + 1)).slice(-2);
@@ -69,18 +48,31 @@ var columns = [
             const hours = ("0" + date.getHours()).slice(-2);
             const minutes = ("0" + date.getMinutes()).slice(-2);
             const seconds = ("0" + date.getSeconds()).slice(-2);
-
-            return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+    
+            // Cambiamos el formato a año-mes-día horas
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         },
         orderable: true,
     },
+    
     {
-        data: "description",
-        render: function(data, type, row) {
-       
-        return '  <a style="background:green; color:white;" class="view-description btn btn-info" data-description="' + data + '"><i class="fa-brands fa-whatsapp"></i> </a>';
-        }
-    }
+        data: "status",
+        render: function (data, type, row, meta) {
+            return data;
+        },
+        orderable: false,
+    },
+    {
+        data: "messageSend",
+        render: function (data, type, row) {
+            return (
+                '  <a style="background:green; color:white;" class="view-description btn btn-info" data-description="' +
+                data +
+                '"><i class="fa-brands fa-whatsapp"></i> </a>'
+            );
+        },
+    },
+
 ];
 
 
@@ -188,20 +180,14 @@ var init = function () {
                 colIdx == 3 ||
                 colIdx == 5 ||
                 colIdx == 4 ||
-                colIdx == 6 ||
-                colIdx == 7 
+                colIdx == 6
             ) {
                 var cell = $(".filters th").eq(header.index());
                 var title = header.text();
                 $(cell).html(
                     '<input type="text" placeholder="Escribe aquí..." />'
                 );
-                if (colIdx == 0) {
-                    $(cell).html(
-                        '<input style="width: 30px;" type="text" placeholder="#" />'
-                    );
-                }
-
+           
                 // Evento para filtrar cuando se escriba en el input
                 $("input", cell)
                     .off("keyup change")
@@ -267,7 +253,7 @@ $(document).ready(function () {
             processing: true,
             serverSide: true,
             ajax: {
-                url: "mensajeriaAll",
+                url: "send-reportAll",
                 type: "GET",
                 data: function (d) {
                     // Aquí configuramos los filtros de búsqueda por columna

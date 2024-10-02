@@ -118,6 +118,7 @@ class SendWhatsappJob implements ShouldQueue
                     'telephone' => $telephoneStudent,
                     'amount' => $amount,
                     'costSend' => $costSend,
+                    'concept' => $concept,
                     'routeFile' => $messageBase->routeFile,
                     'contac_id' => $contact->id,
                     'user_id' => $user->id,
@@ -161,7 +162,12 @@ class SendWhatsappJob implements ShouldQueue
                             $messageSend->status = $status === 'success' ? 'Envio Exitoso' : 'Envio Fallido';
                             $messageSend->sendApi_id = $sendApi->id;
                             $messageSend->save();
-                            $totalSuccess++;
+                            if ($status === 'success') {
+                                $totalSuccess++;
+                            } else {
+                                $totalErrors++;
+                            }
+
                             $totalSend++;
                         }
                     }
@@ -176,7 +182,7 @@ class SendWhatsappJob implements ShouldQueue
                         $messageSend->status = 'Envio Fallido';
                         $messageSend->sendApi_id = $sendApi->id;
                         $messageSend->save();
-                        
+
                         $totalErrors++;
                         $totalSend++;
                     }
@@ -190,7 +196,9 @@ class SendWhatsappJob implements ShouldQueue
             $sendApi->success = $totalSuccess;
             $sendApi->save();
 
-            return response()->json(['message' => 'El mensaje de WhatsApp se ha enviado correctamente'], 200);
+            return response()->json($sendApi
+                , 200);
+
         } catch (Exception $e) {
             Log::error('Error al enviar WhatsApp: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al enviar el mensaje de WhatsApp'], 500);

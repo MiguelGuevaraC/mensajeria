@@ -20,15 +20,23 @@ class ExportExcel implements FromCollection, WithStyles
     }
 
     public function collection()
-    {
-
+    {  
+        // Agregar los encabezados de la columna como la primera fila
         array_unshift($this->data, [
-            'CuotasVencidas', 'Estudiante', 'Padres',
-            'InfoEstudiante', 'Telefono',
-            'Meses', 'MontoPago', 'FechaEnvio','Mensaje',
+            'Grupo', 
+            'Contacto', 
+            'Concepto',
+            'Monto', 
+            'FechaReferencia',
+            'FechaEnvio', 
+            'Estado', 
+            'Mensaje', // Asegúrate de que 'Mensaje' sea uno de los nuevos campos que necesitas
         ]);
+    
+        // Retornar los datos como una colección
         return collect($this->data);
     }
+    
 
     public function headings(): array
     {

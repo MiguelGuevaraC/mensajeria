@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -20,11 +19,10 @@ class Contact extends Model
         'dateReference',
         'routeFile',
 
-
         'migration_id',
         'groupSend_id',
         'state',
-       
+
         'status',
         'created_at',
 
@@ -40,11 +38,13 @@ class Contact extends Model
     //     return $this->belongsTo(Company::class, 'company_id');
     // }
 
-  
-
     public function contactByGroup()
     {
         return $this->hasMany(ContactByGroup::class);
+    }
+    public function group()
+    {
+        return $this->belongsTo(GroupSend::class, 'groupSend_id');
     }
     public function groupSend()
     {

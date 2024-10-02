@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -70,11 +68,17 @@
     <!-- CSS DEL DATATABLE -->
     <link rel="stylesheet" href="/mensajeria/Cdn-Locales/pkgDatatables/datatables.css">
     <link rel="stylesheet" href="/mensajeria/Cdn-Locales/pkgAwsome/css/all.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
     <link rel="stylesheet" href="{{ asset('css/appPlantilla.css') }}">
 
 
+    <style>
+        .bg-light {
+            background-color: #ffffff !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -192,25 +196,27 @@
                 <!--===================================================-->
 
 
-                <div class="container mt-2">
-                    <div class="panel p-2 border rounded bg-light">
+                <div class="container mt-1">
+                    <div class="panel p-2 bg-light">
                         <form id="filterForm" class="mb-3">
                             <div id="demo-custom-toolbar2" class="mb-2">
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="startDate">Inicio</label>
-                                            <input type="date" id="startDate" name="startDate" class="form-control" required>
+                                            <input type="date" id="startDate" name="startDate"
+                                                class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="endDate">Fin</label>
-                                            <input type="date" id="endDate" name="endDate" class="form-control" required>
+                                            <input type="date" id="endDate" name="endDate" class="form-control"
+                                                required>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="d-flex flex-wrap gap-2">
                                     <button type="submit" id="search" class="btn btn-primary">
                                         <i class="fa-solid fa-magnifying-glass"></i> BUSCAR
@@ -285,7 +291,7 @@
                                             <span class="mnp-desc"></span>
                                         </a>
                                     </div>
-                                    
+
                                 </div>
 
 

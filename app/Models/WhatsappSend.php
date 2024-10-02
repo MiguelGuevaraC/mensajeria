@@ -44,11 +44,12 @@ class WhatsappSend extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
+
     public function contact()
     {
-        return $this->belongsTo(Person::class, 'contact_id');
+        return $this->belongsTo(Contact::class, 'contac_id');
     }
     public function messageWhasapp()
     {

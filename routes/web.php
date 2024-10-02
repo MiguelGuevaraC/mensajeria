@@ -11,6 +11,7 @@ use App\Http\Controllers\web\GroupSendController;
 use App\Http\Controllers\web\MessageController;
 use App\Http\Controllers\web\MigrationController;
 use App\Http\Controllers\web\OptionMenuController;
+use App\Http\Controllers\web\SendReportController;
 use App\Http\Controllers\web\TypeUserController;
 use App\Http\Controllers\web\UserController;
 use App\Http\Controllers\web\WhatsappSendController;
@@ -152,5 +153,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('importExcel', [ContactController::class, 'importExcel']);
     Route::post('sendApi', [WhatsappSendController::class, 'store']);
 
+    Route::post('prueba', [WhatsappSendController::class, 'prueba']);
+    Route::get('whatsapp', [WhatsappSendController::class, 'show'])->middleware('auth');
+
+    Route::get('send-report', [SendReportController::class, 'index']);
+    Route::get('send-reportAll', [SendReportController::class, 'all']);
 
 });
