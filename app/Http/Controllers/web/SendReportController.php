@@ -55,15 +55,10 @@ class SendReportController extends Controller
             ; // Cambia 'id' por 'user_id'
 
             if ($user->typeofUser_id == 1) {
-                // $query->whereHas('user', function ($q) use ($user) {
-                //     $q->where('company_id', $user->company_id);
-                // });
             } else if ($user->typeofUser_id == 2) {
-
                 $query->whereHas('user', function ($q) use ($user) {
                     $q->where('company_id', $user->company_id);
                 });
-
             } else {
                 $query->where('user_id', $user->id);
             }
@@ -73,7 +68,6 @@ class SendReportController extends Controller
                 $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
             }
 
-            $company_id = Auth::user()->company_id;
 
             // Aplicar filtros por columnas
             foreach ($request->get('columns') as $column) {
@@ -83,7 +77,7 @@ class SendReportController extends Controller
                     switch ($column['data']) {
                         case 'contact.group.name':
                             // Filtrar por el nombre del grupo, asegurando el company_id
-                            $query->whereHas('contact.group', function ($query) use ($searchValue, $company_id) {
+                            $query->whereHas('contact.group', function ($query) use ($searchValue) {
                                 $query->where('name', 'like', '%' . $searchValue . '%')
                                 ;
                             });

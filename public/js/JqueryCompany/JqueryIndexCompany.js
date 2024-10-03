@@ -1,9 +1,8 @@
 var columns = [
-
     {
         data: "businessName",
         render: function (data, type, row, meta) {
-            return data + ' | '+row.tradeName+ ' | '+row.documentNumber; // Mostrar solo el nombre de la empresa
+            return data + " | " + row.tradeName + " | " + row.documentNumber; // Mostrar solo el nombre de la empresa
         },
         orderable: false,
     },
@@ -18,7 +17,7 @@ var columns = [
     {
         data: "address",
         render: function (data, type, row, meta) {
-            return data ; // Mostrar solo el nombre de la empresa
+            return data; // Mostrar solo el nombre de la empresa
         },
         orderable: false,
     },
@@ -44,7 +43,6 @@ var columns = [
         orderable: false,
     },
 ];
-
 
 var lenguag = {
     lengthMenu: "Mostrar _MENU_ Registros por paginas",
@@ -110,12 +108,7 @@ var init = function () {
     api.columns()
         .eq(0)
         .each(function (colIdx) {
-            if (
-                colIdx == 0 ||
-                colIdx == 1 ||
-                colIdx == 2 ||
-                colIdx == 3 
-            ) {
+            if (colIdx == 0 || colIdx == 1 || colIdx == 2 || colIdx == 3) {
                 var cell = $(".filters th").eq(
                     $(api.column(colIdx).header()).index()
                 );
@@ -123,7 +116,7 @@ var init = function () {
                 $(cell).html(
                     '<input type="text" placeholder="Escribe aquí..." />'
                 );
-            
+
                 $(
                     "input",
                     $(".filters th").eq($(api.column(colIdx).header()).index())
@@ -176,8 +169,8 @@ $(document).ready(function () {
             type: "GET",
             data: function (d) {
                 // Aquí configuramos los filtros de búsqueda por columna
-                $('#tbCompanies .filters input').each(function () {
-                    var name = $(this).attr('name');
+                $("#tbCompanies .filters input").each(function () {
+                    var name = $(this).attr("name");
                     d.columns.forEach(function (column) {
                         if (column.data === name) {
                             column.search.value = $(this).val();
@@ -185,7 +178,7 @@ $(document).ready(function () {
                     }, this);
                 });
             },
-            debounce: 500 ,
+            debounce: 500,
             error: function (xhr, error, thrown) {
                 // Manejo de errores
                 console.error("Error en la solicitud AJAX:", error);
@@ -193,15 +186,21 @@ $(document).ready(function () {
                 // Intentar nuevamente si no se alcanzó el número máximo de reintentos
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    console.log("Reintentando... (Intento " + retryCount + " de " + maxRetries + ")");
+                    console.log(
+                        "Reintentando... (Intento " +
+                            retryCount +
+                            " de " +
+                            maxRetries +
+                            ")"
+                    );
                     fetchTableData(retryCount);
-                } 
-            }
+                }
+            },
         },
         orderCellsTop: true,
         fixedHeader: true,
         columns: columns,
-        dom: "Brtip",
+        dom: "rtip",
         buttons: [],
 
         language: lenguag,

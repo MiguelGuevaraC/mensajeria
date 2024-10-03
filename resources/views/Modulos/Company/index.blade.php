@@ -200,7 +200,7 @@
                                     class="demo-pli-plus"></i>
                                 Añadir</button>
                         </div>
-                        <br>
+                        <br><br><br><br>
 
                         <div class="panel-body">
                             @include('Modulos.Company.Tables.tablaCompany')

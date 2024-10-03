@@ -222,7 +222,7 @@ $("#tbGroupSends thead tr")
             orderCellsTop: true,
             fixedHeader: true,
             columns: columns, // Define las columnas según tu configuración
-            dom: "Bfrtip", // Configura los controles de la tabla (filtro, paginación, etc.)
+            dom: "rtip", // Configura los controles de la tabla (filtro, paginación, etc.)
             buttons: butomns, // Botones de acción (como exportar)
             lengthMenu: lengthmenu, // Configura las opciones de paginación
             language: lenguag, // Configura el lenguaje de la tabla

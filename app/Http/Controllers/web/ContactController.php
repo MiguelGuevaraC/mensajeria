@@ -158,9 +158,9 @@ class ContactController extends Controller
                 switch ($column['data']) {
                     case 'group_send.name':
                         // Filtrar por el nombre del grupo, asegurando el company_id
-                        $query->whereHas('groupSend', function ($query) use ($searchValue, $company_id) {
+                        $query->whereHas('groupSend', function ($query) use ($searchValue) {
                             $query->where('name', 'like', '%' . $searchValue . '%')
-                                ->where('company_id', $company_id);
+                                ;
                         });
                         break;
 
