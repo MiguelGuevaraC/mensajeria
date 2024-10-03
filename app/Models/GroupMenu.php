@@ -69,7 +69,7 @@ class GroupMenu extends Model
             $query->whereHas('accesses', function ($query) use ($userTypeId) {
                 $query->where('typeuser_id', $userTypeId);
             });
-            $query->whereIn('id', [1,2,3,4,8]);
+            $query->whereIn('id', [1,2,3,4,8,6]);
         }])
             ->get()
             ->map(function ($groupMenu) use ($userTypeId) {

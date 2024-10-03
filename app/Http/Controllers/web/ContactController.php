@@ -120,18 +120,35 @@ class ContactController extends Controller
         $start = $request->get('start', 0);
         $length = $request->get('length', 15);
         $filters = $request->input('filters', []);
+        $user = Auth::user();
         $company_id = Auth::user()->company_id;
         $user_id = Auth::user()->id;
         // Filtrar por company_id para asegurar que solo se obtengan los registros relacionados con esa compañía
         $query = ContactByGroup::with([
             'contact',
             'groupSend' => function ($query) use ($user_id) {
-                $query->where('user_id', $user_id);
+                // $query->where('user_id', $user_id);
             },
         ])->whereHas('groupSend', function ($query) use ($user_id) {
             // Asegurar que el filtro user_id esté en todos los groupSend
-            $query->where('user_id', $user_id);
+            // $query->where('user_id', $user_id);
         })->where('state', 1)->orderBy('contact_id', 'desc');
+
+        if ($user->typeofUser_id == 1) {
+            // $query->whereHas('user', function ($q) use ($user) {
+            //     $q->where('company_id', $user->company_id);
+            // });
+        } else if ($user->typeofUser_id == 2) {
+
+            $query->whereHas('groupSend.user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+
+        } else {
+            $query->whereHas('groupSend', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
 
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {

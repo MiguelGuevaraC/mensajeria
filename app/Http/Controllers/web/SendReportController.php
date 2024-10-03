@@ -47,11 +47,26 @@ class SendReportController extends Controller
         $filters = $request->input('filters', []);
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
+        $user = Auth::user();
 
         try {
             // Iniciar la consulta con las relaciones necesarias
             $query = WhatsappSend::with(['user', 'contact.group', 'messageWhasapp'])
-                ->where('user_id', Auth::user()->id); // Cambia 'id' por 'user_id'
+            ; // Cambia 'id' por 'user_id'
+
+            if ($user->typeofUser_id == 1) {
+                // $query->whereHas('user', function ($q) use ($user) {
+                //     $q->where('company_id', $user->company_id);
+                // });
+            } else if ($user->typeofUser_id == 2) {
+
+                $query->whereHas('user', function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id);
+                });
+
+            } else {
+                $query->where('user_id', $user->id);
+            }
 
             // Aplicar filtros por fecha si están presentes
             if ($startDate && $endDate) {

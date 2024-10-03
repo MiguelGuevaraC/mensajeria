@@ -287,7 +287,7 @@ $(document).ready(function () {
             orderCellsTop: true,
             fixedHeader: true,
             columns: columns,
-            dom: "frtip",
+            dom: "rtip",
             buttons: [],
 
             language: lenguag,
