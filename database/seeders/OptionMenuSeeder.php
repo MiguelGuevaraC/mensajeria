@@ -22,22 +22,20 @@ class OptionMenuSeeder extends Seeder
 
             ['id' => '5', 'name' => 'Envíos', 'route' => 'send', 'groupmenu_id' => 2, 'icon' => 'fa-solid fa-envelope-circle-check'],
             
-            ['id' => '6', 'name' => 'Reporte de Envíos', 'route' => 'send-report', 'groupmenu_id' => 3, 'icon' => 'fa fa-file-alt'],
-            ['id' => '7', 'name' => 'Reporte de Pagos', 'route' => 'payment-report', 'groupmenu_id' => 3, 'icon' => 'fa fa-file-invoice-dollar'],
-            ['id' => '8', 'name' => 'Dashboard', 'route' => 'dashboard', 'groupmenu_id' => 3, 'icon' => 'fa fa-chart-line'],
+            ['id' => '6', 'name' => 'Dashboard', 'route' => 'dashboard', 'groupmenu_id' => 3, 'icon' => 'fa fa-chart-line'],
             
-            ['id' => '9', 'name' => 'Gestión de Accesos', 'route' => 'access', 'groupmenu_id' => 4, 'icon' => 'fa fa-key'],
-            ['id' => '10', 'name' => 'Usuarios', 'route' => 'user', 'groupmenu_id' => 4, 'icon' => 'fa fa-user-cog'],
-            ['id' => '11', 'name' => 'Inicio', 'route' => 'vistaInicio', 'groupmenu_id' => 1, 'icon' => 'fa fa-user-cog'],
-            ['id' => '12', 'name' => 'Perfil', 'route' => 'perfilD', 'groupmenu_id' => 4, 'icon' => 'fa fa-user-cog'],
+            ['id' => '7', 'name' => 'Gestión de Accesos', 'route' => 'access', 'groupmenu_id' => 4, 'icon' => 'fa fa-key'],
+            ['id' => '8', 'name' => 'Usuarios', 'route' => 'user', 'groupmenu_id' => 4, 'icon' => 'fa fa-user-cog'],
+            ['id' => '9', 'name' => 'Inicio', 'route' => 'vistaInicio', 'groupmenu_id' => 1, 'icon' => 'fa fa-user-cog'],
+            ['id' => '10', 'name' => 'Perfil', 'route' => 'perfilD', 'groupmenu_id' => 4, 'icon' => 'fa fa-user-cog'],
 
         ];
         
 
         foreach ($array as $object) {
-            $typeOfuser1 = Optionmenu::find($object['id']);
-            if ($typeOfuser1) {
-                $typeOfuser1->update($object);
+            $option = Optionmenu::find($object['id']);
+            if ($option) {
+                $option->update($object);
             } else {
                 Optionmenu::create($object);
             }
