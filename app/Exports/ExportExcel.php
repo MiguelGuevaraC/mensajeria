@@ -29,6 +29,7 @@ class ExportExcel implements FromCollection, WithStyles
             'Monto', 
             'FechaReferencia',
             'FechaEnvio', 
+            'User', 
             'Estado', 
             'Mensaje', // Asegúrate de que 'Mensaje' sea uno de los nuevos campos que necesitas
         ]);

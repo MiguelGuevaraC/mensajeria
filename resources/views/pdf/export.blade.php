@@ -252,6 +252,7 @@
                 <th>Monto</th>
                 <th>Fecha Referencia</th>
                 <th>Fecha Envío</th>
+                <th>User</th>
                 <th>Estado</th>
                 <th>Mensaje</th>
             </tr>
@@ -260,11 +261,15 @@
             @foreach ($data as $moviment)
                 <tr>
                     <td class="font-8">{{ $moviment->contact->group->name ?? 'N/A' }}</td> <!-- Grupo -->
-                    <td class="font-8">{{ $moviment->namesPerson . ' | ' . $moviment->documentNumber . ' | ' . $moviment->telephone }}</td> <!-- Contacto -->
+                    <td class="font-8">
+                        {{ implode(' | ', array_filter([$moviment->namesPerson, $moviment->documentNumber, $moviment->telephone, $moviment->address])) }}
+                    </td>
+                    <!-- Contacto -->
                     <td class="font-8">{{ $moviment->concept ?? '-' }}</td> <!-- Concepto -->
                     <td class="font-8">{{ $moviment->amount ?? '' }}</td> <!-- Monto -->
                     <td class="font-8">{{ $moviment->contact->concept ?? '-' }}</td> <!-- FechaReferencia -->
                     <td class="font-8">{{ $moviment->created_at ? \Carbon\Carbon::parse($moviment->created_at)->format('Y-m-d H:i:s') : '-' }}</td> <!-- FechaEnvio -->
+                    <td class="font-8">{{ $moviment->user->username ?? '-' }}</td> <!-- Estado -->
                     <td class="font-8">{{ $moviment->status ?? '-' }}</td> <!-- Estado -->
                     <td class="font-8 justify">{{ $moviment->messageSend ?? '-' }}</td> <!-- Mensaje -->
                 </tr>

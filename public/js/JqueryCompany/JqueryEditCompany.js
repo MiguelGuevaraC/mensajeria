@@ -21,7 +21,7 @@ function editCompany(id) {
             $("#costSendE").val(data.costSend);
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log("Error al cargar datos del company:", errorThrown);
+            // console.log("Error al cargar datos del company:", errorThrown);
         }
     });
 }

@@ -59,7 +59,7 @@ $(document).ready(function () {
             url: "message/showExample/" + id,
             method: "GET",
             success: function (response) {
-                console.log(response);
+                // console.log(response);
                 let data = response;
                 Swal.fire({
                     title: "VISTA MENSAJE",

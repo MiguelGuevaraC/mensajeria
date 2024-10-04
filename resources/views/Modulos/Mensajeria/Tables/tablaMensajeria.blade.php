@@ -14,6 +14,7 @@
             <th scope="col">F. Referencia</th>
 
             <th scope="col">F. Envio</th>
+            <th scope="col">User</th>
             <th scope="col">Estado</th>
             <th scope="col">Mensaje</th>
         </tr>

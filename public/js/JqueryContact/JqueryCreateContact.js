@@ -41,7 +41,7 @@ $(document).ready(function () {
                     processData: false,
                     contentType: false,
                     success: function (response) {
-                        console.log(response);
+                        // console.log(response);
                         // Cerrar la alerta de SweetAlert
                         Swal.close();
                         // Aquí puedes manejar la respuesta del servidor
@@ -598,7 +598,7 @@ $(document).on("click", "#btonShowView", function () {
         url: "message/showExample/" + id,
         method: "GET",
         success: function (response) {
-            console.log(response);
+            // console.log(response);
             let data = response;
             Swal.fire({
                 title: "VISTA MENSAJE",

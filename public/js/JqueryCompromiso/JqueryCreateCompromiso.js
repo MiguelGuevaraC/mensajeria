@@ -42,7 +42,7 @@ $(document).ready(function () {
                     processData: false,
                     contentType: false,
                     success: function (response) {
-                        console.log(response);
+                        // console.log(response);
                         // Cerrar la alerta de SweetAlert
                         Swal.close();
                         // Aquí puedes manejar la respuesta del servidor
@@ -409,7 +409,7 @@ function enviarCompromisos() {
             arrayCompromisos: [],
         },
         success: function (response) {
-            console.log(response);
+            // console.log(response);
 
             // Aquí puedes hacer algo adicional después de enviar los mensajes, si es necesario
         },

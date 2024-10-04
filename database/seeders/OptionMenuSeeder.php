@@ -28,6 +28,9 @@ class OptionMenuSeeder extends Seeder
             
             ['id' => '9', 'name' => 'Gestión de Accesos', 'route' => 'access', 'groupmenu_id' => 4, 'icon' => 'fa fa-key'],
             ['id' => '10', 'name' => 'Usuarios', 'route' => 'user', 'groupmenu_id' => 4, 'icon' => 'fa fa-user-cog'],
+            ['id' => '11', 'name' => 'Inicio', 'route' => 'vistaInicio', 'groupmenu_id' => 1, 'icon' => 'fa fa-user-cog'],
+            ['id' => '12', 'name' => 'Perfil', 'route' => 'perfilD', 'groupmenu_id' => 4, 'icon' => 'fa fa-user-cog'],
+
         ];
         
 

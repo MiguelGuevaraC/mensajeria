@@ -73,6 +73,6 @@ function pruebaApi(){
     $.get('api/ejemploApi', function(data) {
         // Una vez que se reciban los datos, manejar la respuesta
         // Por ejemplo, mostrar la lista de usuarios en el div 'users-list'
-       console.log(data);
+    //    console.log(data);
     });
 }

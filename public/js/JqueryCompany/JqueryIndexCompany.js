@@ -186,13 +186,13 @@ $(document).ready(function () {
                 // Intentar nuevamente si no se alcanzó el número máximo de reintentos
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    console.log(
-                        "Reintentando... (Intento " +
-                            retryCount +
-                            " de " +
-                            maxRetries +
-                            ")"
-                    );
+                    // console.log(
+                    //     "Reintentando... (Intento " +
+                    //         retryCount +
+                    //         " de " +
+                    //         maxRetries +
+                    //         ")"
+                    // );
                     fetchTableData(retryCount);
                 }
             },

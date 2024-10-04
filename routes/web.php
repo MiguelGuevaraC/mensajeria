@@ -8,9 +8,11 @@ use App\Http\Controllers\web\ContactController;
 use App\Http\Controllers\web\DashboardController;
 use App\Http\Controllers\web\GroupMenuController;
 use App\Http\Controllers\web\GroupSendController;
+use App\Http\Controllers\web\HomeController;
 use App\Http\Controllers\web\MessageController;
 use App\Http\Controllers\web\MigrationController;
 use App\Http\Controllers\web\OptionMenuController;
+use App\Http\Controllers\web\PerfilController;
 use App\Http\Controllers\web\SendReportController;
 use App\Http\Controllers\web\TypeUserController;
 use App\Http\Controllers\web\UserController;
@@ -158,5 +160,9 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('send-report', [SendReportController::class, 'index']);
     Route::get('send-reportAll', [SendReportController::class, 'all']);
+
+    Route::get('send-reportAll', [SendReportController::class, 'all']);
+
+    Route::get('perfilD', [PerfilController::class, 'index']);
 
 });

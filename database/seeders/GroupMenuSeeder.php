@@ -25,7 +25,7 @@ class GroupMenuSeeder extends Seeder
             ['id' => '1', 'name' => 'Mantenimiento', 'icon' => 'fa fa-cogs'],
             ['id' => '2', 'name' => 'Movimientos', 'icon' => 'fa fa-exchange-alt'],
             ['id' => '3', 'name' => 'Reporte', 'icon' => 'fa fa-chart-bar'],
-            ['id' => '4', 'name' => 'Seguridad', 'icon' => 'fa fa-shield-alt'],
+            ['id' => '4', 'name' => 'Configuración', 'icon' => 'fa fa-shield-alt'],
         ];
         
 

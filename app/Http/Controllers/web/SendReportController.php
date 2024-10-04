@@ -82,6 +82,13 @@ class SendReportController extends Controller
                                 ;
                             });
                             break;
+                            case 'user.username':
+                                // Filtrar por el nombre del grupo, asegurando el company_id
+                                $query->whereHas('user', function ($query) use ($searchValue) {
+                                    $query->where('username', 'like', '%' . $searchValue . '%')
+                                    ;
+                                });
+                                break;
 
                         case 'namesPerson':
                             $query->where('namesPerson', 'like', '%' . $searchValue . '%')

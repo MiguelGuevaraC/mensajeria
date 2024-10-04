@@ -151,24 +151,31 @@ class WhatsappSendController extends Controller
 
         foreach ($data as $moviment) {
             $exportData[] = [
-                'Grupo' => $moviment->contact->group->name ?? 'N/A', // Asegúrate de que 'group' tenga el campo 'name'
-                'Contacto' => $moviment->namesPerson . ' | ' . $moviment->documentNumber. ' | ' .$moviment->telephone,
+                'Grupo' => $moviment->contact->group->name ?? 'N/A',
+                'Contacto' =>
+                ($moviment->namesPerson ? $moviment->namesPerson : '') .
+                ($moviment->documentNumber ? ' | ' . $moviment->documentNumber : '') .
+                ($moviment->telephone ? ' | ' . $moviment->telephone : '') .
+                ($moviment->address ? ' | ' . $moviment->address : ''),
                 'Concepto' => $moviment->concept ?? '-',
                 'Monto' => $moviment->amount ?? '',
                 'FechaReferencia' => $moviment->contact->concept ?? '-',
                 'FechaEnvio' => $moviment->created_at ?? '-',
+                'User' => $moviment->user->username ?? '-',
                 'Estado' => $moviment->status ?? '-',
                 'Mensaje' => $moviment->messageSend ?? '-',
             ];
         }
 
-        return Excel::download(new ExportExcel($exportData, $startDate, $endDate), 'export.xlsx');
+        return Excel::download(new ExportExcel($exportData, $startDate, $endDate), strtoupper('export-' . $startDate . '-al-' . $endDate . '.xlsx'));
+
     }
 
     public function pdfExport(Request $request)
     {
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
+        $userName = Auth()->user()->username;
 
         $query = WhatsappSend::with(['user', 'contact.group', 'messageWhasapp'])
             ->where('user_id', Auth::user()->id); // Cambia 'id' por 'user_id'
@@ -184,8 +191,8 @@ class WhatsappSendController extends Controller
             'dateStart' => $startDate, 'dateEnd' => $endDate])
             ->setPaper('a4', 'landscape')
             ->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+        return $pdf->download(strtoupper($userName . '-Reporte-Envios-del-' . $startDate . '-al-' . $endDate . '.pdf'));
 
-        return $pdf->download('export.pdf');
     }
 
 }

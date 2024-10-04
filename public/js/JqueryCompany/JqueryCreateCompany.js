@@ -84,7 +84,7 @@ $("#registroCompany").submit(function (event) {
             });
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log("Error al registrar empresa:", errorThrown);
+  
     
             let errorMessage = "Error al registrar empresa";
     
