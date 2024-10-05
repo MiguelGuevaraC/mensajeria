@@ -72,12 +72,22 @@ class WhatsappSendController extends Controller
         Log::info('Iniciando el envío de mensajes', ['user_id' => $user_id, 'company_id' => $company_id]);
 
         // Obtener los contactos activos para enviar
-        $contactsByGroups = ContactByGroup::where('stateSend', 1) // Solo envíos activos
-            ->whereHas('groupSend', function ($query) use ($user_id) {
-                $query->where('user_id', $user_id)
-                    ->where('state', 1); // Solo grupos con estado activo
+        $contactsByGroups = ContactByGroup::with([
+            'contact',
+            'groupSend.user.company',
+            'groupSend' => function ($query) use ($user_id) {
+                $query->where('user_id', $user_id); // Asegúrate de aplicar el filtro de user_id
+            },
+        ])
+            ->whereHas('contact', function ($query) {
+                $query->where('state', 1); // Asegurarte de que el contacto no esté eliminado
             })
-            ->with('contact') // Optimiza la consulta para traer el contacto asociado
+            ->whereHas('groupSend', function ($query) use ($user_id) {
+                // Asegurar que el filtro user_id esté en todos los groupSend
+                $query->where('state', 1);
+            })
+            ->where('state', 1) // Filtrar ContactByGroup que no estén eliminados
+            ->orderBy('contact_id', 'desc')
             ->get();
 
         // Verificar si no se encontraron contactos
@@ -102,7 +112,7 @@ class WhatsappSendController extends Controller
             }
 
             // Si el paquete de contactos alcanza los 50, despacha un job y almacena la respuesta
-            if (count($contactByGroupPaquete) >= 2) {
+            if (count($contactByGroupPaquete) >= 50) {
                 $response = SendWhatsappJob::dispatchNow($contactByGroupPaquete, $user, $message_id); // Usamos dispatchNow para obtener la respuesta directamente
                 $jobResponses[] = $response->original; // Almacenar la respuesta del job
                 $totalEnviados += $response->original['quantitySend'];

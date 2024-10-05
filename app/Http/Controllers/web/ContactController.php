@@ -163,10 +163,14 @@ class ContactController extends Controller
             'groupSend' => function ($query) use ($user_id) {
                 // $query->where('user_id', $user_id);
             },
-        ])->whereHas('groupSend', function ($query) use ($user_id) {
+        ])->whereHas('contact', function ($query) {
+            $query->where('state', 1); // Asegurarte de que el contacto no esté eliminado
+        })->whereHas('groupSend', function ($query) use ($user_id) {
             // Asegurar que el filtro user_id esté en todos los groupSend
-            // $query->where('user_id', $user_id);
-        })->where('state', 1)->orderBy('contact_id', 'desc');
+            $query->where('state', 1);
+        })->where('state', 1)
+     
+        ->orderBy('contact_id', 'desc');
 
         if ($user->typeofUser_id == 1) {
             // $query->whereHas('user', function ($q) use ($user) {

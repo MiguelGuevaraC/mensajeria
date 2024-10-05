@@ -51,8 +51,24 @@ class SendReportController extends Controller
 
         try {
             // Iniciar la consulta con las relaciones necesarias
-            $query = WhatsappSend::with(['user', 'user.company', 'contact.group', 'messageWhasapp'])
-            ; // Cambia 'id' por 'user_id'
+            $query = WhatsappSend::with([
+                'user', 
+                'user.company', 
+                'contact.group', 
+                'messageWhasapp'
+            ])
+            ->withTrashed() // Incluir todos los registros eliminados en la consulta
+            ->with(['contact' => function($query) {
+                $query->withTrashed(); // Incluir contactos eliminados
+            }, 
+            'contact.group' => function($query) {
+                $query->withTrashed(); // Incluir grupos eliminados
+            }, 
+            'messageWhasapp' => function($query) {
+                $query->withTrashed(); // Incluir mensajes eliminados
+            }])
+            ;
+            
 
             if ($user->typeofUser_id == 1) {
             } else if ($user->typeofUser_id == 2) {

@@ -2,7 +2,7 @@ function destroyRol(id) {
     // Mostrar SweetAlert para confirmar la eliminación
     Swal.fire({
         title: "¿Estás seguro?",
-        text: "¡No podrás revertir esto!",
+        text: "Recuerda que los contactos de este grupo también se desactivarán.",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",

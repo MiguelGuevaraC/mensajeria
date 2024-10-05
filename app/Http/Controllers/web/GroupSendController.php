@@ -76,7 +76,7 @@ class GroupSendController extends Controller
         $user_id = $user->id;
 
         $query = GroupSend::where('group_sends.state', 1)
-            // ->where('user_id', $user_id)
+        // ->where('user_id', $user_id)
             ->whereHas('contactos', function ($query) {
                 $query->where('contacts.state', 1);
             });
@@ -228,14 +228,23 @@ class GroupSendController extends Controller
     public function destroy(int $id)
     {
         $object = GroupSend::find($id);
-        if (!$object) {
-            return response()->json(
-                ['message' => 'Grupo No Encontrado'], 404
-            );
-        }
 
+        if (!$object) {
+            return response()->json(['message' => 'Grupo No Encontrado'], 404);
+        }
+        $object->contactos()->update(['state' => 0]); // Esto actualizará el estado de todos los contactos a 1
+
+        // Elimina todos los contactos relacionados con el grupo
+        $object->contactos()->delete(); // Esto eliminará todos los contactos de la base de datos
+
+        // Cambia el estado del grupo a 0 (desactivado)
         $object->state = 0;
         $object->save();
 
+        // Finalmente, elimina el grupo
+        $object->delete();
+
+        return response()->json(['message' => 'Grupo y contactos eliminados correctamente'], 200);
     }
+
 }
