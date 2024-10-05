@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         $users = [
-            ['id' => '1', 'username' => 'PRUEBADEMO', 'password' => 'PRUEBADEMO', 'company_id' => 1, 'typeofUser_id' => '2'],
+            ['id' => '1', 'username' => 'PRUEBADEMO', 'password' => 'PRUEBADEMO', 'company_id' => 1, 'typeofUser_id' => '3'],
             ['id' => '2', 'username' => 'administrador', 'password' => 'adminBack2024', 'company_id' => 2, 'typeofUser_id' => '1'],
             ['id' => '3', 'username' => '20602871119', 'password' => '20602871119', 'company_id' => 2, 'typeofUser_id' => '2'],
         ];
