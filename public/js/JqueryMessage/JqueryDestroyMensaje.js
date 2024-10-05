@@ -25,7 +25,8 @@ function destroyMessage(id) {
                         "El mensaje ha sido eliminado.",
                         "success"
                     ).then(() => {
-                        $("#tbMensajes").DataTable().ajax.reload();
+                        // $("#tbMensajes").DataTable().ajax.reload();
+                        $("#tbMensajes").DataTable().ajax.reload(null, false);
                     });
                 },
                 error: function (xhr, status, error) {

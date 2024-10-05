@@ -146,9 +146,33 @@ class WhatsappSendController extends Controller
     {
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
+        $user = Auth::user();
+        $query =
+        WhatsappSend::with([
+            'user',
+            'user.company',
+            'contact.group',
+            'messageWhasapp',
+        ])
+            ->withTrashed() // Incluir todos los registros eliminados en la consulta
+            ->with(['contact' => function ($query) {
+                $query->withTrashed(); // Incluir contactos eliminados
+            },
+                'contact.group' => function ($query) {
+                    $query->withTrashed(); // Incluir grupos eliminados
+                },
+                'messageWhasapp' => function ($query) {
+                    $query->withTrashed(); // Incluir mensajes eliminados
+                }]); // Cambia 'id' por 'user_id'
 
-        $query = WhatsappSend::with(['user', 'contact.group', 'messageWhasapp'])
-            ->where('user_id', Auth::user()->id); // Cambia 'id' por 'user_id'
+        if ($user->typeofUser_id == 1) {
+        } else if ($user->typeofUser_id == 2) {
+            $query->whereHas('user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+        } else {
+            $query->where('user_id', $user->id);
+        }
 
         // Aplicar filtros por fecha si están presentes
         if ($startDate && $endDate) {
@@ -186,9 +210,34 @@ class WhatsappSendController extends Controller
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
         $userName = Auth()->user()->username;
+        $user = Auth::user();
 
-        $query = WhatsappSend::with(['user', 'contact.group', 'messageWhasapp'])
-            ->where('user_id', Auth::user()->id); // Cambia 'id' por 'user_id'
+            $query =
+        WhatsappSend::with([
+            'user',
+            'user.company',
+            'contact.group',
+            'messageWhasapp',
+        ])
+            ->withTrashed() // Incluir todos los registros eliminados en la consulta
+            ->with(['contact' => function ($query) {
+                $query->withTrashed(); // Incluir contactos eliminados
+            },
+                'contact.group' => function ($query) {
+                    $query->withTrashed(); // Incluir grupos eliminados
+                },
+                'messageWhasapp' => function ($query) {
+                    $query->withTrashed(); // Incluir mensajes eliminados
+                }]); // Cambia 'id' por 'user_id'
+
+        if ($user->typeofUser_id == 1) {
+        } else if ($user->typeofUser_id == 2) {
+            $query->whereHas('user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+        } else {
+            $query->where('user_id', $user->id);
+        }
 
         // Aplicar filtros por fecha si están presentes
         if ($startDate && $endDate) {

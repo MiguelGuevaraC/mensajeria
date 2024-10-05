@@ -287,7 +287,8 @@
                                             <span class="pull-right dropdown-toggle">
                                                 <i class="dropdown-caret"></i>
                                             </span>
-                                            <p class="mnp-name">{{ $user->typeUser->name }}</p>
+                                            <p class="mnp-name">{{ strtoupper($user->username) . " | ".strtoupper($user->company->businessName) }}</p>
+
                                             <span class="mnp-desc"></span>
                                         </a>
                                     </div>

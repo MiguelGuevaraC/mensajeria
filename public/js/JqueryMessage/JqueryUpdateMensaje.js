@@ -33,7 +33,8 @@ $(document).ready(function() {
                     title: 'Éxito',
                     text: 'El mensaje se ha actualizado correctamente.',
                 }).then(() => {
-                    $("#tbMensajes").DataTable().ajax.reload(); // Recargar la tabla tras el éxito
+                    $("#tbMensajes").DataTable().ajax.reload(null, false);
+                    // $("#tbMensajes").DataTable().ajax.reload(); // Recargar la tabla tras el éxito
                 });
             },
             error: function (xhr) {

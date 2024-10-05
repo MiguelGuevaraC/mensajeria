@@ -65,7 +65,8 @@ $("#editarCompany").submit(function (event) {
             $("#modalEditarCompany").modal("hide");
 
             // Recargar los datos en la tabla utilizando DataTables
-            $("#tbCompanies").DataTable().ajax.reload();
+            // $("#tbCompanies").DataTable().ajax.reload();
+            $("#tbCompanies").DataTable().ajax.reload(null, false);
 
             // Mostrar notificación de éxito con SweetAlert
             Swal.fire({

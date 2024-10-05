@@ -32,7 +32,8 @@ $("#registroGroupSendE").submit(function (event) {
                 title: "Actualización exitosa",
                 text: "El groupSend ha sido actualizado correctamente.",
             }).then(() => {
-                $("#tbGroupSends").DataTable().ajax.reload();
+                $("#tbGroupSends").DataTable().ajax.reload(null, false);
+
             });
             $("#passE").val("");
             $("#modalEditarGroupSend").modal("hide");

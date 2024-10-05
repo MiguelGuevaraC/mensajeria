@@ -36,7 +36,8 @@ $("#registroCompromisoE").submit(function (event) {
             $("#modalEditarCompromisoE").modal("hide");
 
             // Recargar los datos en la tabla utilizando DataTables
-            $("#tbCompromisos").DataTable().ajax.reload();
+            // $("#tbCompromisos").DataTable().ajax.reload();
+            $("#tbCompromisos").DataTable().ajax.reload(null, false);
 
             // Mostrar notificación de éxito
             $.niftyNoty({

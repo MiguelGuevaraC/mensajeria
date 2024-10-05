@@ -23,7 +23,8 @@ $("#registroRolE").submit(function (event) {
         success: function (response) {
             // Cerrar el modal de edición
             $("#modalEditarRolE").modal("hide");
-            $("#tbRoles").DataTable().ajax.reload();
+            // $("#tbRoles").DataTable().ajax.reload();
+            $("#tbRoles").DataTable().ajax.reload(null, false);
 
             // Mostrar notificación de éxito
             $.niftyNoty({

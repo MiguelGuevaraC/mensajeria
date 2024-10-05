@@ -14,7 +14,8 @@ $("#updateContactForm").on("submit", function (e) {
                 "Contacto actualizado con éxito.",
                 "success"
             );
-            $("#tbContacts").DataTable().ajax.reload(); // Recargar la tabla
+            // $("#tbContacts").DataTable().ajax.reload(); // Recargar la tabla
+            $("#tbContacts").DataTable().ajax.reload(null, false);
             $("#modalUpdateContact").modal("hide"); // Ocultar el modal
         },
         error: function (jqXHR, textStatus, errorThrown) {

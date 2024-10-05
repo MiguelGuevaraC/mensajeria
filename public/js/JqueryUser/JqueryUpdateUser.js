@@ -28,8 +28,8 @@ $("#registroUsuarioE").submit(function (event) {
             $("#modalNuevoUsuarioE").modal("hide");
 
             // Recargar la tabla de usuarios
-            $("#tbUsuarios").DataTable().ajax.reload();
-
+            // $("#tbUsuarios").DataTable().ajax.reload();
+            $("#tbUsuarios").DataTable().ajax.reload(null, false);
             // Mostrar mensaje de éxito
             Swal.fire({
                 icon: "success",
