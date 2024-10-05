@@ -45,35 +45,23 @@ var columns = [
             if (row.contact.documentNumber) parts.push(row.contact.documentNumber);
             if (row.contact.telephone) parts.push(row.contact.telephone);
             if (row.contact.address) parts.push(row.contact.address);
-            
-            return parts.join(" - ");
-        },
-        orderable: false,
-    },
-    
+            if (row.contact.concept) parts.push(row.contact.concept);
+            if (row.contact.amount) parts.push(row.contact.amount);
+            if (row.contact.dateReference) parts.push(row.contact.dateReference);
 
-    {
-        data: "contact.concept",
-        render: function (data, type, row, meta) {
-            return data;
+            return parts.join(" | ");
         },
         orderable: false,
     },
     {
-        data: "contact.amount",
+        data: "group_send.user.username",
         render: function (data, type, row, meta) {
-            return data;
+            return data+' | '+row.group_send.user.company.businessName+' | '+row.group_send.user.company.documentNumber; // Formato de fecha
         },
         orderable: false,
     },
 
-    {
-        data: "contact.dateReference",
-        render: function (data, type, row, meta) {
-            return data ? formatDateOnlyDate(data) : '-'; // Formato de fecha
-        },
-        orderable: true,
-    },
+
     
     {
         data: "created_at",
@@ -202,11 +190,11 @@ var init = function (settings, json) {
             var header = $(column.header());
 
             // Configurar filtro para columnas específicas
-            if ([1, 2, 3, 4, 5, 6, 7, 8].includes(colIdx)) {
+            if ([1, 2, 3, 4,5].includes(colIdx)) {
                 var cell = $(".filters th").eq(header.index());
                 var title = header.text();
 
-                if (colIdx == 1 || colIdx == 8) {
+                if (colIdx == 1 || colIdx == 6) {
                     $(cell).html("");
                 } else {
                     $(cell).html(

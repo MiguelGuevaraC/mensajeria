@@ -51,7 +51,7 @@ class SendReportController extends Controller
 
         try {
             // Iniciar la consulta con las relaciones necesarias
-            $query = WhatsappSend::with(['user', 'contact.group', 'messageWhasapp'])
+            $query = WhatsappSend::with(['user', 'user.company', 'contact.group', 'messageWhasapp'])
             ; // Cambia 'id' por 'user_id'
 
             if ($user->typeofUser_id == 1) {
@@ -68,7 +68,6 @@ class SendReportController extends Controller
                 $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
             }
 
-
             // Aplicar filtros por columnas
             foreach ($request->get('columns') as $column) {
                 if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
@@ -82,18 +81,36 @@ class SendReportController extends Controller
                                 ;
                             });
                             break;
-                            case 'user.username':
-                                // Filtrar por el nombre del grupo, asegurando el company_id
-                                $query->whereHas('user', function ($query) use ($searchValue) {
-                                    $query->where('username', 'like', '%' . $searchValue . '%')
-                                    ;
-                                });
-                                break;
+                        case 'user.username':
+                            // Filtrar por el nombre del grupo, asegurando el company_id
+                            $query->where(function ($q) use ($searchValue) {
+                                // Filtro por username
+                                $q->whereHas('user', function ($query) use ($searchValue) {
+                                    $query->where('username', 'like', '%' . $searchValue . '%');
+                                })
+
+                                // Filtro por businessName y documentNumber
+                                    ->orWhereHas('user.company', function ($query) use ($searchValue) {
+                                        $query->where('businessName', 'like', '%' . $searchValue . '%')
+                                            ->orWhere('documentNumber', 'like', '%' . $searchValue . '%');
+                                    });
+                            });
+                            break;
 
                         case 'namesPerson':
-                            $query->where('namesPerson', 'like', '%' . $searchValue . '%')
-                                ->orWhere('documentNumber', 'like', '%' . $searchValue . '%')
-                                ->orWhere('telephone', 'like', '%' . $searchValue . '%');
+                            // Concatenamos el nombre, el número de documento y otros campos en una sola cadena
+                            $query->where(function ($query) use ($searchValue) {
+                                $query->where('namesPerson', 'like', '%' . $searchValue . '%')
+                                    ->orWhere('documentNumber', 'like', '%' . $searchValue . '%')
+                                    ->orWhere('telephone', 'like', '%' . $searchValue . '%')
+                                    ->orWhere('concept', 'like', '%' . $searchValue . '%')
+                                    ->orWhere('amount', 'like', '%' . $searchValue . '%');
+
+                                // Filtramos por una fecha en formato Y-m-d en la tabla relacionada 'contact'
+                                $query->orWhereHas('contact', function ($q) use ($searchValue) {
+                                    $q->whereRaw("DATE_FORMAT(dateReference, '%Y-%m-%d') like ?", ['%' . $searchValue . '%']);
+                                });
+                            });
                             break;
 
                         case 'concept':

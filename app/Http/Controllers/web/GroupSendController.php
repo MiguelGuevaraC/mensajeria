@@ -75,12 +75,21 @@ class GroupSendController extends Controller
         $user = Auth::user();
         $user_id = $user->id;
 
-        $groupSends = GroupSend::where('group_sends.state', 1)
-            ->where('user_id', $user_id)
+        $query = GroupSend::where('group_sends.state', 1)
+            // ->where('user_id', $user_id)
             ->whereHas('contactos', function ($query) {
                 $query->where('contacts.state', 1);
-            })
-            ->get();
+            });
+
+        if ($user->typeofUser_id == 1) {
+        } else if ($user->typeofUser_id == 2) {
+            $query->whereHas('user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+        } else {
+            $query->where('user_id', $user->id);
+        }
+        $groupSends = $query->orderBy('created_at', 'asc')->get();
 
         $data = [
             "groupSends" => $groupSends,

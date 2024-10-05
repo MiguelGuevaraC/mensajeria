@@ -50,15 +50,32 @@ class ContactController extends Controller
         $company_id = $user->company_id;
 
         // Agrupar y contar contactos por grupo directamente en la base de datos
-        $groupSends = ContactByGroup::selectRaw('group_sends.id as idGroupSend,group_sends.name as groupName, COUNT(contact_by_groups.contact_id) as contactCount')
+        $query = ContactByGroup::selectRaw('group_sends.id as idGroupSend,group_sends.name as groupName, COUNT(contact_by_groups.contact_id) as contactCount')
             ->join('group_sends', 'contact_by_groups.groupSend_id', '=', 'group_sends.id')
             ->join('contacts', 'contact_by_groups.contact_id', '=', 'contacts.id')
-            ->where('group_sends.user_id', $user->id)
+        // ->where('group_sends.user_id', $user->id)
             ->where('group_sends.state', 1) // Solo grupos con estado activo
             ->where('contacts.state', 1) // Solo contactos con estado activo
             ->where('contact_by_groups.stateSend', 1) // Solo envíos activos
-            ->groupBy('group_sends.id', 'group_sends.name') // Agrupamos por grupo
-            ->get();
+        // Agrupamos por grupo
+        ;
+
+        if ($user->typeofUser_id == 1) {
+            // $query->whereHas('user', function ($q) use ($user) {
+            //     $q->where('company_id', $user->company_id);
+            // });
+        } else if ($user->typeofUser_id == 2) {
+
+            $query->whereHas('groupSend.user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+
+        } else {
+            $query->whereHas('groupSend', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
+        $groupSends = $query->groupBy('group_sends.id', 'group_sends.name')->get();
 
         // Contar el total de grupos y el total de contactos
         $totalGroups = $groupSends->count();
@@ -91,19 +108,36 @@ class ContactController extends Controller
             );
         }
 
-        $contactsByGroup = ContactByGroup::select(
+        $query = ContactByGroup::select(
             'contact_by_groups.id as idContactByGroup',
             'contacts.names as name',
             'contacts.telephone as telephone'
         )
             ->join('group_sends', 'contact_by_groups.groupSend_id', '=', 'group_sends.id')
             ->join('contacts', 'contact_by_groups.contact_id', '=', 'contacts.id')
-            ->where('group_sends.user_id', $user->id)
+        // ->where('group_sends.user_id', $user->id)
             ->where('group_sends.state', 1) // Solo grupos con estado activo
             ->where('group_sends.id', $id)
             ->where('contacts.state', 1) // Solo contactos con estado activo
             ->where('contact_by_groups.stateSend', 1) // Solo envíos activos
-            ->get();
+        ;
+
+        if ($user->typeofUser_id == 1) {
+            // $query->whereHas('user', function ($q) use ($user) {
+            //     $q->where('company_id', $user->company_id);
+            // });
+        } else if ($user->typeofUser_id == 2) {
+
+            $query->whereHas('groupSend.user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+
+        } else {
+            $query->whereHas('groupSend', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
+        $contactsByGroup = $query->get();
 
         $data = [
             "arrayContactsByGroup" => $contactsByGroup, // Contactos por grupo
@@ -125,7 +159,7 @@ class ContactController extends Controller
         $user_id = Auth::user()->id;
         // Filtrar por company_id para asegurar que solo se obtengan los registros relacionados con esa compañía
         $query = ContactByGroup::with([
-            'contact',
+            'contact', 'groupSend.user.company',
             'groupSend' => function ($query) use ($user_id) {
                 // $query->where('user_id', $user_id);
             },
@@ -160,7 +194,7 @@ class ContactController extends Controller
                         // Filtrar por el nombre del grupo, asegurando el company_id
                         $query->whereHas('groupSend', function ($query) use ($searchValue) {
                             $query->where('name', 'like', '%' . $searchValue . '%')
-                                ;
+                            ;
                         });
                         break;
 
@@ -168,7 +202,12 @@ class ContactController extends Controller
                         // Filtrar por el nombre del contacto
                         $query->whereHas('contact', function ($query) use ($searchValue) {
                             $query->where('names', 'like', '%' . $searchValue . '%')
-                                ->orWhere('documentNumber', 'like', '%' . $searchValue . '%');
+                                ->orWhere('documentNumber', 'like', '%' . $searchValue . '%')
+                                ->orWhere('telephone', 'like', '%' . $searchValue . '%')
+                                ->orWhere('address', 'like', '%' . $searchValue . '%')
+                                ->orWhere('concept', 'like', '%' . $searchValue . '%')
+                                ->orWhere('amount', 'like', '%' . $searchValue . '%')
+                                ->orWhere('dateReference', 'like', '%' . $searchValue . '%');
                         });
                         break;
 
@@ -203,7 +242,20 @@ class ContactController extends Controller
                         });
 
                         break;
+                    case 'group_send.user.username':
+                        $query->where(function ($q) use ($searchValue) {
+                            // Filtro por username
+                            $q->whereHas('groupSend.user', function ($query) use ($searchValue) {
+                                $query->where('username', 'like', '%' . $searchValue . '%');
+                            })
 
+                            // Filtro por businessName y documentNumber
+                                ->orWhereHas('groupSend.user.company', function ($query) use ($searchValue) {
+                                    $query->where('businessName', 'like', '%' . $searchValue . '%')
+                                        ->orWhere('documentNumber', 'like', '%' . $searchValue . '%');
+                                });
+                        });
+                        break;
                     case 'created_at':
 
                         $query->where('created_at', 'like', '%' . $searchValue . '%');
@@ -312,23 +364,47 @@ class ContactController extends Controller
     {
         // Verificar si el ID es -1
         if ($id == -1) {
-            $company_id = Auth::user()->company_id;
+            $user = Auth::user();
             $user_id = Auth::user()->id;
 
-            $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($user_id) {
-                $query->where('user_id', $user_id);
-            })->update(['stateSend' => 1]);
+            if ($user->typeofUser_id == 1) {
+                $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($user_id) {
+                    // $query->where('user_id', $user_id);
+                })->update(['stateSend' => 1]);
+            } else if ($user->typeofUser_id == 2) {
 
-            return response()->json(['success' => 'Estado actualizado para contactos de la empresa'], 200);
+                $updatedRows = ContactByGroup::whereHas('groupSend.user', function ($query) use ($user) {
+                    $query->where('company_id', $user->company_id);
+                })->update(['stateSend' => 1]);
+
+            } else {
+                $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($user_id) {
+                    $query->where('user_id', $user_id);
+                })->update(['stateSend' => 1]);
+            }
+
+            return response()->json(['success' => $updatedRows], 200);
         } else if ($id == -2) {
-            $company_id = Auth::user()->company_id;
+            $user = Auth::user();
             $user_id = Auth::user()->id;
 
-            $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($user_id) {
-                $query->where('user_id', $user_id);
-            })->update(['stateSend' => 0]);
+            if ($user->typeofUser_id == 1) {
+                $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($user_id) {
+                    // $query->where('user_id', $user_id);
+                })->update(['stateSend' => 0]);
+            } else if ($user->typeofUser_id == 2) {
 
-            return response()->json(['success' => 'Estado actualizado para contactos de la empresa'], 200);
+                $updatedRows = ContactByGroup::whereHas('groupSend.user', function ($query) use ($user) {
+                    $query->where('company_id', $user->company_id);
+                })->update(['stateSend' => 0]);
+
+            } else {
+                $updatedRows = ContactByGroup::whereHas('groupSend', function ($query) use ($user_id) {
+                    $query->where('user_id', $user_id);
+                })->update(['stateSend' => 0]);
+            }
+
+            return response()->json(['success' => $updatedRows], 200);
 
         } else {
             // Buscar el grupo por ID
@@ -342,7 +418,7 @@ class ContactController extends Controller
             $updatedRows = ContactByGroup::where('groupSend_id', $id)
                 ->update(['stateSend' => 1]);
 
-            return response()->json(['success' => 'Estado actualizado para el grupo'], 200);
+            return response()->json(['success' => $updatedRows], 200);
         }
     }
 

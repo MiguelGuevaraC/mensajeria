@@ -9,9 +9,7 @@
             <th scope="col">Grupo</th>
             <th scope="col">Contacto</th>
 
-            <th scope="col">Concepto</th>
-            <th scope="col">Monto</th>
-            <th scope="col">F. Referencia</th>
+            
 
             <th scope="col">F. Envio</th>
             <th scope="col">User</th>

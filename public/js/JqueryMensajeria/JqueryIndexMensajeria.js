@@ -11,35 +11,17 @@ var columns = [
     {
         data: "namesPerson",
         render: function (data, type, row, meta) {
-            let values = [
-                row.namesPerson,
-                row.documentNumber,
-                row.telephone,
-                row.address,
-            ];
-            return values.filter((value) => value).join(" | ");
-        },
-        orderable: false,
-    },
+            const parts = [];
+            
+            if (data) parts.push(data);
+            if (row.documentNumber) parts.push(row.documentNumber);
+            if (row.telephone) parts.push(row.telephone);
+            if (row.address) parts.push(row.address);
+            if (row.concept) parts.push(row.concept);
+            if (row.amount) parts.push(row.amount);
+            if (row.contact.dateReference) parts.push(row.contact.dateReference);
 
-    {
-        data: "concept",
-        render: function (data, type, row, meta) {
-            return data;
-        },
-        orderable: false,
-    },
-    {
-        data: "amount",
-        render: function (data, type, row, meta) {
-            return data;
-        },
-        orderable: false,
-    },
-    {
-        data: "contact.dateReference",
-        render: function (data, type, row, meta) {
-            return data;
+            return parts.join(" | ");
         },
         orderable: false,
     },
@@ -65,9 +47,9 @@ var columns = [
     {
         data: "user.username",
         render: function (data, type, row, meta) {
-            return data;
+            return data+' | '+row.user.company.businessName+' | '+row.user.company.documentNumber; // Formato de fecha
         },
-        orderable: false,
+        orderable: true,
     },
     {
         data: "status",
@@ -190,10 +172,8 @@ var init = function () {
                 colIdx == 1 ||
                 colIdx == 2 ||
                 colIdx == 3 ||
-                colIdx == 5 ||
-                colIdx == 4 ||
-                colIdx == 6 ||
-                colIdx == 7
+              
+                colIdx == 4 
             ) {
                 var cell = $(".filters th").eq(header.index());
                 var title = header.text();
