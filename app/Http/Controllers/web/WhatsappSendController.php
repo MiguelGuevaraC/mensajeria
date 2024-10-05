@@ -102,7 +102,7 @@ class WhatsappSendController extends Controller
             }
 
             // Si el paquete de contactos alcanza los 50, despacha un job y almacena la respuesta
-            if (count($contactByGroupPaquete) >= 50) {
+            if (count($contactByGroupPaquete) >= 2) {
                 $response = SendWhatsappJob::dispatchNow($contactByGroupPaquete, $user, $message_id); // Usamos dispatchNow para obtener la respuesta directamente
                 $jobResponses[] = $response->original; // Almacenar la respuesta del job
                 $totalEnviados += $response->original['quantitySend'];

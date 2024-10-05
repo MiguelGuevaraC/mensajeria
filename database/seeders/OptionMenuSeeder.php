@@ -16,11 +16,11 @@ class OptionMenuSeeder extends Seeder
     {
         $array = [
             ['id' => '1', 'name' => 'Mensajes', 'route' => 'message', 'groupmenu_id' => 1, 'icon' => 'fa fa-comments'],
-            ['id' => '2', 'name' => 'Grupos', 'route' => 'groupSend', 'groupmenu_id' => 1, 'icon' => 'fa fa-layer-group'],
-            ['id' => '3', 'name' => 'Contactos', 'route' => 'contacts', 'groupmenu_id' => 1, 'icon' => 'fa-solid fa-people-group'],
+            ['id' => '2', 'name' => 'Grupos', 'route' => 'groupSend', 'groupmenu_id' => 1, 'icon' => 'fa-solid fa-users-rectangle'],
+            ['id' => '3', 'name' => 'Contactos', 'route' => 'contacts', 'groupmenu_id' => 1, 'icon' => 'fa-solid fa-id-badge'],
             ['id' => '4', 'name' => 'Empresas', 'route' => 'company', 'groupmenu_id' => 1, 'icon' => 'fa-solid fa-building'],
 
-            ['id' => '5', 'name' => 'Envíos', 'route' => 'send', 'groupmenu_id' => 2, 'icon' => 'fa-solid fa-envelope-circle-check'],
+            ['id' => '5', 'name' => 'Envíos', 'route' => 'send', 'groupmenu_id' => 2, 'icon' => 'fa-brands fa-whatsapp'],
             
             ['id' => '6', 'name' => 'Dashboard', 'route' => 'dashboard', 'groupmenu_id' => 3, 'icon' => 'fa fa-chart-line'],
             

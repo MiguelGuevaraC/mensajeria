@@ -456,14 +456,16 @@ $(document).ready(function () {
                                     },
                                     success: function (response) {
                                         let totalMessages = response.totalEnviados; // Total de mensajes a enviar
+                                
+                                        // Iniciar un intervalo para simular el envío
                                         const interval = setInterval(() => {
-                                            // Simulación de envío de mensajes
+                                            // Aumentar los contadores usando la respuesta de la API
                                             if (totalEnviados < totalMessages) {
                                                 totalEnviados++;
-                                                totalExitosos += (totalEnviados % 2 === 0) ? 1 : 0; // Simulación de éxitos
-                                                totalErrores += (totalEnviados % 3 === 0) ? 1 : 0; // Simulación de errores
+                                                totalExitosos = response.totalExitosos;
+                                                totalErrores = response.totalErrores;
                                 
-                                                // Actualizar el contenido de la ventana emergente
+                                                // Actualizar los datos mostrados en la ventana emergente
                                                 $('#totalEnviados').text(totalEnviados);
                                                 $('#totalExitosos').text(totalExitosos);
                                                 $('#totalErrores').text(totalErrores);
@@ -489,6 +491,7 @@ $(document).ready(function () {
                                             }
                                         }, 500);
                                 
+                                        // Función para calcular el progreso
                                         function calculateProgress(totalEnviados, totalMessages) {
                                             return Math.min((totalEnviados / totalMessages) * 100, 100); // Asegura que el valor no supere el 100
                                         }
@@ -501,6 +504,7 @@ $(document).ready(function () {
                                         });
                                     }
                                 });
+                                
                                 
                                 
                                 
