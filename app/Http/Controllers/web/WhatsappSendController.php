@@ -87,6 +87,7 @@ class WhatsappSendController extends Controller
                 $query->where('state', 1);
             })
             ->where('state', 1) // Filtrar ContactByGroup que no estén eliminados
+            ->where('stateSend', 1) 
             ->orderBy('contact_id', 'desc')
             ->get();
 
