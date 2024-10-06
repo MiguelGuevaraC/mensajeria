@@ -70,26 +70,36 @@ class WhatsappSendController extends Controller
 
         // Iniciar el registro de logs
         Log::info('Iniciando el envío de mensajes', ['user_id' => $user_id, 'company_id' => $company_id]);
-
+        $user = Auth::user();
         // Obtener los contactos activos para enviar
-        $contactsByGroups = ContactByGroup::with([
+        $query = ContactByGroup::with([
             'contact',
             'groupSend.user.company',
             'groupSend' => function ($query) use ($user_id) {
-                $query->where('user_id', $user_id); // Asegúrate de aplicar el filtro de user_id
+                // $query->where('user_id', $user_id); // Asegúrate de aplicar el filtro de user_id
             },
         ])
             ->whereHas('contact', function ($query) {
                 $query->where('state', 1); // Asegurarte de que el contacto no esté eliminado
             })
-            ->whereHas('groupSend', function ($query) use ($user_id) {
-                // Asegurar que el filtro user_id esté en todos los groupSend
-                $query->where('state', 1);
-            })
             ->where('state', 1) // Filtrar ContactByGroup que no estén eliminados
-            ->where('stateSend', 1) 
-            ->orderBy('contact_id', 'desc')
-            ->get();
+            ->where('stateSend', 1)
+
+        ;
+
+        if ($user->typeofUser_id == 1) {
+        } else if ($user->typeofUser_id == 2) {
+            $query->whereHas('groupSend.user', function ($q) use ($user) {
+                $q->where('company_id', $user->company_id);
+            });
+        } else {
+            $query->whereHas('groupSend', function ($query) use ($user_id) {
+                $query->where('state', 1);
+                $query->where('user_id', $user_id);
+            });
+        }
+
+        $contactsByGroups = $query->orderBy('contact_id', 'desc')->get();
 
         // Verificar si no se encontraron contactos
         if ($contactsByGroups->isEmpty()) {
@@ -213,7 +223,7 @@ class WhatsappSendController extends Controller
         $userName = Auth()->user()->username;
         $user = Auth::user();
 
-            $query =
+        $query =
         WhatsappSend::with([
             'user',
             'user.company',
