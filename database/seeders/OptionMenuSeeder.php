@@ -20,7 +20,7 @@ class OptionMenuSeeder extends Seeder
             ['id' => '3', 'name' => 'Contactos', 'route' => 'contacts', 'groupmenu_id' => 1, 'icon' => 'fa-solid fa-id-badge'],
             ['id' => '4', 'name' => 'Empresas', 'route' => 'company', 'groupmenu_id' => 1, 'icon' => 'fa-solid fa-building'],
 
-            ['id' => '5', 'name' => 'Envíos', 'route' => 'send', 'groupmenu_id' => 2, 'icon' => 'fa-brands fa-whatsapp'],
+            ['id' => '5', 'name' => 'Envíos', 'route' => 'send-report', 'groupmenu_id' => 2, 'icon' => 'fa-brands fa-whatsapp'],
             
             ['id' => '6', 'name' => 'Dashboard', 'route' => 'dashboard', 'groupmenu_id' => 3, 'icon' => 'fa fa-chart-line'],
             

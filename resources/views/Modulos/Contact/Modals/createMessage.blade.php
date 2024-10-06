@@ -11,45 +11,39 @@
                 <form id="registroMensajeNuevo" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
-                        <div class="col-12">
-
-
-                            <div id="messageForm">
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-                                <div class="form-group">
-                                    <label for="title">TÍTULO</label>
-                                    <textarea id="title" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->title ?? ''}}</textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="block1">PÁRRAFO 1</label>
-                                    <textarea id="block1" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block1 ?? ''}}</textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="block2">PÁRRAFO 2</label>
-                                    <textarea id="block2" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block2 ?? ''}}</textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="block3">PÁRRAFO 3</label>
-                                    <textarea id="block3" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block3 ?? ''}}</textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="block4">PÁRRAFO 4</label>
-                                    <textarea id="block4" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block4 ?? ''}}</textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="fileUpload">SUBIR ARCHIVO (JPG,PNG o PDF)</label>
-                                    <input type="file" id="fileUpload" name="fileUpload" class="form-control">
-                                    <p>Opcional</p>
-                                </div>
-                                
+                        <div class="col-md-6"> <!-- Primera columna -->
+                            <div class="form-group">
+                                <label for="title">TÍTULO</label>
+                                <textarea id="title" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->title ?? ''}}</textarea>
                             </div>
 
-                         
+                            <div class="form-group">
+                                <label for="block1">PÁRRAFO 1</label>
+                                <textarea id="block1" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block1 ?? ''}}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="block2">PÁRRAFO 2</label>
+                                <textarea id="block2" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block2 ?? ''}}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6"> <!-- Segunda columna -->
+                            <div class="form-group">
+                                <label for="block3">PÁRRAFO 3</label>
+                                <textarea id="block3" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block3 ?? ''}}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="block4">PÁRRAFO 4</label>
+                                <textarea id="block4" class="form-control" rows="2" placeholder="Escribe Aquí...">{{$message->block4 ?? ''}}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fileUpload">SUBIR ARCHIVO (JPG, PNG o PDF)</label>
+                                <input type="file" id="fileUpload" name="fileUpload" class="form-control">
+                                <p>Opcional</p>
+                            </div>
                         </div>
                     </div>
 

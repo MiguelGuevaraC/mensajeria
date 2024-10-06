@@ -60,6 +60,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('user', [UserController::class, 'store']);
     Route::put('user/{id}', [UserController::class, 'update']);
     Route::delete('user/{id}', [UserController::class, 'destroy']);
+    Route::put('updatePass', [UserController::class, 'updatePassword']);
 
     //GROUP MENU
     Route::get('groupmenu', [GroupMenuController::class, 'index']);

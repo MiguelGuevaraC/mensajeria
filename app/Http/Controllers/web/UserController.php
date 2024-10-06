@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -289,6 +290,46 @@ class UserController extends Controller
 
         return response()->json($object, 200);
     }
+
+    public function updatePassword(Request $request)
+{
+    $user = User::find(Auth()->user()->id);
+    $validator = validator()->make($request->all(), [
+        'username' => [
+            'required',
+            Rule::unique('users')->ignore($user->id)->whereNull('deleted_at'),
+        ],
+        'passOld' => 'required|string',
+        'passNew' => 'required|string|min:6', // Puedes ajustar la longitud mínima según tus necesidades
+        'passConf' => 'required|string|same:passNew', // Verifica que coincidan con passNew
+    ], [
+        'username.required' => 'El nombre de usuario es obligatorio.',
+        'username.unique' => 'El nombre de usuario ya está en uso, elige otro.',
+        'passOld.required' => 'La contraseña anterior es obligatoria.',
+        'passOld.string' => 'La contraseña anterior debe ser un texto.',
+        'passNew.required' => 'La nueva contraseña es obligatoria.',
+        'passNew.string' => 'La nueva contraseña debe ser un texto.',
+        'passNew.min' => 'La nueva contraseña debe tener al menos 6 caracteres.',
+        'passConf.required' => 'La confirmación de la contraseña es obligatoria.',
+        'passConf.string' => 'La confirmación de la contraseña debe ser un texto.',
+        'passConf.same' => 'La confirmación de la contraseña no coincide con la nueva contraseña.',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
+    
+    if (!Hash::check($request->passOld, $user->password)) {
+        return response()->json(['error' => 'La contraseña anterior que ingresaste es incorrecta.'], 422);
+    }
+
+    $user->username = $request->username;
+    $user->password = Hash::make($request->passNew);
+    $user->save();
+    
+    return response()->json(['username' => $user->username], 200);
+}
+
 
     /**
      * Show the specified Group menu
