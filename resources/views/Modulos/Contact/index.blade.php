@@ -74,6 +74,20 @@
 
     <link rel="stylesheet" href="{{ asset('css/appPlantilla.css') }}">
 
+    <style>
+        input[type="search"] {
+            height: 12px;
+            /* Altura del campo de búsqueda */
+        }
+
+        .swal2-popup {
+            width: 800px !important;
+            /* Asegúrate de que el ancho deseado se aplique */
+           
+            /* Permitir que sea más estrecho si es necesario */
+        }
+    </style>
+
 
 </head>
 
@@ -204,9 +218,8 @@
                                     class="demo-pli-plus"></i>
                                 <i class="fa-regular fa-square-check"></i> MARCAR POR GRUPO</button>
 
-                            <button id="contactsForSend" style="margin: 5px; padding:5px" 
-                            class="btn btn-success">
-                            <i class="fa-solid fa-list-check"></i> RESUMEN ENVÍO</button>
+                            <button id="contactsForSend" style="margin: 5px; padding:5px" class="btn btn-success">
+                                <i class="fa-solid fa-list-check"></i> RESUMEN ENVÍO</button>
 
                         </div>
                         <br><br><br>
@@ -270,7 +283,9 @@
                                             <span class="pull-right dropdown-toggle">
                                                 <i class="dropdown-caret"></i>
                                             </span>
-                                            <p class="mnp-name">{{ strtoupper($user->username) . " | ".strtoupper($user->company->businessName) }}</p>
+                                            <p class="mnp-name">
+                                                {{ strtoupper($user->username) . ' | ' . strtoupper($user->company->businessName) }}
+                                            </p>
 
                                             <span class="mnp-desc"></span>
                                         </a>
