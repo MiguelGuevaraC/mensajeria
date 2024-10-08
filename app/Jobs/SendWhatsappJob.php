@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Contact;
+use App\Models\DetailProgramming;
 use App\Models\MessageWhasapp;
 use App\Models\Programming;
 use App\Models\SendApi;
@@ -58,7 +59,7 @@ class SendWhatsappJob implements ShouldQueue
             $costSend = $this->user->company->costSend ?? '0';
             $companyTradeName = $this->user->company->tradeName ?? '';
             $programming_id = $this->programming_id;
-            $detalleProgrmacion=null;
+            $detalleProgrmacion = null;
             $companyName = $this->user->company->documentNumber . '-' . $this->user->company->businessName;
 
             $messageBase = MessageWhasapp::where('id', $this->message_id)->first() ?? (object) [
@@ -70,11 +71,7 @@ class SendWhatsappJob implements ShouldQueue
 
             $whatsappSends = []; // Array para almacenar los envíos realizados
 
-  
-            
-
             foreach ($this->contactsByGroups as $contactByGroup) {
-
 
                 $contact = Contact::find($contactByGroup->contact_id);
 
@@ -121,9 +118,6 @@ class SendWhatsappJob implements ShouldQueue
                 $tipo = 'E' . str_pad($user_id, 3, '0', STR_PAD_LEFT); // Rellenar con ceros a la izquierda
                 $resultado = DB::select('SELECT COALESCE(MAX(CAST(SUBSTRING(sequentialNumber, LOCATE("-", sequentialNumber) + 1) AS SIGNED)), 0) + 1 AS siguienteNum FROM whatsapp_sends a WHERE SUBSTRING(sequentialNumber, 1, 4) = ?', [$tipo])[0]->siguienteNum;
                 $siguienteNum = (int) $resultado;
-
-
-           
 
                 $data = [
                     'sequentialNumber' => $tipo . "-" . str_pad($siguienteNum, 8, '0', STR_PAD_LEFT),
@@ -214,9 +208,6 @@ class SendWhatsappJob implements ShouldQueue
                 Log::error('Failed to send WhatsApp messages. Response: ' . $response->body());
             }
 
-            
-            
-            
             $sendApi->quantitySend = $totalSend;
             $sendApi->errors = $totalErrors;
             $sendApi->success = $totalSuccess;
@@ -227,17 +218,18 @@ class SendWhatsappJob implements ShouldQueue
 
             if ($programming_id != null) {
                 $programming = Programming::find($programming_id);
-                $programming->status= 'Enviado';
+                $programming->status = 'Enviado';
+                $programming->save();
                 // Obtener todos los detalles de la programación
                 $detalleProgramacion = $programming->detailProgramming;
-            
+
                 // Actualizar el estado a 'enviado' para todos los registros
                 foreach ($detalleProgramacion as $detalle) {
+                    $detalle = DetailProgramming::find($detalle->id);
                     $detalle->status = 'Enviado';
                     $detalle->save();
                 }
             }
-            
 
             return response()->json($sendApi
                 , 200);
