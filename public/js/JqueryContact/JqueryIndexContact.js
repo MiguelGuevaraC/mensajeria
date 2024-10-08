@@ -75,6 +75,9 @@ var columns = [
         data: null,
         render: function (data, type, full, meta) {
             return `
+             <a href="javascript:void(0)" onclick="addProgramming(${data.id})" style="background:#192550; color:white;" class="btn btn-primary"> 
+                   <i class="fa-solid fa-calendar-plus"></i>
+                </a>
                 <a href="javascript:void(0)" onclick="editRol(${data.id})" style="background:#ffc107; color:white;" class="btn btn-info"> 
                     <i class="fas fa-edit"></i>
                 </a>

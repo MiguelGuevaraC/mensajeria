@@ -71,6 +71,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+    public function programmings()
+    {
+        return $this->hasMany(Programming::class);
+    }
 
     public function createGroupSend()
     {

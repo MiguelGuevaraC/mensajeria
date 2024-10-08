@@ -6,28 +6,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SendApi extends Model
+class DetailProgramming extends Model
 {
     use SoftDeletes;
     protected $fillable = [
-        'quantitySend',
-        'errors',
-        'success',
-        'type',
-        'dateSend',
-        'user_id',
+        'status',
         'programming_id',
+        'contactByGroup_id',
         'state',
+        'created_at',
     ];
 
     protected $hidden = [
-        'created_at',
         'updated_at',
         'deleted_at',
     ];
 
-    public function whasappSends()
+    public function programming()
     {
-        return $this->hasMany(WhatsappSend::class);
+        return $this->belongsTo(Programming::class, 'programming_id');
+    }
+    public function contactByGroup()
+    {
+        return $this->belongsTo(ContactByGroup::class, 'contactByGroup_id');
     }
 }

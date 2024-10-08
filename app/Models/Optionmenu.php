@@ -38,7 +38,7 @@ class Optionmenu extends Model
 
     public function groupmenu()
     {
-        return $this->belongsTo(Person::class, 'groupmenu_id');
+        return $this->belongsTo(GroupMenu::class, 'groupmenu_id');
     }
 
     public function accesses()

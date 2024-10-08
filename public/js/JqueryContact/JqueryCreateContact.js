@@ -133,8 +133,22 @@ $(document).ready(function () {
                         <i class="fas fa-paper-plane" style="font-size: 19px; color: #3085d6;"></i>
                         <p style="margin: 5px 0;">${totalContacts} Envíos</p>
                     </div>
+                     <div style="text-align: center;">
+                      
+                        <div class="toggleContainer">
+
+                       <input type="checkbox" id="switch" class="toggle">
+
+
+                        <label for="switch" class="switch"></label>
+  <p style="margin: 5px 0;">Programar</p>
+                        </div> 
+                    </div>
                 </div>
- 
+         <div id="dateTimeContainer" style="display: none; margin-top: 10px;">
+                <label for="sendDateTime"><b>Seleccionar fecha y hora de envío:</b></label>
+                <input type="datetime-local" id="sendDateTime" style="width: 100%; padding: 5px;">
+            </div><br>
             `;
 
                 // Construir tabla con datos
@@ -194,17 +208,20 @@ $(document).ready(function () {
                     
                 </div>`;
 
-              
-
                 Swal.fire({
                     title: "Resumen de Envío",
-                    html: summaryHtml + tableContent,
+                    html: `
+        <div style="max-height: 300px; overflow-y: auto;">
+            ${summaryHtml + tableContent}
+    
+        </div>
+    `,
                     width: "1000px",
                     showCancelButton: true,
                     confirmButtonText: "Enviar Mensajes",
                     confirmButtonColor: "green",
                     cancelButtonColor: "#d33",
-                    
+
                     preConfirm: () => {
                         const mensajeId = $("#message_id").val();
 
@@ -215,12 +232,68 @@ $(document).ready(function () {
                             return false;
                         }
 
-                        return { mensajeId: mensajeId }; // Retorna el valor para usarlo en el then
+                        const isProgram = $("#switch").is(":checked");
+                        const sendDateTime = $("#sendDateTime").val() ?? "";
+
+                        if (isProgram) {
+                            if (
+                                sendDateTime == "" ||
+                                sendDateTime == null ||
+                                !sendDateTime
+                            ) {
+                                Swal.showValidationMessage(
+                                    "La fecha de envío es Obligatorio"
+                                );
+                                return false;
+                            }
+                        }
+
+                        return {
+                            mensajeId: mensajeId,
+                            isProgram: isProgram,
+                            sendDateTime: sendDateTime,
+                        };
                     },
                     didRender: () => {
-                        $('#tablaPorGrupos').DataTable({
+                        $("#switch").change(function () {
+                            const isChecked = $(this).is(":checked");
+                            if (isChecked) {
+                                const now = new Date();
+
+                                console.log(now);
+                                now.setMinutes(now.getMinutes() + 20);
+
+                                // Formatear la fecha y hora para input datetime-local
+                                const year = now.getFullYear();
+                                const month = String(
+                                    now.getMonth() + 1
+                                ).padStart(2, "0"); // Los meses son 0-indexados
+                                const day = String(now.getDate()).padStart(
+                                    2,
+                                    "0"
+                                );
+                                const hours = String(now.getHours()).padStart(
+                                    2,
+                                    "0"
+                                );
+                                const minutes = String(
+                                    now.getMinutes()
+                                ).padStart(2, "0");
+
+                                const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`; // 'YYYY-MM-DDTHH:mm'
+
+                                $("#sendDateTime").val(formattedDate);
+                                $("#dateTimeContainer").show();
+                            } else {
+                                $("#sendDateTime").val("");
+                                $("#dateTimeContainer").hide();
+                            }
+                        });
+
+                        $("#sendDateTime").val();
+                        $("#tablaPorGrupos").DataTable({
                             paging: true, // Activa la paginación
-                            lengthMenu: [ 3], // Opciones de longitud de página
+                            lengthMenu: [3], // Opciones de longitud de página
                             searching: true, // Habilita búsqueda
                             info: true, // Muestra información de la tabla
 
@@ -229,16 +302,13 @@ $(document).ready(function () {
                                 emptyTable:
                                     "No hay datos disponibles en la tabla", // Mensaje cuando no hay datos
                                 info: "Mostrando _START_ a _END_ de _TOTAL_ entradas", // Mensaje de información
-                                infoEmpty:
-                                    "No se encontraron entradas", // Mensaje cuando no hay entradas
+                                infoEmpty: "No se encontraron entradas", // Mensaje cuando no hay entradas
                                 infoFiltered:
                                     "(filtrado de _MAX_ entradas totales)", // Mensaje filtrado
-                                loadingRecords:
-                                    "Cargando...", // Mensaje de carga
+                                loadingRecords: "Cargando...", // Mensaje de carga
                                 processing: "Procesando...", // Mensaje de procesamiento
                                 search: "Buscar:", // Etiqueta de búsqueda
-                                zeroRecords:
-                                    "No se encontraron coincidencias", // Mensaje si no se encuentran coincidencias
+                                zeroRecords: "No se encontraron coincidencias", // Mensaje si no se encuentran coincidencias
                                 paginate: {
                                     first: "Primero", // Texto del primer botón de paginación
                                     last: "Último", // Texto del último botón de paginación
@@ -304,13 +374,19 @@ $(document).ready(function () {
                                     // Mostrar SweetAlert con los envíos del grupo
                                     Swal.fire({
                                         title: `Grupo: ${response.groupName}`,
-                                        html: contactsTableContent,
+                                
+                                        html: `
+                                        <div style="max-height: 300px; overflow-y: auto;">
+                                            ${contactsTableContent}
+                                    
+                                        </div>
+                                    `,
                                         width: "700px",
                                         showCloseButton: true, // Oculta el botón de cerrar (X)
                                         showCancelButton: false, // Asegúrate de que esto esté configurado como false
                                         showConfirmButton: false,
                                         confirmButtonText: "", // Sin texto para el botón de confirmación
-                                        allowOutsideClick: false, // No permite cerrar haciendo clic fuera del cuadro de diálogo
+                                        // No permite cerrar haciendo clic fuera del cuadro de diálogo
 
                                         didClose: () => {
                                             // Cuando se cierra el modal, abrir el resumen
@@ -320,7 +396,7 @@ $(document).ready(function () {
                                             // Inicializa DataTable
                                             $("#contactsTable").DataTable({
                                                 paging: true, // Activa la paginación
-                                                lengthMenu: [ 5,10, 25, 50], // Opciones de longitud de página
+                                                lengthMenu: [5, 10, 25, 50], // Opciones de longitud de página
                                                 searching: true, // Habilita búsqueda
                                                 info: true, // Muestra información de la tabla
 
@@ -469,6 +545,21 @@ $(document).ready(function () {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         idMensaje = result.value.mensajeId;
+                        isProgram = result.value.isProgram;
+                        sendDateTime = result.value.sendDateTime;
+
+                        // Formatear la fecha en un formato más amigable
+                        const formattedDate = new Date(
+                            sendDateTime
+                        ).toLocaleString("es-ES", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                        });
+
                         Swal.fire({
                             title: "¿Confirmar el envío?",
                             html: `
@@ -476,6 +567,16 @@ $(document).ready(function () {
                                     <i class="fas fa-paper-plane" style="font-size: 24px; color: #3085d6;"></i>
                                     <p style="margin: 5px 0;">Se han registrado ${totalContacts} envíos</p>
                                     <p style="color: #555;">¿Estás seguro de que deseas proceder?</p>
+                                    ${
+                                        isProgram
+                                            ? `<p style="font-weight: bold; color: #3085d6;">Programación activada</p>
+                                        <p style="font-size: 18px; font-weight: bold; color: #333; margin-top: 10px;">
+                                        <i class="fas fa-clock" style="color: #d9534f; margin-right: 5px;"></i>
+                                        Fecha de envío: <span style="color: ##d9534f;">${formattedDate}</span>
+                                    </p>`
+                                            : ""
+                                    }
+                                    
                                 </div>
                             `,
                             icon: "question",
@@ -496,6 +597,8 @@ $(document).ready(function () {
                                     },
                                     data: {
                                         message_id: idMensaje,
+                                        isProgram: isProgram,
+                                        sendDateTime: sendDateTime,
                                     },
                                     beforeSend: function () {
                                         // Inicializar las variables antes de enviar
@@ -503,34 +606,56 @@ $(document).ready(function () {
                                         totalExitosos = 0;
                                         totalErrores = 0;
 
-                                        // Mostrar alerta de carga
-                                        Swal.fire({
-                                            title: "Enviando mensajes...",
-                                            html: `
-                                                <div style="text-align: center; font-size: 1.2em; margin-bottom: 20px;">
-                                                    <div style="font-size: 1.5em; margin-bottom: 10px;">
-                                                        <i class="fas fa-paper-plane" style="color: #007bff;"></i>
-                                                        Enviados: <span id="totalEnviados" style="font-weight: bold;">${totalEnviados}</span>
-                                                    </div>
-                                                    <div style="font-size: 1.5em; margin-bottom: 10px;">
-                                                        <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                                                        Éxitos: <span id="totalExitosos" style="font-weight: bold;">${totalExitosos}</span>
-                                                    </div>
-                                                    <div style="font-size: 1.5em;">
-                                                        <i class="fas fa-times-circle" style="color: #dc3545;"></i>
-                                                        Errores: <span id="totalErrores" style="font-weight: bold;">${totalErrores}</span>
-                                                    </div>
-                                                </div>
-                                                <div style="text-align: center; margin-top: 20px;">
-                                                    <progress id="progressBar" value="0" max="100" style="width: 100%; height: 25px;"></progress>
-                                                </div>
-                                            `,
-                                            icon: "info",
-                                            showConfirmButton: false, // Ocultar botón de confirmar
-                                            willOpen: () => {
-                                                Swal.showLoading();
-                                            },
-                                        });
+                                        console.log(isProgram);
+                                        if (!isProgram) {
+                                            // Mostrar alerta de carga
+                                            Swal.fire({
+                                                title: "Enviando mensajes...",
+                                                html: `
+        <div style="text-align: center; font-size: 1.2em; margin-bottom: 20px;">
+            <div style="font-size: 1.5em; margin-bottom: 10px;">
+                <i class="fas fa-paper-plane" style="color: #007bff;"></i>
+                Enviados: <span id="totalEnviados" style="font-weight: bold;">${totalEnviados}</span>
+            </div>
+            <div style="font-size: 1.5em; margin-bottom: 10px;">
+                <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                Éxitos: <span id="totalExitosos" style="font-weight: bold;">${totalExitosos}</span>
+            </div>
+            <div style="font-size: 1.5em;">
+                <i class="fas fa-times-circle" style="color: #dc3545;"></i>
+                Errores: <span id="totalErrores" style="font-weight: bold;">${totalErrores}</span>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <progress id="progressBar" value="0" max="100" style="width: 100%; height: 25px;"></progress>
+        </div>
+    `,
+                                                icon: "info",
+                                                showConfirmButton: false, // Ocultar botón de confirmar
+                                                willOpen: () => {
+                                                    Swal.showLoading();
+                                                },
+                                            });
+                                        }else{
+                                            Swal.fire({
+                                                title: "¡Programación realizada con éxito!",
+                                                html: `
+                                                    <p>La programación se ha realizado correctamente.</p>
+                                                    <a href="programming" target="_blank" class="btn btn-primary" style="margin-top: 10px;">
+                                                        Ir a ver programaciones
+                                                    </a>
+                                                `,
+                                                icon: "success",
+                                                showConfirmButton: false, // Ocultar botón de confirmar
+                                                willOpen: () => {
+                                                    Swal.showLoading(); // Muestra una animación de carga hasta que el modal esté completamente cargado
+                                                },
+                                                didOpen: () => {
+                                                    Swal.hideLoading(); // Oculta la animación de carga cuando el modal se abre por completo
+                                                },
+                                            });
+                                            
+                                        }
                                     },
                                     success: function (response) {
                                         let totalMessages =

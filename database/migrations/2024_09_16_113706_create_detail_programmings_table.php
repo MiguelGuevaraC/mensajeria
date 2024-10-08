@@ -11,21 +11,19 @@ return new class extends Migration
      *
      * @return void
      */
+
     public function up()
     {
-        Schema::create('send_apis', function (Blueprint $table) {
-            $table->id(); // ID automático
-            $table->integer('quantitySend')->nullable(); // Cantidad enviada
-            $table->integer('errors')->nullable(); // Errores, puede ser nulo
-            $table->integer('success')->nullable(); // Éxitos, puede ser nulo
-            $table->dateTime('dateSend')->nullable(); // Fecha de envío
-            $table->string('type')->nullable(); // Campo 'type'
+        Schema::create('detail_programmings', function (Blueprint $table) {
+            $table->id();
+            $table->string('status')->nullable()->default("Pendiente"); // Campo 'type'
 
-            $table->foreignId('user_id')->nullable()->unsigned()->constrained('users');
             $table->foreignId('programming_id')->nullable()->unsigned()->constrained('programmings');
+            $table->foreignId('contactByGroup_id')->nullable()->unsigned()->constrained('contact_by_groups');
 
             $table->boolean('state')->nullable()->default(1); // Campo 'state'
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -36,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('send_apis');
+        Schema::dropIfExists('detail_programmings');
     }
 };

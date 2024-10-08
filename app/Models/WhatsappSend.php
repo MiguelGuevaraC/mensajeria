@@ -33,6 +33,7 @@ class WhatsappSend extends Model
         'user_id', 
         'sendApi_id',
         'messageWhasapp_id', 
+        'contactByGroup_id',
     ];
     
     
@@ -58,5 +59,9 @@ class WhatsappSend extends Model
     public function sendApi()
     {
         return $this->belongsTo(SendApi::class, 'sendApi_id');
+    }
+    public function contactByGroup()
+    {
+        return $this->belongsTo(ContactByGroup::class, 'contactByGroup_id');
     }
 }

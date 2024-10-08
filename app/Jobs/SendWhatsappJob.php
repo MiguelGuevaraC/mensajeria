@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Contact;
 use App\Models\MessageWhasapp;
+use App\Models\Programming;
 use App\Models\SendApi;
 use App\Models\User;
 use App\Models\WhatsappSend;
@@ -23,16 +24,23 @@ class SendWhatsappJob implements ShouldQueue
     protected $contactsByGroups;
     protected $user;
     protected $message_id;
+    protected $programming_id;
+
+    protected $typeSend;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($contactsByGroups, $user, $message_id)
+    public function __construct($contactsByGroups, $user, $message_id, $typeSend, $programming_id)
     {
+
         $this->contactsByGroups = $contactsByGroups;
         $this->user = $user;
         $this->message_id = $message_id;
+        $this->typeSend = $typeSend;
+        $this->programming_id = $programming_id;
+
     }
 
     /**
@@ -46,8 +54,11 @@ class SendWhatsappJob implements ShouldQueue
         try {
             $mensajes = [];
             $user = $this->user;
+            $typeSend = $this->typeSend;
             $costSend = $this->user->company->costSend ?? '0';
             $companyTradeName = $this->user->company->tradeName ?? '';
+            $programming_id = $this->programming_id;
+            $detalleProgrmacion=null;
             $companyName = $this->user->company->documentNumber . '-' . $this->user->company->businessName;
 
             $messageBase = MessageWhasapp::where('id', $this->message_id)->first() ?? (object) [
@@ -59,7 +70,11 @@ class SendWhatsappJob implements ShouldQueue
 
             $whatsappSends = []; // Array para almacenar los envíos realizados
 
+  
+            
+
             foreach ($this->contactsByGroups as $contactByGroup) {
+
 
                 $contact = Contact::find($contactByGroup->contact_id);
 
@@ -107,6 +122,9 @@ class SendWhatsappJob implements ShouldQueue
                 $resultado = DB::select('SELECT COALESCE(MAX(CAST(SUBSTRING(sequentialNumber, LOCATE("-", sequentialNumber) + 1) AS SIGNED)), 0) + 1 AS siguienteNum FROM whatsapp_sends a WHERE SUBSTRING(sequentialNumber, 1, 4) = ?', [$tipo])[0]->siguienteNum;
                 $siguienteNum = (int) $resultado;
 
+
+           
+
                 $data = [
                     'sequentialNumber' => $tipo . "-" . str_pad($siguienteNum, 8, '0', STR_PAD_LEFT),
                     'messageSend' => $title . "\n\n" . $block1 . "\n\n" . $block2 . "\n\n" . $block3 . "\n\n" . $block4,
@@ -123,6 +141,7 @@ class SendWhatsappJob implements ShouldQueue
                     'contac_id' => $contact->id,
                     'user_id' => $user->id,
                     'messageWhasapp_id' => $messageBase->id,
+                    'contactByGroup_id' => $contactByGroup->id,
 
                 ];
 
@@ -132,7 +151,7 @@ class SendWhatsappJob implements ShouldQueue
 
             // Llamada a la API
             $url = 'https://sistema.gesrest.net/api/send-massive-wa-messages';
-
+            $response = [];
             $response = Http::withHeaders([
                 'Authorization' => '}*rA3>#pyM<dITk]]DFP2,/wc)1md_Y/',
             ])->timeout(120)->post($url, [
@@ -145,10 +164,14 @@ class SendWhatsappJob implements ShouldQueue
                 'success' => null,
                 'dateSend' => now(),
                 'user_id' => $user->id,
-
+                'programming_id' => $programming_id,
             ];
 
             $sendApi = SendApi::create($data);
+            Log::info('Job creado', [
+                '$sendApi' => $sendApi,
+
+            ]);
             $totalErrors = 0;
             $totalSuccess = 0;
             $totalSend = 0;
@@ -191,10 +214,30 @@ class SendWhatsappJob implements ShouldQueue
                 Log::error('Failed to send WhatsApp messages. Response: ' . $response->body());
             }
 
+            
+            
+            
             $sendApi->quantitySend = $totalSend;
             $sendApi->errors = $totalErrors;
             $sendApi->success = $totalSuccess;
+            $sendApi->type = $typeSend;
+            $sendApi->type = $typeSend;
+            $sendApi->programming_id = $programming_id;
             $sendApi->save();
+
+            if ($programming_id != null) {
+                $programming = Programming::find($programming_id);
+                $programming->status= 'Enviado';
+                // Obtener todos los detalles de la programación
+                $detalleProgramacion = $programming->detailProgramming;
+            
+                // Actualizar el estado a 'enviado' para todos los registros
+                foreach ($detalleProgramacion as $detalle) {
+                    $detalle->status = 'Enviado';
+                    $detalle->save();
+                }
+            }
+            
 
             return response()->json($sendApi
                 , 200);

@@ -86,6 +86,47 @@
            
             /* Permitir que sea más estrecho si es necesario */
         }
+        .toggleContainer{
+         position: relative;
+          width: 90px;
+          height: 30px;
+      }
+      .toggle{
+          position: absolute;
+          width: 0;
+          height: 0;
+          & + .switch{
+              position:relative;
+              display: block;
+              background: lightgray;
+              width: 90px;
+              height: 20px;
+              cursor: pointer;
+              border-radius: 30px;
+              transition: 0.5s;
+          }
+          &:checked + .switch{
+              background: #3085d6;
+          }
+          & + .switch:before{
+              content:"";
+              position: absolute;
+              width: 20px;
+              height: 20px;
+              top: 50%;
+              transform: translateY(-50%);
+              background: black;
+              border-radius: 50%;
+              margin: 0px 2px;
+              left: 0%;
+              transition: 1s;
+          }
+          &:checked + .switch:before{
+              left: 100%;
+              transform: translate(calc(-100% - 2px), -50%);
+          }
+      }
+  
     </style>
 
 
