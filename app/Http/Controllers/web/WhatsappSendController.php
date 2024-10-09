@@ -70,7 +70,7 @@ class WhatsappSendController extends Controller
             return response()->json(['error' => $validator->errors()->first()], 422);
         }
 
-        $typeSend= 'Programada';
+        $typeSend = 'Programada';
         $message_id = $request->input('message_id');
         $sendDateTime = $request->input('sendDateTime');
         $dateProgram = Carbon::parse($sendDateTime);
@@ -86,6 +86,8 @@ class WhatsappSendController extends Controller
         $data = [
             'dateProgram' => $sendDateTime,
             'user_id' => $user_id,
+            'status' => "Pendiente",
+            'messageWhasapp_id' => $message_id,
         ];
         $programming = Programming::create($data);
 
@@ -137,7 +139,6 @@ class WhatsappSendController extends Controller
 
             // Si el paquete de contactos alcanza los 50, despacha un job y almacena la respuesta
             if (count($contactByGroupPaquete) >= 50) {
-  
 
                 // Crear registros de DetailProgramming para cada contacto
                 foreach ($contactByGroupPaquete as $contactByGroup) {
@@ -156,7 +157,7 @@ class WhatsappSendController extends Controller
 
         // Si queda algún paquete menor a 50, también despacharlo y almacenar la respuesta
         if (count($contactByGroupPaquete) > 0) {
-  
+
             $delay = $dateProgram->diffInSeconds(now());
 
             // Crear registros de DetailProgramming para cada contacto
@@ -207,7 +208,7 @@ class WhatsappSendController extends Controller
             return response()->json(['error' => $validator->errors()->first()], 422);
         }
 
-        $typeSend='Normal';
+        $typeSend = 'Normal';
         $message_id = $request->input('message_id');
         $user = Auth::user();
         $company_id = $user->company_id;
@@ -258,7 +259,7 @@ class WhatsappSendController extends Controller
         $totalEnviados = 0;
         $totalExitosos = 0;
         $totalErrores = 0;
-        
+
         foreach ($contactsByGroups as $contactByGroup) {
             $contact = $contactByGroup->contact;
 
@@ -270,7 +271,7 @@ class WhatsappSendController extends Controller
 
             // Si el paquete de contactos alcanza los 50, despacha un job y almacena la respuesta
             if (count($contactByGroupPaquete) >= 50) {
-                $response = SendWhatsappJob::dispatchNow($contactByGroupPaquete, $user, $message_id,$typeSend,null); // Usamos dispatchNow para obtener la respuesta directamente
+                $response = SendWhatsappJob::dispatchNow($contactByGroupPaquete, $user, $message_id, $typeSend, null); // Usamos dispatchNow para obtener la respuesta directamente
                 $jobResponses[] = $response->original; // Almacenar la respuesta del job
                 $totalEnviados += $response->original['quantitySend'];
                 $totalExitosos += $response->original['success'];
@@ -282,7 +283,7 @@ class WhatsappSendController extends Controller
 
         // Si queda algún paquete menor a 50, también despacharlo y almacenar la respuesta
         if (count($contactByGroupPaquete) > 0) {
-            $response = SendWhatsappJob::dispatchNow($contactByGroupPaquete, $user, $message_id,$typeSend,null);
+            $response = SendWhatsappJob::dispatchNow($contactByGroupPaquete, $user, $message_id, $typeSend, null);
             $jobResponses[] = $response->original; // Almacenar la respuesta del job
             $totalEnviados += $response->original['quantitySend'];
             $totalExitosos += $response->original['success'];
