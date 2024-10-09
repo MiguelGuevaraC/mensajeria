@@ -374,7 +374,7 @@ $(document).ready(function () {
                                     // Mostrar SweetAlert con los envíos del grupo
                                     Swal.fire({
                                         title: `Grupo: ${response.groupName}`,
-                                
+
                                         html: `
                                         <div style="max-height: 300px; overflow-y: auto;">
                                             ${contactsTableContent}
@@ -636,7 +636,7 @@ $(document).ready(function () {
                                                     Swal.showLoading();
                                                 },
                                             });
-                                        }else{
+                                        } else {
                                             Swal.fire({
                                                 title: "¡Programación realizada con éxito!",
                                                 html: `
@@ -654,7 +654,6 @@ $(document).ready(function () {
                                                     Swal.hideLoading(); // Oculta la animación de carga cuando el modal se abre por completo
                                                 },
                                             });
-                                            
                                         }
                                     },
                                     success: function (response) {

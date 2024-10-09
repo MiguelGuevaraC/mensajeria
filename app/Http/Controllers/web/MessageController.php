@@ -499,6 +499,8 @@ class MessageController extends Controller
             $message->routeFile = 'storage/app/public/' . $filePath;
         }
 
+        $message->updateMessageDataInProgramming();
+
         return response()->json($message, 200);
     }
 

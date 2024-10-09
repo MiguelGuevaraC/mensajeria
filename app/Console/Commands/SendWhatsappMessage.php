@@ -7,7 +7,6 @@ use App\Models\Programming;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class SendWhatsappMessage extends Command
@@ -40,8 +39,8 @@ class SendWhatsappMessage extends Command
     {
         // Obtener la fecha actual
         $fechaActual = Carbon::now();
-   
-        $typeSend='Programada';
+
+        $typeSend = 'Programada';
 
         $programaciones = Programming::where('dateProgram', '<=', $fechaActual)
             ->where('status', 'Pendiente') // Puedes ajustar el estado según lo necesites
@@ -50,7 +49,7 @@ class SendWhatsappMessage extends Command
         foreach ($programaciones as $programming) {
             // Obtenemos los contactos relacionados a la programación
             $contactsByGroups = $programming->contactsByGroup;
-            $message_id= $programming->messageWhasapp_id;
+            $message_id = $programming->messageWhasapp_id;
             $user = User::find($programming->user_id);
             $company_id = $user->company_id;
             $user_id = $user->id;

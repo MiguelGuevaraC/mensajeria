@@ -9,6 +9,7 @@ use App\Models\Contact;
 use App\Models\ContactByGroup;
 use App\Models\DetailProgramming;
 use App\Models\GroupMenu;
+use App\Models\MessageWhasapp;
 use App\Models\Programming;
 use App\Models\WhatsappSend;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -82,12 +83,22 @@ class WhatsappSendController extends Controller
         // Iniciar el registro de logs
         Log::info('Iniciando el envío de mensajes', ['user_id' => $user_id, 'company_id' => $company_id]);
 
+        $messageBase = MessageWhasapp::where('id', $message_id)->first() ?? (object) [
+            'title' => 'titulo',
+            'block1' => 'block1',
+            'block2' => 'block2',
+            'block3' => 'block3',
+            'block4' => 'block4',
+        ];
+
+
         // CREANDO PROGRAMACIÓN
         $data = [
             'dateProgram' => $sendDateTime,
             'user_id' => $user_id,
             'status' => "Pendiente",
             'messageWhasapp_id' => $message_id,
+            'messageSend' => $messageBase->title . "\n\n" . $messageBase->block1 . "\n\n" . $messageBase->block2 . "\n\n" .$messageBase->block3 . "\n\n" . $messageBase->block4,
         ];
         $programming = Programming::create($data);
 

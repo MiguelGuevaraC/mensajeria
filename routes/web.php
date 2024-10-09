@@ -170,4 +170,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('programming', [ProgrammingController::class, 'index']);
     Route::get('programmingAll', [ProgrammingController::class, 'all']);
     Route::get('programming/{id}', [ProgrammingController::class, 'show']);
+
+    Route::get('showContactForAddProgramming/{id}', [ProgrammingController::class, 'showPendientes']);
+    Route::get('addDetailProgramming', [ProgrammingController::class, 'addDetailProgramming']);
 });

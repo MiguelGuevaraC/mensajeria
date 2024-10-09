@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('quantitySend')->nullable(); // Cantidad enviada
             $table->integer('errors')->nullable(); // Errores, puede ser nulo
             $table->integer('success')->nullable(); // Éxitos, puede ser nulo
-
+            $table->text('messageSend')->nullable(); 
             $table->foreignId('user_id')->nullable()->unsigned()->constrained('users');
             $table->foreignId('messageWhasapp_id')->nullable()->unsigned()->constrained('message_whasapps');
             

@@ -15,6 +15,7 @@ class Programming extends Model
         'user_id',
         'state',
         'created_at',
+        'messageSend',
         'messageWhasapp_id',
     ];
 

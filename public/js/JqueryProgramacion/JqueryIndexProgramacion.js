@@ -132,7 +132,7 @@ $(document).on("click", ".view-description", function () {
         </div>
         <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
             <i class="fas fa-envelope" style="font-size: 3vw; color: #3085d6;"></i>
-            <p style="margin: 5px 0;"><b>Registros Enviados:</b><br>${data.count}</p>
+            <p style="margin: 5px 0;"><b>Contactos:</b><br>${data.count}</p>
         </div>
     </div>
 `;
@@ -164,14 +164,21 @@ $(document).on("click", ".view-description", function () {
                     </tbody>
                 </table>
             `;
+            let mensaje = `
+            <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);">
+                <label for="messageSend" style="font-weight: bold; color: #333; font-size: 14px;">Mensaje:</label><br>
+                <textarea id="messageSend" style="width: 100%; height: 70px; margin-top: 5px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none; font-family: Arial, sans-serif; font-size: 14px; color: #555;" readonly>${data.messageSend?? ''}</textarea>
+            </div>
+        `;
 
             // Mostrar SweetAlert con la tabla de contactos y resumen
             Swal.fire({
                 title: "Detalles de la Programación",
                 html: `
-                    <div style="padding:0px 15px;max-height: 300px; overflow-y: auto;">
+                    <div style="padding:0px 15px;max-height: 400px; overflow-y: auto;">
                         ${summaryHtml}
                         ${tableContent}
+                        ${mensaje}
                     </div>
                 `,
                 showCloseButton: true, // Oculta el botón de cerrar (X)

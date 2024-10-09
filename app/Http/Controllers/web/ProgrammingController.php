@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
+use App\Models\ContactByGroup;
+use App\Models\DetailProgramming;
 use App\Models\GroupMenu;
 use App\Models\Programming;
 use Illuminate\Http\Request;
@@ -143,6 +145,21 @@ class ProgrammingController extends Controller
         }
     }
 
+    public function showPendientes($id)
+    {
+        $object = ContactByGroup::with(['contact', 'groupSend'])->find($id);
+        if (!$object) {
+            return response()->json(
+                ['message' => 'Contacto no encontrado'], 404
+            );
+        }
+
+        // Incluir registros eliminados con withTrashed() en el modelo y sus relaciones
+        $programmings = Programming::with('messageWhasapp')->where('status', 'Pendiente')->get();
+
+        return response()->json(["contactByGroup" => $object, "programmings" => $programmings], 200);
+    }
+
     public function show($id)
     {
         // Incluir registros eliminados con withTrashed() en el modelo y sus relaciones
@@ -174,4 +191,36 @@ class ProgrammingController extends Controller
         return response()->json($message, 200);
     }
 
+    public function addDetailProgramming(Request $request)
+    {
+        $idContactByGroup = $request->get('idContactByGroup');
+        $idProgramming = $request->get('idProgramming');
+
+        // Incluir registros eliminados con withTrashed() en el modelo y sus relaciones
+        $contactByGroup = ContactByGroup::find($idContactByGroup);
+
+        if (!$contactByGroup) {
+            return response()->json(
+                ['message' => 'El Contacto no fué encontrado'], 404
+            );
+        }
+    
+        $programming = Programming::where('status', 'Pendiente')->find($idProgramming);
+
+        if (!$programming) {
+            return response()->json(
+                ['message' => 'La programación no está en Pendiente'], 404
+            );
+        }
+
+        $detailNuevo = DetailProgramming::create([
+            'status' => 'Pendiente', // Puedes usar otro estado que necesites
+            'programming_id' => $programming->id,
+            'contactByGroup_id' => $contactByGroup->id,
+            'state' => 1, // Asumimos que 1 es el estado de activo
+        ]);
+        $contactByGroup->contact->updateDetailContactData();
+
+        return response()->json($detailNuevo, 200);
+    }
 }
