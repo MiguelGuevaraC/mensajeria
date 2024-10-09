@@ -98,6 +98,13 @@ class SendWhatsappMessage extends Command
                 Log::info('Enviando último paquete de mensajes', ['cantidad' => count($contactByGroupPaquete)]);
             }
 
+            $programming->quantitySend = $totalEnviados;
+            $programming->errors = $totalErrores;
+            $programming->success = $totalExitosos;
+            $programming->dateSend = $fechaActual;
+
+            $programming->save();
+
         }
     }
 
