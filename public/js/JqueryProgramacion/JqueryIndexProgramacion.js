@@ -119,19 +119,19 @@ $(document).on("click", ".view-description", function () {
             const summaryHtml = `
     <div style="display: flex; flex-wrap: wrap; justify-content: space-around; margin-bottom: 10px;">
         <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
-            <i class="fas fa-calendar-alt" style="font-size: 4vw; color: #3085d6;"></i>
+            <i class="fas fa-calendar-alt" style="font-size: 3vw; color: #3085d6;"></i>
             <p style="margin: 5px 0;"><b>Fecha de Programación:</b><br>${formattedDateProgram}</p>
         </div>
         <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
-            <i class="fas fa-paper-plane" style="font-size: 4vw; color: #3085d6;"></i>
+            <i class="fas fa-paper-plane" style="font-size: 3vw; color: #3085d6;"></i>
             <p style="margin: 5px 0;"><b>Fecha de Envío:</b><br>${formattedDateSend}</p>
         </div>
         <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
-            <i class="fas fa-clock" style="font-size: 4vw; color: #3085d6;"></i>
+            <i class="fas fa-clock" style="font-size: 3vw; color: #3085d6;"></i>
             <p style="margin: 5px 0;"><b>Fecha de Registro:</b><br>${formattedCreatedAt}</p>
         </div>
         <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
-            <i class="fas fa-envelope" style="font-size: 4vw; color: #3085d6;"></i>
+            <i class="fas fa-envelope" style="font-size: 3vw; color: #3085d6;"></i>
             <p style="margin: 5px 0;"><b>Registros Enviados:</b><br>${data.count}</p>
         </div>
     </div>
