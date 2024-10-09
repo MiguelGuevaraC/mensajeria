@@ -9,9 +9,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <?php
-    $vista = 'Reporte Mensajería';
+    $vista = 'Programaciones';
     $categoriaActual = 'Movimientos';
-    $OpcionActual = 'mensajería';
+    $OpcionActual = 'programming';
     
     ?>
 
@@ -78,6 +78,60 @@
         .bg-light {
             background-color: #ffffff !important;
         }
+    </style>
+      <style>
+        input[type="search"] {
+            height: 12px;
+            /* Altura del campo de búsqueda */
+        }
+
+        .swal2-popup {
+            width: 800px !important;
+            /* Asegúrate de que el ancho deseado se aplique */
+           
+            /* Permitir que sea más estrecho si es necesario */
+        }
+        .toggleContainer{
+         position: relative;
+          width: 90px;
+          height: 30px;
+      }
+      .toggle{
+          position: absolute;
+          width: 0;
+          height: 0;
+          & + .switch{
+              position:relative;
+              display: block;
+              background: lightgray;
+              width: 90px;
+              height: 20px;
+              cursor: pointer;
+              border-radius: 30px;
+              transition: 0.5s;
+          }
+          &:checked + .switch{
+              background: #3085d6;
+          }
+          & + .switch:before{
+              content:"";
+              position: absolute;
+              width: 20px;
+              height: 20px;
+              top: 50%;
+              transform: translateY(-50%);
+              background: black;
+              border-radius: 50%;
+              margin: 0px 2px;
+              left: 0%;
+              transition: 1s;
+          }
+          &:checked + .switch:before{
+              left: 100%;
+              transform: translate(calc(-100% - 2px), -50%);
+          }
+      }
+  
     </style>
 </head>
 
@@ -221,18 +275,18 @@
                                     <button type="submit" id="search" class="btn btn-primary">
                                         <i class="fa-solid fa-magnifying-glass"></i> BUSCAR
                                     </button>
-                                    <button id="savePdf" class="btn btn-danger">
+                                    {{-- <button id="savePdf" class="btn btn-danger">
                                         <i class="fas fa-file-pdf"></i> DESCARGAR PDF
                                     </button>
                                     <button id="saveExcel" class="btn btn-success">
                                         <i class="fas fa-file-excel"></i> DESCARGAR EXCEL
-                                    </button>
+                                    </button> --}}
                                 </div>
                             </div>
                         </form>
 
                         <div class="">
-                            @include('Modulos.Mensajeria.Tables.tablaMensajeria')
+                            @include('Modulos.Programacion.Tables.tablaProgramacion')
                         </div>
                     </div>
                 </div>
@@ -394,9 +448,9 @@
 
 
     <!-- MODALES -->
-    <div>@include('Modulos.Mensajeria.Modals.modalEditarMensajeria')</div>
+    <div>@include('Modulos.Programacion.Modals.modalEditarProgramacion')</div>
 
-    <div>@include('Modulos.Mensajeria.Modals.modalCrearMensajeria')</div>
+    <div>@include('Modulos.Programacion.Modals.modalCrearProgramacion')</div>
 
 
     <!--===================================================-->
@@ -458,11 +512,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
     <!--Modals [ SAMPLE ]-->
-    <script src="{{ asset('js/JqueryMensajeria/JqueryIndexMensajeria.js') }}"></script>
-    <script src="{{ asset('js/JqueryMensajeria/JqueryDestroyMensajeria.js') }}"></script>
-    <script src="{{ asset('js/JqueryMensajeria/JqueryCreateMensajeria.js') }}"></script>
-    <script src="{{ asset('js/JqueryMensajeria/JqueryEditMensajeria.js') }}"></script>
-    <script src="{{ asset('js/JqueryMensajeria/JqueryUpdateMensajeria.js') }}"></script>
+    <script src="{{ asset('js/JqueryProgramacion/JqueryIndexProgramacion.js') }}"></script>
+    <script src="{{ asset('js/JqueryProgramacion/JqueryDestroyProgramacion.js') }}"></script>
+    <script src="{{ asset('js/JqueryProgramacion/JqueryCreateProgramacion.js') }}"></script>
+    <script src="{{ asset('js/JqueryProgramacion/JqueryEditProgramacion.js') }}"></script>
+    <script src="{{ asset('js/JqueryProgramacion/JqueryUpdateProgramacion.js') }}"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 

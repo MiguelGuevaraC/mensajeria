@@ -37,9 +37,16 @@ class ContactByGroupController extends Controller
         $contactByGroup->save();
 
         $contact = Contact::find($contactByGroup->id);
+        if (!$contact) {
+            return response()->json(
+                ['message' => 'Contacto no Encontrado'], 404
+            );
+        }
+
         $validatedData = $request->validated();
         $validatedData['state'] = 1;
         $contact->update($validatedData);
+        $contact->updateDetailContactData();
 
         return response()->json($contact);
     }

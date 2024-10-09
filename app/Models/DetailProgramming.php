@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -10,6 +9,15 @@ class DetailProgramming extends Model
 {
     use SoftDeletes;
     protected $fillable = [
+        'documentNumber',
+        'names',
+        'telephone',
+        'address',
+        'concept',
+        'amount',
+        'dateReference',
+        'routeFile',
+
         'status',
         'programming_id',
         'contactByGroup_id',
@@ -31,5 +39,6 @@ class DetailProgramming extends Model
         return $this->belongsTo(ContactByGroup::class, 'contactByGroup_id');
     }
 
-    
+
+
 }

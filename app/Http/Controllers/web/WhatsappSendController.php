@@ -143,11 +143,12 @@ class WhatsappSendController extends Controller
                 // Crear registros de DetailProgramming para cada contacto
                 foreach ($contactByGroupPaquete as $contactByGroup) {
                     DetailProgramming::create([
-                        'status' => 'pending', // Puedes usar otro estado que necesites
+                        'status' => 'Pendiente', // Puedes usar otro estado que necesites
                         'programming_id' => $programming->id,
                         'contactByGroup_id' => $contactByGroup->id,
                         'state' => 1, // Asumimos que 1 es el estado de activo
                     ]);
+                    $contactByGroup->contact->updateDetailContactData();
                 }
 
                 Log::info('Enviando paquete de mensajes', ['cantidad' => count($contactByGroupPaquete)]);
@@ -163,11 +164,12 @@ class WhatsappSendController extends Controller
             // Crear registros de DetailProgramming para cada contacto
             foreach ($contactByGroupPaquete as $contactByGroup) {
                 DetailProgramming::create([
-                    'status' => 'pending', // Puedes usar otro estado que necesites
+                    'status' => 'Pendiente', // Puedes usar otro estado que necesites
                     'programming_id' => $programming->id,
                     'contactByGroup_id' => $contactByGroup->id,
                     'state' => 1, // Asumimos que 1 es el estado de activo
                 ]);
+                $contactByGroup->contact->updateDetailContactData();
             }
 
             Log::info('Enviando último paquete de mensajes', ['cantidad' => count($contactByGroupPaquete)]);

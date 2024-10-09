@@ -13,6 +13,7 @@ use App\Http\Controllers\web\MessageController;
 use App\Http\Controllers\web\MigrationController;
 use App\Http\Controllers\web\OptionMenuController;
 use App\Http\Controllers\web\PerfilController;
+use App\Http\Controllers\web\ProgrammingController;
 use App\Http\Controllers\web\SendReportController;
 use App\Http\Controllers\web\TypeUserController;
 use App\Http\Controllers\web\UserController;
@@ -166,4 +167,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('perfilD', [PerfilController::class, 'index']);
 
+    Route::get('programming', [ProgrammingController::class, 'index']);
+    Route::get('programmingAll', [ProgrammingController::class, 'all']);
+    Route::get('programming/{id}', [ProgrammingController::class, 'show']);
 });
