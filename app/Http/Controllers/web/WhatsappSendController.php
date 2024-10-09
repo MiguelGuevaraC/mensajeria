@@ -137,8 +137,7 @@ class WhatsappSendController extends Controller
 
             // Si el paquete de contactos alcanza los 50, despacha un job y almacena la respuesta
             if (count($contactByGroupPaquete) >= 50) {
-                $response = SendWhatsappJob::dispatch($contactByGroupPaquete, $user, $message_id,$typeSend,$programming->id)
-                    ->delay($dateProgram);
+  
 
                 // Crear registros de DetailProgramming para cada contacto
                 foreach ($contactByGroupPaquete as $contactByGroup) {
@@ -159,14 +158,6 @@ class WhatsappSendController extends Controller
         if (count($contactByGroupPaquete) > 0) {
   
             $delay = $dateProgram->diffInSeconds(now());
-
-            if ($delay > 0) {
-                $response = SendWhatsappJob::dispatch($contactByGroupPaquete, $user, $message_id,$typeSend,$programming->id)
-                    ->delay(now()->addSeconds($delay)); // Usa now()->addSeconds($delay) para establecer el retraso correcto
-            } else {
-                Log::warning('La fecha de envío debe ser en el futuro. No se enviará el mensaje.', ['user_id' => $user_id]);
-                
-            }
 
             // Crear registros de DetailProgramming para cada contacto
             foreach ($contactByGroupPaquete as $contactByGroup) {

@@ -30,4 +30,6 @@ class DetailProgramming extends Model
     {
         return $this->belongsTo(ContactByGroup::class, 'contactByGroup_id');
     }
+
+    
 }

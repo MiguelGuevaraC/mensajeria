@@ -19,6 +19,7 @@ return new class extends Migration
             $table->dateTime('dateProgram')->nullable(); // Campo 'dataReference'
             $table->dateTime('dateSend')->nullable(); // Fecha de envío
             $table->foreignId('user_id')->nullable()->unsigned()->constrained('users');
+            $table->foreignId('messageWhasapp_id')->nullable()->unsigned()->constrained('message_whasapps');
             
             $table->boolean('state')->nullable()->default(1); // Campo 'state'
             $table->timestamps();
