@@ -101,9 +101,9 @@ class ProgrammingController extends Controller
                         case 'dateProgram':
                             $query->where('dateProgram', 'like', '%' . $searchValue . '%');
                             break;
-                            case 'created_at':
-                                $query->where('created_at', 'like', '%' . $searchValue . '%');
-                                break;
+                        case 'created_at':
+                            $query->where('created_at', 'like', '%' . $searchValue . '%');
+                            break;
                         case 'status':
                             $query->where('status', 'like', '%' . $searchValue . '%');
                             break;
@@ -149,28 +149,29 @@ class ProgrammingController extends Controller
         $message = Programming::withTrashed()
             ->with([
                 'user' => function ($query) {
-                    
+                    // Puedes agregar más filtros o campos en esta consulta si es necesario
                 },
                 'user.company' => function ($query) {
-            
+                    // Puedes agregar más filtros o campos en esta consulta si es necesario
                 },
-
                 'detailProgramming' => function ($query) {
-                    $query->withTrashed(); // Incluir contactos eliminados
+                    $query->withTrashed() // Incluir detalles de programación eliminados
+                        ->where('state', 1); // Filtrar solo los registros con state 1
                 },
             ])
             ->find($id);
-    
+
         // Verificar si se encontró la programación
         if (!$message) {
             return response()->json(
                 ['message' => 'Programación no encontrada'], 404
             );
         }
-    
+
+        // Agregar el conteo de los detailProgramming (incluyendo los eliminados)
+        $message->count = $message->detailProgramming->count();
+
         return response()->json($message, 200);
     }
-    
-    
 
 }

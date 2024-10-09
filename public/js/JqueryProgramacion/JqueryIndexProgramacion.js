@@ -80,14 +80,22 @@ var columns = [
     {
         data: "id",
         render: function (data, type, row) {
-            return (
+            let viewButton =
                 '<a style="background:green; color:white; margin-right:5px;" class="view-description btn btn-success" data-description="' +
                 data +
-                '" title="Ver"><i class="fa-solid fa-eye"></i></a>' +
+                '" title="Ver"><i class="fa-solid fa-eye"></i></a>';
+
+            let editButton =
                 '<a style="background:blue; color:white;" class="edit-description btn btn-primary" data-description="' +
                 data +
-                '" title="Editar"><i class="fa-solid fa-edit"></i></a>'
-            );
+                '" title="Editar"><i class="fa-solid fa-edit"></i></a>';
+
+            // Si el estado no es 'Enviado', muestra el botón de editar
+            if (row.status !== "Enviado") {
+                return viewButton + editButton;
+            } else {
+                return viewButton; // Solo muestra el botón de ver si está "Enviado"
+            }
         },
     },
 ];
@@ -102,26 +110,33 @@ $(document).on("click", ".view-description", function () {
         success: function (data) {
             // Formatear las fechas
             const formattedDateProgram = formatDate(data.dateProgram);
-            const formattedDateSend = data.dateSend ? formatDate(data.dateSend) : "No disponible";
+            const formattedDateSend = data.dateSend
+                ? formatDate(data.dateSend)
+                : "Aun no Enviado";
             const formattedCreatedAt = formatDate(data.created_at);
 
             // Resumen informativo
             const summaryHtml = `
-            <div style="display: flex; justify-content: space-around; margin-bottom: 10px;">
-                <div style="text-align: center;">
-                    <i class="fas fa-calendar-alt" style="font-size: 24px; color: #3085d6;"></i>
-                    <p style="margin: 5px 0;"><b>Fecha de Programación:</b><br>${formattedDateProgram}</p>
-                </div>
-                <div style="text-align: center;">
-                    <i class="fas fa-paper-plane" style="font-size: 24px; color: #3085d6;"></i>
-                    <p style="margin: 5px 0;"><b>Fecha de Envío:</b><br>${formattedDateSend}</p>
-                </div>
-                <div style="text-align: center;">
-                    <i class="fas fa-clock" style="font-size: 24px; color: #3085d6;"></i>
-                    <p style="margin: 5px 0;"><b>Fecha de Registro:</b><br>${formattedCreatedAt}</p>
-                </div>
-            </div>
-        `;
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-around; margin-bottom: 10px;">
+        <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
+            <i class="fas fa-calendar-alt" style="font-size: 4vw; color: #3085d6;"></i>
+            <p style="margin: 5px 0;"><b>Fecha de Programación:</b><br>${formattedDateProgram}</p>
+        </div>
+        <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
+            <i class="fas fa-paper-plane" style="font-size: 4vw; color: #3085d6;"></i>
+            <p style="margin: 5px 0;"><b>Fecha de Envío:</b><br>${formattedDateSend}</p>
+        </div>
+        <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
+            <i class="fas fa-clock" style="font-size: 4vw; color: #3085d6;"></i>
+            <p style="margin: 5px 0;"><b>Fecha de Registro:</b><br>${formattedCreatedAt}</p>
+        </div>
+        <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
+            <i class="fas fa-envelope" style="font-size: 4vw; color: #3085d6;"></i>
+            <p style="margin: 5px 0;"><b>Registros Enviados:</b><br>${data.count}</p>
+        </div>
+    </div>
+`;
+
 
             // Tabla con DataTables
             let tableContent = `
@@ -154,7 +169,7 @@ $(document).on("click", ".view-description", function () {
             Swal.fire({
                 title: "Detalles de la Programación",
                 html: `
-                    <div style="padding:0px 15px;max-height: 400px; overflow-y: auto;">
+                    <div style="padding:0px 15px;max-height: 300px; overflow-y: auto;">
                         ${summaryHtml}
                         ${tableContent}
                     </div>
@@ -163,12 +178,10 @@ $(document).on("click", ".view-description", function () {
                 showCancelButton: false, // Asegúrate de que esto esté configurado como false
                 showConfirmButton: false,
                 confirmButtonText: "", // Sin texto para el botón de confirmación
-                
-
             });
 
             // Inicializar DataTables después de que el DOM esté completamente cargado
-            $('#contactsTable').DataTable({
+            $("#contactsTable").DataTable({
                 paging: true, // Activar paginación
                 searching: true, // Mostrar buscador
                 info: false, // Ocultar información adicional (opcional)
@@ -177,10 +190,10 @@ $(document).on("click", ".view-description", function () {
                 language: {
                     paginate: {
                         previous: "Anterior",
-                        next: "Siguiente"
+                        next: "Siguiente",
                     },
                     search: "Buscar:", // Personalización del buscador
-                }
+                },
             });
         },
         error: function (xhr, status, error) {
@@ -194,7 +207,6 @@ $(document).on("click", ".view-description", function () {
         },
     });
 });
-
 
 // Función para formatear la fecha
 function formatDate(dateString) {
