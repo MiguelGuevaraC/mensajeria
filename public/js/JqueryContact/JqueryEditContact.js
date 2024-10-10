@@ -32,7 +32,7 @@ function editRol(id) {
         },
     });
 }
-let idContactByGroupGlobal=null; // Variable global para almacenar el idContactByGroup
+let idContactByGroupGlobal = null; // Variable global para almacenar el idContactByGroup
 
 function addProgramming(idContactByGroup) {
     idContactByGroupGlobal = idContactByGroup; // Asignar a la variable global
@@ -60,7 +60,13 @@ function addProgramming(idContactByGroup) {
             // Crear las opciones del selector de programación
             let optionsHtml = "";
             programmingResponse.forEach(function (programming, index) {
-                optionsHtml += `<option value="${programming.id}" ${index === 0 ? "selected" : ""}>${programming.dateProgram + " | " + programming.message_whasapp.title}</option>`;
+                optionsHtml += `<option value="${programming.id}" ${
+                    index === 0 ? "selected" : ""
+                }>${
+                    programming.dateProgram +
+                    " | " +
+                    programming.message_whasapp.title
+                }</option>`;
             });
 
             // Reemplazar los datos del HTML con la respuesta del servidor
@@ -120,29 +126,53 @@ function addProgramming(idContactByGroup) {
 }
 
 // Función separada para manejar el evento click del botón "Agregar"
-$(document).on('click', '#btnAddProgramming', function () {
-    const selectedProgrammingId = $('#selectProgramming').val();
- 
-    // Realizar la solicitud AJAX para agregar el detalle de programación
-    $.ajax({
-        url: `addDetailProgramming`,
-        type: "GET", // Si usas GET
-        data: {
-            idContactByGroup: idContactByGroupGlobal, // Usar la variable global
-            idProgramming: selectedProgrammingId
-        },
-        success: function (response) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Agregado',
-                text: 'El detalle de la programación fue agregado exitosamente.',
-            });
-        },
-        error: function (xhr, status, error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudo agregar el detalle de la programación.',
+$(document).on("click", "#btnAddProgramming", function () {
+    const selectedProgrammingId = $("#selectProgramming").val();
+
+    // Validación de confirmación con SweetAlert2
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Estás a punto de agregar este detalle de programación. ¿Quieres continuar?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, agregar",
+        cancelButtonText: "Cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Realizar la solicitud AJAX para agregar el detalle de programación
+            $.ajax({
+                url: `addDetailProgramming`,
+                type: "GET", // Si usas GET
+                data: {
+                    idContactByGroup: idContactByGroupGlobal, // Usar la variable global
+                    idProgramming: selectedProgrammingId,
+                },
+                success: function (response) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Agregado",
+                        html: `
+                            <p>El contacto fue agregado exitosamente a la programación.</p>
+                            <a href="programming" target="_blank" class="btn btn-primary" style="margin-top: 10px;">
+                                Ir a ver programaciones
+                            </a>
+                        `,
+                        showCloseButton: true, // Oculta el botón de cerrar (X)
+                        showCancelButton: false, // Asegúrate de que esto esté configurado como false
+                        showConfirmButton: false,
+                        confirmButtonText: "", 
+                    });
+                }
+                ,
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "No se pudo agregar el detalle de la programación.",
+                    });
+                },
             });
         }
     });

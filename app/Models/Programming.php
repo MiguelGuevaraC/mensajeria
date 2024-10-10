@@ -14,6 +14,7 @@ class Programming extends Model
         'status',
         'user_id',
         'state',
+        'date_cancel',
         'created_at',
         'messageSend',
         'messageWhasapp_id',

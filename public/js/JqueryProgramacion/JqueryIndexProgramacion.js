@@ -80,21 +80,25 @@ var columns = [
     {
         data: "id",
         render: function (data, type, row) {
-            let viewButton =
-                '<a style="background:green; color:white; margin-right:5px;" class="view-description btn btn-success" data-description="' +
-                data +
-                '" title="Ver"><i class="fa-solid fa-eye"></i></a>';
+            let viewButton = `<a style="background:green; color:white; margin-right:5px;" 
+                class="view-description btn btn-success" data-description="${data}" title="Ver">
+                <i class="fa-solid fa-eye"></i></a>`;
 
-            let editButton =
-                '<a style="background:blue; color:white;" class="edit-description btn btn-primary" data-description="' +
-                data +
-                '" title="Editar"><i class="fa-solid fa-edit"></i></a>';
+            let editButton = `<a style="background:blue; color:white; margin-right:5px;" 
+                class="edit-description btn btn-primary" data-description="${data}" title="Editar">
+                <i class="fa-solid fa-edit"></i></a>`;
 
-            // Si el estado no es 'Enviado', muestra el botón de editar
-            if (row.status !== "Enviado") {
-                return viewButton + editButton;
-            } else {
-                return viewButton; // Solo muestra el botón de ver si está "Enviado"
+            let cancelButton = `<a style="background:red; color:white;" 
+                class="cancel-description btn btn-danger" data-description="${data}" title="Cancelar">
+                <i class="fa-solid fa-rectangle-xmark"></i></a>`;
+
+            // Si el estado no es 'Enviado', muestra los botones de editar y cancelar
+            if (row.status == "Enviado") {
+                return viewButton;
+            } else if(row.status == "Cancelado") {
+                return viewButton;
+            }else if(row.status == "Pendiente"){
+                return editButton + cancelButton;
             }
         },
     },
@@ -137,7 +141,6 @@ $(document).on("click", ".view-description", function () {
     </div>
 `;
 
-
             // Tabla con DataTables
             let tableContent = `
                 <table id="contactsTable" class="display" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -167,7 +170,9 @@ $(document).on("click", ".view-description", function () {
             let mensaje = `
             <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);">
                 <label for="messageSend" style="font-weight: bold; color: #333; font-size: 14px;">Mensaje:</label><br>
-                <textarea id="messageSend" style="width: 100%; height: 70px; margin-top: 5px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none; font-family: Arial, sans-serif; font-size: 14px; color: #555;" readonly>${data.messageSend?? ''}</textarea>
+                <textarea id="messageSend" style="width: 100%; height: 70px; margin-top: 5px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none; font-family: Arial, sans-serif; font-size: 14px; color: #555;" readonly>${
+                    data.messageSend ?? ""
+                }</textarea>
             </div>
         `;
 
@@ -212,6 +217,176 @@ $(document).on("click", ".view-description", function () {
                 confirmButtonText: "Aceptar",
             });
         },
+    });
+});
+
+$(document).on("click", ".edit-description", function () {
+    var idProgramming = $(this).data("description");
+
+    // Realizar la llamada AJAX
+    $.ajax({
+        url: "programming/" + idProgramming, // Ruta para obtener la programación
+        type: "GET",
+        success: function (data) {
+            // Formatear las fechas
+            const formattedDateProgram = formatDate(data.dateProgram);
+            const formattedDateSend = data.dateSend
+                ? formatDate(data.dateSend)
+                : "Aun no Enviado";
+            const formattedCreatedAt = formatDate(data.created_at);
+
+            // Resumen informativo
+            const summaryHtml = `
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-around; margin-bottom: 10px;">
+        <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
+            <i class="fas fa-calendar-alt" style="font-size: 3vw; color: #3085d6;"></i>
+            <p style="margin: 5px 0;"><b>Fecha de Programación:</b><br>${formattedDateProgram}</p>
+        </div>
+        <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
+            <i class="fas fa-paper-plane" style="font-size: 3vw; color: #3085d6;"></i>
+            <p style="margin: 5px 0;"><b>Fecha de Envío:</b><br>${formattedDateSend}</p>
+        </div>
+        <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
+            <i class="fas fa-clock" style="font-size: 3vw; color: #3085d6;"></i>
+            <p style="margin: 5px 0;"><b>Fecha de Registro:</b><br>${formattedCreatedAt}</p>
+        </div>
+        <div style="text-align: center; flex: 1 1 150px; margin-bottom: 10px;">
+            <i class="fas fa-envelope" style="font-size: 3vw; color: #3085d6;"></i>
+            <p style="margin: 5px 0;"><b>Contactos:</b><br>${data.count}</p>
+        </div>
+    </div>
+`;
+
+            // Tabla con DataTables
+            let tableContent = `
+                <table id="contactsTable" class="display" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center;border: 0.5px solid #ffffff; padding: 8px;">Nombre</th>
+                            <th style="text-align:center;border: 0.5px solid #ffffff; padding: 8px;">Teléfono</th>
+                             <th style="text-align:center;border: 0.5px solid #ffffff; padding: 8px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Agregar filas de contacts_by_group
+            data.detail_programming.forEach((contactByGroup) => {
+                tableContent += `
+                  <tr>
+    <td style="border: 0.5px solid #ffffff; padding: 8px;">${contactByGroup.names}</td>
+    <td style="border: 0.5px solid #ffffff; padding: 8px;">${contactByGroup.telephone}</td>
+    <td style="border: 0.5px solid #ffffff; padding: 8px; text-align: center;">
+        <i class="fas fa-trash-alt" style="cursor: pointer; color: red;" title="Eliminar contacto"></i>
+    </td>
+</tr>
+
+                `;
+            });
+
+            tableContent += `
+                    </tbody>
+                </table>
+            `;
+            let mensaje = `
+            <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);">
+                <label for="messageSend" style="font-weight: bold; color: #333; font-size: 14px;">Mensaje:</label><br>
+                <textarea id="messageSend" style="width: 100%; height: 70px; margin-top: 5px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none; font-family: Arial, sans-serif; font-size: 14px; color: #555;" readonly>${
+                    data.messageSend ?? ""
+                }</textarea>
+            </div>
+        `;
+
+            // Mostrar SweetAlert con la tabla de contactos y resumen
+            Swal.fire({
+                title: "Editar la Programación",
+                html: `
+                    <div style="padding:0px 15px;max-height: 400px; overflow-y: auto;">
+                        ${summaryHtml}
+                        ${tableContent}
+                        ${mensaje}
+                    </div>
+                `,
+                showCloseButton: true, // Oculta el botón de cerrar (X)
+                showCancelButton: false, // Asegúrate de que esto esté configurado como false
+                showConfirmButton: false,
+                confirmButtonText: "", // Sin texto para el botón de confirmación
+            });
+
+            // Inicializar DataTables después de que el DOM esté completamente cargado
+            $("#contactsTable").DataTable({
+                paging: true, // Activar paginación
+                searching: true, // Mostrar buscador
+                info: false, // Ocultar información adicional (opcional)
+                lengthChange: false, // Desactivar el cambio del número de resultados mostrados por página
+                pageLength: 5, // Número de filas por página
+                language: {
+                    paginate: {
+                        previous: "Anterior",
+                        next: "Siguiente",
+                    },
+                    search: "Buscar:", // Personalización del buscador
+                },
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error en la solicitud AJAX:", error);
+            Swal.fire({
+                title: "Error",
+                text: "No se pudo recuperar la información de la programación.",
+                icon: "error",
+                confirmButtonText: "Aceptar",
+            });
+        },
+    });
+});
+
+$(document).on("click", ".cancel-description", function () {
+    var idProgramming = $(this).data("description");
+
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Estás a punto de cancelar esta programación. ¿Quieres continuar?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, agregar",
+        cancelButtonText: "Cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Realizar la solicitud AJAX para agregar el detalle de programación
+            $.ajax({
+                url: `cancelProgramming`,
+                type: "GET", // Si usas GET
+                data: {
+                    idProgramming: idProgramming,
+                },
+                success: function (response) {
+                    Swal.fire({
+                        icon: "success",
+                        title: '¡Programación Cancelada!',
+    html: `
+        <div style="text-align: center; font-size: 16px; margin-top: 10px;">
+            <p style="margin-bottom: 15px;">La programación ha sido cancelada con éxito.</p>
+        </div>
+    `,
+                        showCloseButton: true, // Oculta el botón de cerrar (X)
+                        showCancelButton: false, // Asegúrate de que esto esté configurado como false
+                        showConfirmButton: false,
+                        confirmButtonText: "",
+                    });
+                    $("#tbProgramaciones").DataTable().ajax.reload(null, false);
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "No se pudo agregar el detalle de la programación.",
+                    });
+                },
+            });
+        }
     });
 });
 
@@ -442,6 +617,8 @@ $(document).ready(function () {
                     $(row).css("background-color", "rgb(255 217 102 / 25%)"); // Amarillo anaranjado
                 } else if (data.status === "Enviado") {
                     $(row).css("background-color", "rgb(144 238 144 / 41%)"); // Verde
+                }else if (data.status === "Cancelado") {
+                    $(row).css("background-color", "rgb(251 0 48 / 25%)"); // Verde
                 }
             },
         });

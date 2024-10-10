@@ -173,4 +173,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('showContactForAddProgramming/{id}', [ProgrammingController::class, 'showPendientes']);
     Route::get('addDetailProgramming', [ProgrammingController::class, 'addDetailProgramming']);
+
+    Route::get('cancelProgramming', [ProgrammingController::class, 'cancelProgramming']);
 });

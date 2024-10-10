@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('status')->nullable()->default("Pendiente"); // Campo 'type'
             $table->dateTime('dateProgram')->nullable(); // Campo 'dataReference'
             $table->dateTime('dateSend')->nullable(); // Fecha de envío
+            $table->dateTime('date_cancel')->nullable(); // Fecha de cancelacion
             $table->integer('quantitySend')->nullable(); // Cantidad enviada
             $table->integer('errors')->nullable(); // Errores, puede ser nulo
             $table->integer('success')->nullable(); // Éxitos, puede ser nulo

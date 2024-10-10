@@ -191,6 +191,32 @@ class ProgrammingController extends Controller
         return response()->json($message, 200);
     }
 
+    public function cancelProgramming(Request $request)
+    {
+        $idProgramming = $request->get('idProgramming');
+    
+        // Buscar la programación con estado 'Pendiente'
+        $programming = Programming::where('status', 'Pendiente')
+            ->where('id', $idProgramming)
+            ->first();
+    
+        // Verificar si se encontró la programación
+        if (!$programming) {
+            return response()->json(['message' => 'Programación no encontrada'], 404);
+        }
+    
+        // Actualizar el estado de la programación a 'Cancelado' y registrar la fecha de cancelación
+        $programming->status = 'Cancelado';
+        $programming->date_cancel = now();
+        $programming->save();
+    
+        // Actualizar el estado de los detalles de la programación relacionados
+        $programming->detailProgramming()->update(['status' => 'Programación Cancelada']);
+    
+        return response()->json(['message' => 'Programación cancelada con éxito'], 200);
+    }
+    
+
     public function addDetailProgramming(Request $request)
     {
         $idContactByGroup = $request->get('idContactByGroup');
@@ -204,7 +230,7 @@ class ProgrammingController extends Controller
                 ['message' => 'El Contacto no fué encontrado'], 404
             );
         }
-    
+
         $programming = Programming::where('status', 'Pendiente')->find($idProgramming);
 
         if (!$programming) {

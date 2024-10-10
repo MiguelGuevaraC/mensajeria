@@ -115,6 +115,7 @@ class PersonImport implements ToModel, WithHeadingRow
                     'state' => 1,
                     'groupSend_id' => $currentGroup->id, // Asegurar que el grupo es actualizado
                 ]);
+                $existingContact->updateDetailContactData();
                 ContactByGroup::updateOrCreate(
                     ['contact_id' => $existingContact->id, 'groupSend_id' => $currentGroup->id],
                     ['state' => 1]
